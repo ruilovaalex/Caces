@@ -1,46 +1,97 @@
-import { GeneratedDoc } from '../types';
+import { Status, UploadedFile, GeneratedDoc, UploadPayload } from '../types';
+import { StorageService } from './storageService';
 
-const STORAGE_KEY = 'edusudamericano_evidences_v1';
+const STORAGE_KEY = 'edusudamericano_advanced_evidences_v2';
+const DOCS_STORAGE_KEY = 'edusudamericano_generated_docs_v2';
 
 export const EvidenceService = {
-  // Simula GET /api/evidences
-  getAll: (): GeneratedDoc[] => {
-    const data = localStorage.getItem(STORAGE_KEY);
-    return data ? JSON.parse(data) : [];
+  getAll: (): UploadedFile[] => {
+    return StorageService.get<UploadedFile[]>(STORAGE_KEY) || [];
   },
 
-  // Simula POST /api/evidences
-  save: (doc: GeneratedDoc): void => {
-    const all = EvidenceService.getAll();
+  getAllDocs: (): GeneratedDoc[] => {
+    return StorageService.get<GeneratedDoc[]>(DOCS_STORAGE_KEY) || [];
+  },
+
+  saveDoc: (doc: GeneratedDoc): void => {
+    const all = EvidenceService.getAllDocs();
     all.push(doc);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(all));
+    StorageService.set(DOCS_STORAGE_KEY, all);
   },
 
-  // Simula el proceso de subida de archivo real
-  upload: async (file: File, indicatorCode: string): Promise<GeneratedDoc> => {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        const newDoc: GeneratedDoc = {
-          id: Math.random().toString(36).substr(2, 9),
-          indicatorCode: indicatorCode,
-          templateId: 'upload',
-          content: `Archivo subido: ${file.name}`,
-          timestamp: new Date().toLocaleString(),
-          label: file.name,
-          isUpload: true,
-          fileSize: (file.size / 1024).toFixed(2) + ' KB',
-          fileType: file.type
-        };
-        EvidenceService.save(newDoc);
-        resolve(newDoc);
-      }, 1000); // Simulamos retardo de red
-    });
-  },
-
-  // Simula DELETE /api/evidences/:id
-  delete: (id: string): void => {
+  getByIndicator: (indicatorCode: string): UploadedFile[] => {
     const all = EvidenceService.getAll();
-    const filtered = all.filter(d => d.id !== id);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(filtered));
+    return all.filter(f => f.indicatorCode === indicatorCode);
+  },
+
+  getByRequirement: (indicatorCode: string, requirementId: string): UploadedFile[] => {
+    const all = EvidenceService.getAll();
+    return all.filter(f => f.indicatorCode === indicatorCode && f.requirementId === requirementId);
+  },
+
+  upload: async (file: File, payload: UploadPayload): Promise<UploadedFile> => {
+    const all = EvidenceService.getAll();
+    
+    // Desactivar versiones anteriores del mismo requerimiento en ese indicador
+    const updated = all.map(f => {
+      if (f.indicatorCode === payload.indicatorCode && f.requirementId === payload.requirementId) {
+        return { ...f, isCurrentVersion: false };
+      }
+      return f;
+    });
+
+    const newVersion = EvidenceService.getByRequirement(payload.indicatorCode, payload.requirementId).length + 1;
+
+    const newFile: UploadedFile = {
+      id: Math.random().toString(36).substr(2, 9),
+      indicatorCode: payload.indicatorCode,
+      requirementId: payload.requirementId,
+      requirementLabel: payload.requirementLabel,
+      fileName: file.name,
+      fileType: file.type || file.name.split('.').pop() || 'unknown',
+      fileSize: `${(file.size / 1024).toFixed(1)} KB`,
+      uploadDate: new Date().toLocaleString(),
+      uploadedBy: payload.uploadedBy,
+      version: newVersion,
+      status: 'Cargado',
+      observation: payload.observation,
+      isCurrentVersion: true
+    };
+
+    updated.push(newFile);
+    StorageService.set(STORAGE_KEY, updated);
+    return newFile;
+  },
+
+  updateStatus: (evidenceId: string, status: Status, observation?: string): void => {
+    const all = EvidenceService.getAll();
+    const updated = all.map(f => {
+      if (f.id === evidenceId) {
+        return { ...f, status, observation };
+      }
+      return f;
+    });
+    StorageService.set(STORAGE_KEY, updated);
+  },
+
+  updateNote: (evidenceId: string, note: string): void => {
+    const all = EvidenceService.getAll();
+    const updated = all.map(f => {
+      if (f.id === evidenceId) {
+        return { ...f, editableNote: note };
+      }
+      return f;
+    });
+    StorageService.set(STORAGE_KEY, updated);
+  },
+
+  deleteEvidence: (evidenceId: string): void => {
+    const all = EvidenceService.getAll();
+    const updated = all.filter(f => f.id !== evidenceId);
+    StorageService.set(STORAGE_KEY, updated);
+  },
+
+  getVersionHistory: (indicatorCode: string, requirementId: string): UploadedFile[] => {
+    return EvidenceService.getByRequirement(indicatorCode, requirementId).sort((a,b) => b.version - a.version);
   }
 };
