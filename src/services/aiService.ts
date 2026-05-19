@@ -15,48 +15,49 @@ const getAIClient = () => {
 export const AIService = {
   getRequirementGuide: async (indicator: Indicator, requirement: Requirement): Promise<string> => {
     const client = getAIClient();
-    
-    const prompt = `Actúa como un MENTOR y GUÍA experto en acreditación universitaria CACES (Ecuador). 
-      Tu objetivo es explicar cómo construir la evidencia específica "${requirement.label}" para el indicador "${indicator.code}: ${indicator.name}".
-      
+
+    const prompt = `Actua como un MENTOR y GUIA experto en acreditacion universitaria CACES (Ecuador).
+      Tu objetivo es explicar como construir la evidencia especifica "${requirement.label}" para el indicador "${indicator.code}: ${indicator.name}".
+
       DATOS DEL CONTEXTO:
-      - Institución: Instituto Tecnológico Superior EduSudamericano
+      - Institucion: Instituto Tecnologico Superior EduSudamericano
       - Indicador: ${indicator.code} - ${indicator.description}
       - Evidencia requerida: ${requirement.label}
-      - Descripción de la evidencia: ${requirement.description}
+      - Descripcion de la evidencia: ${requirement.description}
       - Formato esperado: ${requirement.format}
-      ${requirement.observation ? `- Observación actual del evaluador: ${requirement.observation}` : ""}
-      
+      ${requirement.observation ? `- Observacion actual del evaluador: ${requirement.observation}` : ""}
+
       ESTRUCTURA DE TU RESPUESTA (Usa Markdown profesional):
-      1. **Qué debe contener esta evidencia**: Detalles técnicos y legales.
-      2. **Organización del documento**: Cómo estructurar el archivo antes de subirlo.
+      1. **Que debe contener esta evidencia**: Detalles tecnicos y legales.
+      2. **Organizacion del documento**: Como estructurar el archivo antes de subirlo.
       3. **Errores a evitar**: Fallos comunes que provocan observaciones del CACES.
-      4. **Documentos complementarios**: Qué otros archivos podrían fortalecer esta evidencia.
-      5. **Nombre de archivo recomendado**: Sigue el estándar SIG-EV-${indicator.code}-...
-      6. **Recomendación final**: Consejo clave para asegurar la validación.`;
+      4. **Documentos complementarios**: Que otros archivos podrian fortalecer esta evidencia.
+      5. **Nombre de archivo recomendado**: Sigue el estandar SIG-EV-${indicator.code}-...
+      6. **Recomendacion final**: Consejo clave para asegurar la validacion.`;
 
     const response = await client.models.generateContent({
       model: "gemini-3-flash-preview",
       contents: prompt,
     });
 
-    return response.text || "No se pudo generar la guía.";
+    return response.text || "No se pudo generar la guia.";
   },
 
   getGuideline: async (indicator: Indicator, template: any): Promise<string> => {
     const client = getAIClient();
-    const prompt = `Como experto en acreditación CACES, genera una guía/plantilla para el documento "${template.label}" del indicador "${indicator.code}: ${indicator.name}".
-    Explica qué secciones debe tener, qué datos son críticos y cómo redactarlo para cumplir con los estándares de evaluación 2025.`;
+    const prompt = `Como experto en acreditacion CACES, genera una guia/plantilla para el documento "${template.label}" del indicador "${indicator.code}: ${indicator.name}".
+    Explica que secciones debe tener, que datos son criticos y como redactarlo para cumplir con los estandares de evaluacion 2025.`;
 
     const response = await client.models.generateContent({
       model: "gemini-3-flash-preview",
       contents: prompt,
     });
 
-    return response.text || "Error al generar guía.";
+    return response.text || "Error al generar guia.";
   },
 
   generateCoordinatorEvidenceGuide: async (data: {
+    action?: string;
     indicatorCode: string;
     indicatorName: string;
     indicatorDescription: string;
@@ -69,33 +70,42 @@ export const AIService = {
     observations?: string;
   }): Promise<string> => {
     const client = getAIClient();
-    
+    const actionGuide = {
+      guia_general: 'Explica el panorama completo de la evidencia y como abordarla desde cero.',
+      revisar_borrador: 'Evalua el borrador actual, detecta vacios y sugiere correcciones concretas.',
+      mejorar_redaccion: 'Redacta en tono tecnico, formal y mas convincente sin perder claridad.',
+      sugerir_nombre: 'Propon nombres de archivo y encabezados institucionales adecuados.',
+      help_section: 'Concentrate en la seccion activa y genera contenido accionable para completarla.'
+    } as const;
+
     const context = `
+      ACCION SOLICITADA: ${data.action || 'guia_general'}
       INDICADOR: ${data.indicatorCode} - ${data.indicatorName}
-      DESCRIPCIÓN INDICADOR: ${data.indicatorDescription}
+      DESCRIPCION INDICADOR: ${data.indicatorDescription}
       EVIDENCIA: ${data.evidenceName}
-      DESCRIPCIÓN EVIDENCIA: ${data.evidenceDescription}
+      DESCRIPCION EVIDENCIA: ${data.evidenceDescription}
       FORMATO: ${data.format}
       ${data.templateName ? `PLANTILLA SELECCIONADA: ${data.templateName}` : ""}
-      ${data.sectionName ? `SECCIÓN ACTUAL: ${data.sectionName}` : ""}
+      ${data.sectionName ? `SECCION ACTUAL: ${data.sectionName}` : ""}
       ${data.content ? `CONTENIDO ACTUAL DEL COORDINADOR: ${data.content}` : ""}
       ${data.observations ? `OBSERVACIONES PREVIAS: ${data.observations}` : ""}
     `;
 
-    const prompt = `Actúa como un ASESOR TÉCNICO EXPERTO para Coordinadores de Aseguramiento de la Calidad.
-      Tu misión es guiar al coordinador paso a paso para completar la evidencia mencionada arriba.
-      
-      Responde de forma práctica, directa y profesional. No uses texto genérico.
-      
-      ESTRUCTURA DE TU GUÍA:
-      1. **Qué completar**: Instrucción específica sobre qué información debe ir en esta evidencia o sección.
-      2. **Puntos de revisión**: Qué verificar antes de darla por terminada.
-      3. **Errores críticos**: Fallos técnicos o de contenido que invalidarían la evidencia ante el CACES.
-      4. **Anexos recomendados**: Qué documentos de respaldo (fotos, actas, listados) fortalecen esta evidencia.
-      5. **Mejora de texto**: ${data.content ? "Analiza el contenido actual y sugiere una redacción más técnica u oficial." : "Sugerencia de redacción inicial."}
-      6. **Recomendación de oro**: Un consejo experto final.
-      
-      DATOS TÉCNICOS:
+    const prompt = `Actua como un ASESOR TECNICO EXPERTO para Coordinadores de Aseguramiento de la Calidad.
+      Tu mision es guiar al coordinador paso a paso para completar la evidencia mencionada arriba.
+
+      Responde de forma practica, directa y profesional. No uses texto generico.
+      OBJETIVO DE ESTA RESPUESTA: ${actionGuide[data.action as keyof typeof actionGuide] || actionGuide.guia_general}
+
+      ESTRUCTURA DE TU GUIA:
+      1. **Que completar**: Instruccion especifica sobre que informacion debe ir en esta evidencia o seccion.
+      2. **Puntos de revision**: Que verificar antes de darla por terminada.
+      3. **Errores criticos**: Fallos tecnicos o de contenido que invalidarian la evidencia ante el CACES.
+      4. **Anexos recomendados**: Que documentos de respaldo (fotos, actas, listados) fortalecen esta evidencia.
+      5. **Mejora de texto**: ${data.content ? "Analiza el contenido actual y sugiere una redaccion mas tecnica u oficial." : "Sugerencia de redaccion inicial."}
+      6. **Recomendacion de oro**: Un consejo experto final.
+
+      DATOS TECNICOS:
       ${context}`;
 
     const response = await client.models.generateContent({
@@ -103,6 +113,6 @@ export const AIService = {
       contents: prompt,
     });
 
-    return response.text || "No se pudo generar la guía técnica.";
+    return response.text || "No se pudo generar la guia tecnica.";
   }
 };

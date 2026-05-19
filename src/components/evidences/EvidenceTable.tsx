@@ -1,15 +1,13 @@
 import React from 'react';
 import { Indicator, Requirement, UploadedFile, UserRole } from '../../types';
 import { EvidenceRow } from './EvidenceRow';
-import { Folder } from 'lucide-react';
+import { Folder, Info, PenSquare, Settings2, Upload } from 'lucide-react';
 
 interface EvidenceTableProps {
   indicator: Indicator;
   userRole: UserRole;
   getRequirementFiles: (reqId: string) => UploadedFile[];
-  onOpenManagement: (req: Requirement) => void;
   onOpenUpload: (req: Requirement) => void;
-  onRequestAI: (req: Requirement) => void;
   onOpenEditor: (req: Requirement) => void;
 }
 
@@ -17,9 +15,7 @@ export const EvidenceTable = ({
   indicator,
   userRole,
   getRequirementFiles,
-  onOpenManagement,
   onOpenUpload,
-  onRequestAI,
   onOpenEditor
 }: EvidenceTableProps) => {
   return (
@@ -29,7 +25,37 @@ export const EvidenceTable = ({
           <Folder className="w-4 h-4 text-blue-600" />
           Evidencias Requeridas por el CACES
         </h3>
-        <span className="text-[10px] font-bold text-blue-600/60 uppercase tracking-widest">Modelo de Evaluación v.2024</span>
+        <span className="text-[10px] font-bold text-blue-600/60 uppercase tracking-widest">Modelo de Evaluacion v.2024</span>
+      </div>
+
+      <div className="mx-8 mt-5 rounded-2xl border border-blue-100 bg-gradient-to-r from-blue-50 via-white to-emerald-50 p-4">
+        <div className="flex items-start gap-3">
+          <div className="mt-0.5 rounded-xl bg-white p-2 text-blue-600 shadow-sm border border-blue-100">
+            <Info className="w-4 h-4" />
+          </div>
+          <div className="flex-1">
+            <p className="text-sm font-black text-slate-800">Como usar esta seccion</p>
+            <p className="mt-1 text-xs text-slate-500 leading-relaxed">
+              Para cada evidencia, entra a editar para trabajar el contenido, revisar observaciones, usar la IA y aplicar plantillas sugeridas. Afuera solo dejas el boton azul para cargar la version final.
+            </p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {userRole === 'COORDINADOR' && (
+                <span className="inline-flex items-center gap-2 rounded-xl bg-white px-3 py-2 text-[10px] font-black uppercase tracking-wider text-emerald-700 border border-emerald-100">
+                  <PenSquare className="w-3.5 h-3.5" />
+                  1. Editar evidencia completa
+                </span>
+              )}
+              <span className="inline-flex items-center gap-2 rounded-xl bg-white px-3 py-2 text-[10px] font-black uppercase tracking-wider text-slate-700 border border-slate-200">
+                <Settings2 className="w-3.5 h-3.5" />
+                Incluye revision e IA
+              </span>
+              <span className="inline-flex items-center gap-2 rounded-xl bg-white px-3 py-2 text-[10px] font-black uppercase tracking-wider text-blue-700 border border-blue-100">
+                <Upload className="w-3.5 h-3.5" />
+                2. Subir version final
+              </span>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div className="flex-1 overflow-y-auto">
@@ -39,19 +65,17 @@ export const EvidenceTable = ({
               <th className="px-8 py-4">Evidencia Requerida</th>
               <th className="px-8 py-4 text-center">Formato</th>
               <th className="px-8 py-4 text-center">Estado</th>
-              <th className="px-8 py-4 text-right">Acciones de Gestión</th>
+              <th className="px-8 py-4 text-right">Acciones de Gestion</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-50">
             {indicator.requirements.map((req) => (
-              <EvidenceRow 
+              <EvidenceRow
                 key={req.id}
                 requirement={req}
                 userRole={userRole}
                 files={getRequirementFiles(req.id)}
-                onOpenManagement={onOpenManagement}
                 onOpenUpload={onOpenUpload}
-                onRequestAI={onRequestAI}
                 onOpenEditor={onOpenEditor}
               />
             ))}

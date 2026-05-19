@@ -1,28 +1,40 @@
 import { Indicator, UploadedFile } from '../types';
 
 export const calculateIndicatorProgress = (indicator: Indicator, allFiles: UploadedFile[]) => {
-  const reqs = indicator.requirements;
-  if (!reqs || reqs.length === 0) return 0;
-  
-  const validatedCount = reqs.filter(r => {
-    const files = allFiles.filter(f => f.requirementId === r.id && f.indicatorCode === indicator.code);
-    return files.some(f => f.status === 'Validado' && f.isCurrentVersion);
+  const requirements = indicator.requirements;
+  if (!requirements || requirements.length === 0) return 0;
+
+  const uploadedCount = requirements.filter(requirement => {
+    const files = allFiles.filter(
+      file => file.requirementId === requirement.id && file.indicatorCode === indicator.code
+    );
+    return files.some(file => file.isCurrentVersion);
   }).length;
 
-  return Math.round((validatedCount / reqs.length) * 100);
+  return Math.round((uploadedCount / requirements.length) * 100);
 };
 
 export const getIndicatorStats = (indicator: Indicator, allFiles: UploadedFile[]) => {
-  const reqs = indicator.requirements || [];
-  const total = reqs.length;
-  
-  const filesForInd = allFiles.filter(f => f.indicatorCode === indicator.code && f.isCurrentVersion);
-  
-  const valid = reqs.filter(r => filesForInd.some(f => f.requirementId === r.id && f.status === 'Validado')).length;
-  const loaded = reqs.filter(r => filesForInd.some(f => f.requirementId === r.id && f.status === 'Cargado')).length;
-  const observed = reqs.filter(r => filesForInd.some(f => f.requirementId === r.id && f.status === 'Observado')).length;
-  const rejected = reqs.filter(r => filesForInd.some(f => f.requirementId === r.id && f.status === 'Rechazado')).length;
-  const pending = total - valid - loaded - observed - rejected;
+  const requirements = indicator.requirements || [];
+  const total = requirements.length;
+
+  const filesForIndicator = allFiles.filter(
+    file => file.indicatorCode === indicator.code && file.isCurrentVersion
+  );
+
+  const loaded = requirements.filter(requirement =>
+    filesForIndicator.some(file => file.requirementId === requirement.id)
+  ).length;
+  const valid = requirements.filter(requirement =>
+    filesForIndicator.some(file => file.requirementId === requirement.id && file.status === 'Validado')
+  ).length;
+  const observed = requirements.filter(requirement =>
+    filesForIndicator.some(file => file.requirementId === requirement.id && file.status === 'Observado')
+  ).length;
+  const rejected = requirements.filter(requirement =>
+    filesForIndicator.some(file => file.requirementId === requirement.id && file.status === 'Rechazado')
+  ).length;
+  const pending = total - loaded;
 
   return { total, valid, loaded, observed, rejected, pending };
 };
