@@ -1,22 +1,25 @@
 import React, { useEffect, useState } from 'react';
-import { motion } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 import {
   X,
   Save,
   Sparkles,
+  Upload,
   FileText,
   History,
   ChevronRight,
   AlertCircle,
-  FileDown,
-  Eye,
   Layout,
+  LayoutDashboard,
   CheckCircle2,
   Clock,
   Info,
   PenSquare,
   Bot,
-  Wand2
+  ClipboardCheck,
+  ShieldAlert,
+  ShieldCheck,
+  ShieldX
 } from 'lucide-react';
 import {
   Indicator,
@@ -24,19 +27,27 @@ import {
   EvidenceDraft,
   EvidenceTemplate,
   DraftStatus,
-  UploadedFile
+  UploadedFile,
+  UserRole,
+  Status
 } from '../../types';
 import { EVIDENCE_TEMPLATES } from '../../data/evidenceTemplates';
 import { CoordinatorAIGuidePanel } from '../ai/CoordinatorAIGuidePanel';
+import { EvaluatorReviewGuidePanel } from '../evaluator/EvaluatorReviewGuidePanel';
+import { EvidenceVersionHistory } from '../evidences/EvidenceVersionHistory';
 import { DraftService } from '../../services/draftService';
 import { AIService } from '../../services/aiService';
-import { EvidenceService } from '../../services/evidenceService';
+import { canUserRequestAI, canUserUpload, canUserValidate } from '../../utils/permissions';
 
 interface CoordinatorEvidenceEditorProps {
   indicator: Indicator;
   requirement: Requirement;
   files: UploadedFile[];
+  userRole: UserRole;
   onClose: () => void;
+  onGoHome: () => void;
+  onUploadFinal: (req: Requirement) => void;
+  onUpdateEvidenceStatus: (evidenceId: string, status: Status, observation?: string) => void;
   currentUser: any;
 }
 
@@ -44,7 +55,11 @@ export const CoordinatorEvidenceEditor = ({
   indicator,
   requirement,
   files,
+  userRole,
   onClose,
+  onGoHome,
+  onUploadFinal,
+  onUpdateEvidenceStatus,
   currentUser
 }: CoordinatorEvidenceEditorProps) => {
   const [draft, setDraft] = useState<EvidenceDraft | null>(null);
@@ -52,12 +67,21 @@ export const CoordinatorEvidenceEditor = ({
   const [isGenerating, setIsGenerating] = useState(false);
   const [aiResponse, setAiResponse] = useState('');
   const [activeSectionId, setActiveSectionId] = useState<string | null>(null);
-  const [workspaceMode, setWorkspaceMode] = useState<'compose' | 'preview'>('compose');
+  const [showHistory, setShowHistory] = useState(false);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
+  const [reviewObservation, setReviewObservation] = useState('');
 
   const templates = EVIDENCE_TEMPLATES.filter(
     template => template.indicatorCode === indicator.code && template.requirementId === requirement.id
   );
+
+  const currentUserName = currentUser?.name || 'Usuario';
+  const currentFile = files.find(file => file.isCurrentVersion);
+  const canDraft = userRole === 'ADMIN' || userRole === 'COORDINADOR';
+  const canUseAI = canUserRequestAI(userRole);
+  const canReview = canUserValidate(userRole);
+  const canUpload = canUserUpload(userRole);
+  const evaluatorMode = userRole === 'EVALUADOR';
 
   useEffect(() => {
     const existingDraft = DraftService.getDraft(indicator.code, requirement.id);
@@ -69,8 +93,9 @@ export const CoordinatorEvidenceEditor = ({
     }
   }, [indicator.code, requirement.id]);
 
-  const currentUserName = currentUser?.name || 'Coordinador';
-  const currentFile = files.find(file => file.isCurrentVersion);
+  useEffect(() => {
+    setReviewObservation(currentFile?.observation || requirement.observation || '');
+  }, [currentFile?.id, currentFile?.observation, requirement.observation]);
 
   const createBlankDraft = (): EvidenceDraft => ({
     id: crypto.randomUUID(),
@@ -126,7 +151,6 @@ export const CoordinatorEvidenceEditor = ({
     setDraft(newDraft);
     setSelectedTemplate(template);
     setActiveSectionId(newDraft.sections[0]?.id || null);
-    setWorkspaceMode('compose');
     DraftService.saveDraft(newDraft);
   };
 
@@ -135,7 +159,6 @@ export const CoordinatorEvidenceEditor = ({
     setDraft(newDraft);
     setSelectedTemplate(null);
     setActiveSectionId(newDraft.sections[1]?.id || newDraft.sections[0]?.id || null);
-    setWorkspaceMode('compose');
     DraftService.saveDraft(newDraft);
   };
 
@@ -175,12 +198,9 @@ export const CoordinatorEvidenceEditor = ({
     setDraft(updatedDraft);
   };
 
-  const completedSections = draft?.sections.filter(section => section.content.trim()).length || 0;
-  const totalSections = draft?.sections.length || 0;
-  const completionPercent = totalSections > 0 ? Math.round((completedSections / totalSections) * 100) : 0;
-  const hasDraftContent = Boolean(draft && draft.sections.some(section => section.content.trim()));
-
   const handleRequestAI = async (action: string, sectionId?: string) => {
+    if (!canUseAI) return;
+
     setIsGenerating(true);
 
     const effectiveSectionId =
@@ -207,7 +227,7 @@ export const CoordinatorEvidenceEditor = ({
         templateName: selectedTemplate?.title || (!selectedTemplate && draft ? 'Borrador guiado' : undefined),
         sectionName: section?.title,
         content: section?.content,
-        observations: requirement.observation
+        observations: currentFile?.observation || requirement.observation
       });
       setAiResponse(response);
     } catch (error) {
@@ -250,130 +270,16 @@ export const CoordinatorEvidenceEditor = ({
     setActiveSectionId(targetSectionId);
   };
 
-  const normalizeFileName = (value: string) => value
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^a-zA-Z0-9]+/g, '_')
-    .replace(/^_+|_+$/g, '')
-    .toUpperCase();
-
-  const escapeHtml = (value: string) => value
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
-
-  const buildGeneratedDocument = () => {
-    if (!draft) return null;
-
-    const generatedAt = new Date();
-    const fileName = [
-      'SIG',
-      'EV',
-      normalizeFileName(indicator.code),
-      normalizeFileName(requirement.id),
-      generatedAt.toISOString().slice(0, 10).replace(/-/g, '')
-    ].join('-');
-
-    const sections = draft.sections.map((section, index) => `
-      <h2>${index + 1}. ${escapeHtml(section.title)}</h2>
-      <p>${escapeHtml(section.content || 'Contenido pendiente de completar.').replace(/\n/g, '<br />')}</p>
-    `).join('');
-
-    const html = `
-      <!doctype html>
-      <html>
-        <head>
-          <meta charset="utf-8" />
-          <title>${fileName}</title>
-          <style>
-            body { font-family: Arial, sans-serif; color: #1f2937; line-height: 1.55; margin: 44px; }
-            .brand { border-bottom: 3px solid #2563eb; padding-bottom: 16px; margin-bottom: 22px; }
-            .brand p { color: #64748b; font-size: 11px; font-weight: 700; letter-spacing: 1.4px; margin: 0 0 4px; text-transform: uppercase; }
-            h1 { font-size: 22px; margin: 0 0 8px; text-transform: uppercase; }
-            h2 { font-size: 15px; margin: 28px 0 8px; color: #0f172a; text-transform: uppercase; border-bottom: 1px solid #dbeafe; padding-bottom: 6px; }
-            p { font-size: 12px; margin: 0 0 10px; }
-            .meta { border: 1px solid #cbd5e1; padding: 14px; margin: 20px 0 24px; background: #f8fafc; }
-            .meta p { margin: 4px 0; }
-          </style>
-        </head>
-        <body>
-          <div class="brand">
-            <p>Instituto Superior Tecnologico Sudamericano</p>
-            <h1>Documento unico de evidencia</h1>
-            <p><strong>Codigo:</strong> ${fileName}</p>
-          </div>
-          <div class="meta">
-            <p><strong>Indicador:</strong> ${escapeHtml(indicator.code)} - ${escapeHtml(indicator.name)}</p>
-            <p><strong>Evidencia:</strong> ${escapeHtml(requirement.label)}</p>
-            <p><strong>Formato requerido:</strong> ${escapeHtml(requirement.format)}</p>
-            <p><strong>Generado por:</strong> ${escapeHtml(currentUserName)}</p>
-            <p><strong>Fecha:</strong> ${generatedAt.toLocaleString()}</p>
-          </div>
-          <h2>Descripcion de la evidencia</h2>
-          <p>${escapeHtml(requirement.description)}</p>
-          ${sections}
-        </body>
-      </html>
-    `;
-
-    return { fileName, html };
+  const handleReviewDecision = (status: Status) => {
+    if (!currentFile) return;
+    onUpdateEvidenceStatus(currentFile.id, status, reviewObservation.trim() || undefined);
   };
 
-  const persistGeneratedDocument = (fileName: string, html: string) => {
-    EvidenceService.saveDoc({
-      id: crypto.randomUUID(),
-      indicatorCode: indicator.code,
-      requirementId: requirement.id,
-      requirementLabel: requirement.label,
-      templateId: draft?.templateId || `blank-${indicator.code}-${requirement.id}`,
-      content: html,
-      timestamp: new Date().toLocaleString(),
-      label: fileName,
-      fileName: `${fileName}.doc`,
-      fileType: 'DOC',
-      isUpload: false
-    });
-
-    if (draft) {
-      const updatedDraft = {
-        ...draft,
-        status: 'DOCUMENTO_GENERADO' as DraftStatus,
-        updatedAt: new Date().toISOString(),
-        updatedBy: currentUserName
-      };
-      DraftService.saveDraft(updatedDraft);
-      setDraft(updatedDraft);
-    }
-  };
-
-  const handleDownloadGeneratedDocument = () => {
-    const generatedDocument = buildGeneratedDocument();
-    if (!generatedDocument) return;
-
-    const blob = new Blob(['\ufeff', generatedDocument.html], {
-      type: 'application/msword;charset=utf-8'
-    });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `${generatedDocument.fileName}.doc`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-    persistGeneratedDocument(generatedDocument.fileName, generatedDocument.html);
-  };
-
-  const generatedDocument = buildGeneratedDocument();
-
-  const getStatusBadge = (status: DraftStatus) => {
+  const getDraftStatusBadge = (status: DraftStatus) => {
     const styles = {
       SIN_INICIAR: 'bg-slate-100 text-slate-500',
       EN_EDICION: 'bg-blue-100 text-blue-600',
       BORRADOR_GUARDADO: 'bg-amber-100 text-amber-600',
-      DOCUMENTO_GENERADO: 'bg-emerald-100 text-emerald-600',
       LISTO_PARA_SUBIR: 'bg-emerald-100 text-emerald-600',
       ARCHIVO_FINAL_CARGADO: 'bg-purple-100 text-purple-600'
     };
@@ -396,36 +302,51 @@ export const CoordinatorEvidenceEditor = ({
         <div className="flex-1 flex flex-col h-full bg-white relative">
           <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-white sticky top-0 z-10">
             <div className="flex items-center gap-4">
-              <div className="h-10 w-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 border border-blue-100">
-                <FileText className="w-5 h-5" />
+              <div className={`h-10 w-10 rounded-xl flex items-center justify-center border ${
+                evaluatorMode ? 'bg-amber-50 text-amber-700 border-amber-100' : 'bg-blue-50 text-blue-600 border-blue-100'
+              }`}>
+                {evaluatorMode ? <ClipboardCheck className="w-5 h-5" /> : <FileText className="w-5 h-5" />}
               </div>
               <div>
                 <h2 className="font-black text-slate-800 tracking-tight">{requirement.label}</h2>
                 <div className="flex items-center gap-3 mt-0.5">
                   <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Indicador {indicator.code}</span>
                   <div className="h-1 w-1 rounded-full bg-slate-300" />
-                  {getStatusBadge(draft?.status || 'SIN_INICIAR')}
+                  {canDraft && draft ? getDraftStatusBadge(draft.status) : (
+                    <span className="px-2 py-1 rounded-md text-[10px] font-black uppercase tracking-widest bg-amber-100 text-amber-700">
+                      {evaluatorMode ? 'Modo revision' : 'Sin borrador'}
+                    </span>
+                  )}
                 </div>
               </div>
             </div>
 
             <div className="flex items-center gap-2">
               <button
-                onClick={handleSaveDraft}
-                disabled={!draft || saveStatus === 'saving'}
-                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${
-                  saveStatus === 'saved' ? 'bg-emerald-500 text-white' : 'bg-slate-900 text-white hover:bg-slate-800'
-                }`}
+                onClick={onGoHome}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-slate-200 bg-white text-xs font-black uppercase tracking-widest text-slate-600 hover:border-blue-300 hover:text-blue-600 transition-all"
               >
-                {saveStatus === 'saving' ? (
-                  <Clock className="w-4 h-4 animate-spin" />
-                ) : saveStatus === 'saved' ? (
-                  <CheckCircle2 className="w-4 h-4" />
-                ) : (
-                  <Save className="w-4 h-4" />
-                )}
-                {saveStatus === 'saving' ? 'Guardando...' : saveStatus === 'saved' ? 'Guardado' : 'Guardar borrador'}
+                <LayoutDashboard className="w-4 h-4" />
+                Volver al inicio
               </button>
+              {canDraft && (
+                <button
+                  onClick={handleSaveDraft}
+                  disabled={!draft || saveStatus === 'saving'}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${
+                    saveStatus === 'saved' ? 'bg-emerald-500 text-white' : 'bg-slate-900 text-white hover:bg-slate-800'
+                  }`}
+                >
+                  {saveStatus === 'saving' ? (
+                    <Clock className="w-4 h-4 animate-spin" />
+                  ) : saveStatus === 'saved' ? (
+                    <CheckCircle2 className="w-4 h-4" />
+                  ) : (
+                    <Save className="w-4 h-4" />
+                  )}
+                  {saveStatus === 'saving' ? 'Guardando...' : saveStatus === 'saved' ? 'Guardado' : 'Guardar borrador'}
+                </button>
+              )}
               <button
                 onClick={onClose}
                 className="h-10 w-10 text-slate-400 hover:bg-slate-50 hover:text-slate-600 rounded-xl transition-colors flex items-center justify-center"
@@ -436,34 +357,25 @@ export const CoordinatorEvidenceEditor = ({
           </div>
 
           <div className="flex-1 overflow-y-auto p-8 space-y-8">
-            <div className="rounded-2xl border border-blue-100 bg-white p-5 shadow-sm">
-              <div className="grid grid-cols-1 gap-3 md:grid-cols-4">
-                {[
-                  { label: 'Plantilla', detail: draft ? 'Seleccionada' : 'Pendiente', icon: Layout, active: !draft },
-                  { label: 'Redaccion IA', detail: draft ? `${completionPercent}% completo` : 'Crear borrador', icon: Wand2, active: Boolean(draft && workspaceMode === 'compose') },
-                  { label: 'Vista previa', detail: hasDraftContent ? 'Disponible' : 'Sin contenido', icon: Eye, active: workspaceMode === 'preview' },
-                  { label: 'Descarga', detail: generatedDocument?.fileName || 'Formato unico', icon: FileDown, active: draft?.status === 'DOCUMENTO_GENERADO' }
-                ].map(step => {
-                  const StepIcon = step.icon;
-                  return (
-                    <div
-                      key={step.label}
-                      className={`rounded-xl border p-4 transition-colors ${
-                        step.active ? 'border-blue-200 bg-blue-50/70' : 'border-slate-100 bg-slate-50/70'
-                      }`}
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className={`rounded-lg p-2 ${step.active ? 'bg-blue-600 text-white' : 'bg-white text-slate-400 border border-slate-100'}`}>
-                          <StepIcon className="h-4 w-4" />
-                        </div>
-                        <div className="min-w-0">
-                          <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">{step.label}</p>
-                          <p className="mt-0.5 truncate text-xs font-bold text-slate-700">{step.detail}</p>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
+            <div className={`rounded-2xl p-5 border ${
+              evaluatorMode ? 'border-amber-100 bg-amber-50/70' : 'border-blue-100 bg-blue-50/60'
+            }`}>
+              <div className="flex items-start gap-3">
+                <div className={`rounded-xl bg-white p-2 border shadow-sm ${
+                  evaluatorMode ? 'text-amber-600 border-amber-100' : 'text-blue-600 border-blue-100'
+                }`}>
+                  {evaluatorMode ? <ClipboardCheck className="w-4 h-4" /> : <Bot className="w-4 h-4" />}
+                </div>
+                <div>
+                  <h4 className="text-xs font-black text-slate-700 uppercase tracking-widest">
+                    {evaluatorMode ? 'Flujo del evaluador' : 'Flujo recomendado'}
+                  </h4>
+                  <p className="mt-1 text-sm text-slate-600 leading-relaxed">
+                    {evaluatorMode
+                      ? 'Revisa la version actual, valida si la evidencia cumple, deja una observacion clara cuando corresponda y decide si la evidencia queda validada, observada o rechazada.'
+                      : 'Elige una plantilla o empieza en blanco, redacta seccion por seccion, usa la IA cuando sea necesario y sube el archivo final cuando la evidencia este lista.'}
+                  </p>
+                </div>
               </div>
             </div>
 
@@ -475,7 +387,7 @@ export const CoordinatorEvidenceEditor = ({
                 <div>
                   <h4 className="text-xs font-black text-slate-600 uppercase tracking-widest mb-1">Descripcion de la evidencia</h4>
                   <p className="text-sm text-slate-500 leading-relaxed">{requirement.description}</p>
-                  <div className="flex items-center gap-4 mt-4">
+                  <div className="flex flex-wrap items-center gap-4 mt-4">
                     <div className="flex items-center gap-2">
                       <Layout className="w-3.5 h-3.5 text-slate-400" />
                       <span className="text-[10px] font-bold text-slate-500 uppercase">Formato: {requirement.format}</span>
@@ -492,211 +404,306 @@ export const CoordinatorEvidenceEditor = ({
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="rounded-2xl border border-slate-200 bg-white p-4">
                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Estado actual</p>
-                <p className="mt-2 text-sm font-bold text-slate-700">{draft?.status?.replace(/_/g, ' ') || 'Pendiente'}</p>
-                <p className="mt-1 text-xs text-slate-400">El avance se centra en el borrador, la vista previa y el documento institucional generado.</p>
+                <p className="mt-2 text-sm font-bold text-slate-700">{currentFile?.status || 'Pendiente'}</p>
+                <p className="mt-1 text-xs text-slate-400">El progreso avanza cuando existe una version cargada para esta evidencia.</p>
               </div>
               <div className="rounded-2xl border border-slate-200 bg-white p-4">
                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Revision actual</p>
-                <p className="mt-2 text-sm text-slate-600 leading-relaxed">{currentFile?.observation || requirement.observation || 'Sin observaciones registradas.'}</p>
+                <p className="mt-2 text-sm text-slate-600 leading-relaxed">
+                  {currentFile?.observation || requirement.observation || 'Sin observaciones registradas.'}
+                </p>
               </div>
               <div className="rounded-2xl border border-slate-200 bg-white p-4">
-                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Formato unico</p>
-                <p className="mt-2 truncate text-sm font-bold text-slate-700">{generatedDocument?.fileName || 'SIG-EV-...'}</p>
-                <p className="mt-1 text-xs text-slate-400">La descarga conserva el nombre institucional generado por la app.</p>
+                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Subida actual</p>
+                <p className="mt-2 text-sm font-bold text-slate-700">{currentFile?.fileName || 'Aun no se ha subido archivo'}</p>
+                <p className="mt-1 text-xs text-slate-400">
+                  {currentFile ? `Ultima carga: ${currentFile.uploadDate}` : 'Cuando subas una version, aparecera aqui.'}
+                </p>
               </div>
             </div>
 
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <h3 className="font-black text-slate-800 text-sm uppercase tracking-tight">Plantilla sugerida</h3>
-                {draft && (
-                  <button
-                    onClick={() => {
-                      setDraft(null);
-                      setSelectedTemplate(null);
-                      setAiResponse('');
-                      setActiveSectionId(null);
-                      setWorkspaceMode('compose');
-                    }}
-                    className="text-[10px] font-bold text-blue-600 uppercase hover:underline"
-                  >
-                    Cambiar enfoque
-                  </button>
+            {canReview && (
+              <div className="rounded-2xl border border-amber-100 bg-white p-6 space-y-5">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-sm font-black text-slate-800 uppercase tracking-tight">Panel de evaluacion</h3>
+                    <p className="text-xs text-slate-500 mt-1">Este rol revisa lo cargado por el coordinador y decide el estado de la evidencia.</p>
+                  </div>
+                  <div className="text-right text-[10px] font-black uppercase tracking-widest text-slate-400">
+                    {currentFile ? `Version actual: v${currentFile.version}` : 'Sin archivo para evaluar'}
+                  </div>
+                </div>
+
+                {!currentFile ? (
+                  <div className="rounded-xl border border-amber-100 bg-amber-50 p-4 text-sm text-amber-700">
+                    Todavia no existe un archivo cargado para esta evidencia. El evaluador solo puede revisar evidencias que ya fueron subidas.
+                  </div>
+                ) : (
+                  <>
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+                      <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Pertinencia</p>
+                        <p className="mt-2 text-xs text-slate-600">Debe corresponder exactamente a lo solicitado por el indicador.</p>
+                      </div>
+                      <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Completitud</p>
+                        <p className="mt-2 text-xs text-slate-600">Revisa si faltan anexos, firmas, fechas o responsables.</p>
+                      </div>
+                      <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Consistencia</p>
+                        <p className="mt-2 text-xs text-slate-600">Comprueba que coincida con el periodo, la carrera y el proceso descrito.</p>
+                      </div>
+                      <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Formalidad</p>
+                        <p className="mt-2 text-xs text-slate-600">Debe tener estructura institucional clara y soportes verificables.</p>
+                      </div>
+                    </div>
+
+                    <div className="space-y-3">
+                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">
+                        Observacion del evaluador
+                      </label>
+                      <textarea
+                        value={reviewObservation}
+                        onChange={(event) => setReviewObservation(event.target.value)}
+                        placeholder="Describe con precision lo que cumple o lo que debe corregirse."
+                        className="w-full min-h-[120px] rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600 focus:outline-none focus:ring-2 focus:ring-amber-200 resize-none"
+                      />
+                    </div>
+
+                    <div className="flex flex-wrap gap-3">
+                      <button
+                        onClick={() => handleReviewDecision('Validado')}
+                        className="inline-flex items-center gap-2 px-4 py-3 rounded-xl bg-emerald-600 text-white text-xs font-black uppercase tracking-widest hover:bg-emerald-700 transition-all"
+                      >
+                        <ShieldCheck className="w-4 h-4" />
+                        Validar evidencia
+                      </button>
+                      <button
+                        onClick={() => handleReviewDecision('Observado')}
+                        className="inline-flex items-center gap-2 px-4 py-3 rounded-xl bg-amber-500 text-white text-xs font-black uppercase tracking-widest hover:bg-amber-600 transition-all"
+                      >
+                        <ShieldAlert className="w-4 h-4" />
+                        Marcar observacion
+                      </button>
+                      <button
+                        onClick={() => handleReviewDecision('Rechazado')}
+                        className="inline-flex items-center gap-2 px-4 py-3 rounded-xl bg-rose-600 text-white text-xs font-black uppercase tracking-widest hover:bg-rose-700 transition-all"
+                      >
+                        <ShieldX className="w-4 h-4" />
+                        Rechazar evidencia
+                      </button>
+                    </div>
+                  </>
                 )}
               </div>
+            )}
 
-              {!draft ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {templates.map(template => (
+            {canDraft && (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="font-black text-slate-800 text-sm uppercase tracking-tight">Plantilla sugerida</h3>
+                  {draft && (
                     <button
-                      key={template.id}
-                      onClick={() => handleApplyTemplate(template)}
-                      className="p-5 border-2 border-slate-100 rounded-2xl text-left hover:border-blue-400 hover:bg-blue-50/30 transition-all group"
+                      onClick={() => {
+                        setDraft(null);
+                        setSelectedTemplate(null);
+                        setAiResponse('');
+                        setActiveSectionId(null);
+                      }}
+                      className="text-[10px] font-bold text-blue-600 uppercase hover:underline"
                     >
-                      <h4 className="font-bold text-slate-700 mb-1 group-hover:text-blue-700">{template.title}</h4>
-                      <p className="text-xs text-slate-400 line-clamp-2">{template.description}</p>
+                      Cambiar enfoque
+                    </button>
+                  )}
+                </div>
+
+                {!draft ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {templates.map(template => (
+                      <button
+                        key={template.id}
+                        onClick={() => handleApplyTemplate(template)}
+                        className="p-5 border-2 border-slate-100 rounded-2xl text-left hover:border-blue-400 hover:bg-blue-50/30 transition-all group"
+                      >
+                        <h4 className="font-bold text-slate-700 mb-1 group-hover:text-blue-700">{template.title}</h4>
+                        <p className="text-xs text-slate-400 line-clamp-2">{template.description}</p>
+                        <div className="flex items-center gap-1.5 mt-3 text-blue-600">
+                          <span className="text-[10px] font-black uppercase tracking-widest">Aplicar plantilla</span>
+                          <ChevronRight className="w-3 h-3" />
+                        </div>
+                      </button>
+                    ))}
+
+                    <button
+                      onClick={handleStartBlankDraft}
+                      className="p-5 border-2 border-dashed border-blue-200 rounded-2xl text-left hover:border-blue-500 hover:bg-blue-50/40 transition-all group"
+                    >
+                      <div className="flex items-center gap-3 mb-2">
+                        <div className="rounded-xl bg-white p-2 border border-blue-100 text-blue-600 shadow-sm">
+                          <PenSquare className="w-4 h-4" />
+                        </div>
+                        <h4 className="font-bold text-slate-700 group-hover:text-blue-700">Empezar desde cero</h4>
+                      </div>
+                      <p className="text-xs text-slate-500">
+                        Abre un editor en blanco con secciones base y luego usa la IA para construir el contenido paso a paso.
+                      </p>
                       <div className="flex items-center gap-1.5 mt-3 text-blue-600">
-                        <span className="text-[10px] font-black uppercase tracking-widest">Aplicar plantilla</span>
+                        <span className="text-[10px] font-black uppercase tracking-widest">Crear borrador guiado</span>
                         <ChevronRight className="w-3 h-3" />
                       </div>
                     </button>
-                  ))}
 
-                  <button
-                    onClick={handleStartBlankDraft}
-                    className="p-5 border-2 border-dashed border-blue-200 rounded-2xl text-left hover:border-blue-500 hover:bg-blue-50/40 transition-all group"
-                  >
-                    <div className="flex items-center gap-3 mb-2">
-                      <div className="rounded-xl bg-white p-2 border border-blue-100 text-blue-600 shadow-sm">
-                        <PenSquare className="w-4 h-4" />
+                    {templates.length === 0 && (
+                      <div className="col-span-full p-8 border-2 border-dashed border-slate-200 rounded-2xl text-center">
+                        <Layout className="w-10 h-10 text-slate-300 mx-auto mb-3" />
+                        <p className="text-sm font-bold text-slate-500">No hay plantillas especificas para esta evidencia.</p>
+                        <p className="text-xs text-slate-400 mt-1">Usa la opcion de borrador guiado para empezar desde un documento en blanco.</p>
                       </div>
-                      <h4 className="font-bold text-slate-700 group-hover:text-blue-700">Empezar desde cero</h4>
-                    </div>
-                    <p className="text-xs text-slate-500">
-                      Abre un editor en blanco con secciones base y luego usa la IA para construir el contenido paso a paso.
-                    </p>
-                    <div className="flex items-center gap-1.5 mt-3 text-blue-600">
-                      <span className="text-[10px] font-black uppercase tracking-widest">Crear borrador guiado</span>
-                      <ChevronRight className="w-3 h-3" />
-                    </div>
-                  </button>
-
-                  {templates.length === 0 && (
-                    <div className="col-span-full p-8 border-2 border-dashed border-slate-200 rounded-2xl text-center">
-                      <Layout className="w-10 h-10 text-slate-300 mx-auto mb-3" />
-                      <p className="text-sm font-bold text-slate-500">No hay plantillas especificas para esta evidencia.</p>
-                      <p className="text-xs text-slate-400 mt-1">Usa la opcion de borrador guiado para empezar desde un documento en blanco.</p>
-                    </div>
-                  )}
-                </div>
-              ) : workspaceMode === 'preview' ? (
-                <div className="rounded-2xl border border-slate-200 bg-slate-100 p-5">
-                  <div className="mb-4 flex items-center justify-between">
-                    <div>
-                      <h4 className="text-sm font-black uppercase tracking-tight text-slate-800">Vista previa institucional</h4>
-                      <p className="mt-1 text-xs text-slate-500">Asi se estructura el archivo unico antes de descargarlo.</p>
-                    </div>
-                    <button
-                      onClick={() => setWorkspaceMode('compose')}
-                      className="rounded-xl border border-slate-200 bg-white px-4 py-2 text-[10px] font-black uppercase tracking-widest text-slate-600 transition-all hover:border-blue-300 hover:text-blue-600"
-                    >
-                      Volver a editar
-                    </button>
+                    )}
                   </div>
-                  <div className="mx-auto max-w-3xl rounded-sm bg-white p-10 shadow-xl ring-1 ring-slate-200">
-                    <div className="border-b-4 border-blue-600 pb-4">
-                      <p className="text-[10px] font-black uppercase tracking-[0.24em] text-slate-500">Instituto Superior Tecnologico Sudamericano</p>
-                      <h1 className="mt-2 text-xl font-black uppercase text-slate-900">Documento unico de evidencia</h1>
-                      <p className="mt-1 text-xs font-bold text-slate-500">Codigo: {generatedDocument?.fileName}</p>
-                    </div>
-                    <div className="mt-6 rounded-xl border border-slate-200 bg-slate-50 p-4 text-xs text-slate-600">
-                      <p><span className="font-black">Indicador:</span> {indicator.code} - {indicator.name}</p>
-                      <p className="mt-1"><span className="font-black">Evidencia:</span> {requirement.label}</p>
-                      <p className="mt-1"><span className="font-black">Formato requerido:</span> {requirement.format}</p>
-                      <p className="mt-1"><span className="font-black">Generado por:</span> {currentUserName}</p>
-                    </div>
-                    <div className="mt-6 space-y-6">
-                      <section>
-                        <h2 className="border-b border-blue-100 pb-2 text-sm font-black uppercase text-slate-900">Descripcion de la evidencia</h2>
-                        <p className="mt-3 text-sm leading-relaxed text-slate-600">{requirement.description}</p>
-                      </section>
-                      {draft.sections.map((section, index) => (
-                        <section key={section.id}>
-                          <h2 className="border-b border-blue-100 pb-2 text-sm font-black uppercase text-slate-900">
-                            {index + 1}. {section.title}
-                          </h2>
-                          <p className="mt-3 whitespace-pre-wrap text-sm leading-relaxed text-slate-600">
-                            {section.content || 'Contenido pendiente de completar.'}
-                          </p>
-                        </section>
-                      ))}
-                    </div>
+                ) : (
+                  <div className="space-y-6">
+                    {draft.sections.map((section, index) => (
+                      <div
+                        key={section.id}
+                        className={`bg-white rounded-2xl border shadow-sm overflow-hidden transition-colors ${
+                          activeSectionId === section.id
+                            ? 'border-blue-300 ring-2 ring-blue-100'
+                            : 'border-slate-200 focus-within:border-blue-400'
+                        }`}
+                      >
+                        <div className="px-5 py-3 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            <span className="h-6 w-6 rounded-full bg-slate-200 flex items-center justify-center text-[10px] font-black text-slate-600">
+                              {index + 1}
+                            </span>
+                            <h5 className="text-[11px] font-black text-slate-700 uppercase tracking-tight">{section.title}</h5>
+                          </div>
+                          {canUseAI && (
+                            <button
+                              onClick={() => handleRequestAI('help_section', section.id)}
+                              className="flex items-center gap-1.5 px-3 py-1 bg-white border border-slate-200 rounded-lg text-[9px] font-black text-blue-600 hover:border-blue-400 transition-all uppercase tracking-widest"
+                            >
+                              <Sparkles className="w-3 h-3" />
+                              Ayuda IA
+                            </button>
+                          )}
+                        </div>
+                        <div className="p-5 space-y-3">
+                          <div className="flex items-start gap-2 bg-blue-50/50 p-3 rounded-lg border border-blue-50">
+                            <AlertCircle className="w-3.5 h-3.5 text-blue-400 mt-0.5" />
+                            <p className="text-[10px] text-blue-600 italic leading-snug">{section.instruction}</p>
+                          </div>
+                          <textarea
+                            value={section.content}
+                            onFocus={() => setActiveSectionId(section.id)}
+                            onChange={(event) => updateSectionContent(section.id, event.target.value)}
+                            placeholder={section.placeholder}
+                            className="w-full min-h-[140px] p-4 text-sm text-slate-600 placeholder-slate-300 bg-transparent border-none focus:ring-0 resize-none font-sans leading-relaxed"
+                          />
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                </div>
-              ) : (
-                <div className="space-y-6">
-                  {draft.sections.map((section, index) => (
-                    <div
-                      key={section.id}
-                      className={`bg-white rounded-2xl border shadow-sm overflow-hidden transition-colors ${
-                        activeSectionId === section.id
-                          ? 'border-blue-300 ring-2 ring-blue-100'
-                          : 'border-slate-200 focus-within:border-blue-400'
-                      }`}
-                    >
-                      <div className="px-5 py-3 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <span className="h-6 w-6 rounded-full bg-slate-200 flex items-center justify-center text-[10px] font-black text-slate-600">
-                            {index + 1}
-                          </span>
-                          <h5 className="text-[11px] font-black text-slate-700 uppercase tracking-tight">{section.title}</h5>
-                        </div>
-                        <button
-                          onClick={() => handleRequestAI('help_section', section.id)}
-                          className="flex items-center gap-1.5 px-3 py-1 bg-white border border-slate-200 rounded-lg text-[9px] font-black text-blue-600 hover:border-blue-400 transition-all uppercase tracking-widest"
-                        >
-                          <Sparkles className="w-3 h-3" />
-                          Ayuda IA
-                        </button>
-                      </div>
-                      <div className="p-5 space-y-3">
-                        <div className="flex items-start gap-2 bg-blue-50/50 p-3 rounded-lg border border-blue-50">
-                          <AlertCircle className="w-3.5 h-3.5 text-blue-400 mt-0.5" />
-                          <p className="text-[10px] text-blue-600 italic leading-snug">{section.instruction}</p>
-                        </div>
-                        <textarea
-                          value={section.content}
-                          onFocus={() => setActiveSectionId(section.id)}
-                          onChange={(event) => updateSectionContent(section.id, event.target.value)}
-                          placeholder={section.placeholder}
-                          className="w-full min-h-[140px] p-4 text-sm text-slate-600 placeholder-slate-300 bg-transparent border-none focus:ring-0 resize-none font-sans leading-relaxed"
-                        />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
+                )}
+              </div>
+            )}
           </div>
 
           <div className="p-6 border-t border-slate-100 bg-slate-50 flex items-center justify-between">
-            <div className="flex flex-col gap-1">
-              <p className="text-xs text-slate-500 leading-relaxed">
-                Este flujo no sube archivos al final: genera y guarda un documento institucional descargable.
-              </p>
-              <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">
-                {generatedDocument ? `${generatedDocument.fileName}.doc` : 'Selecciona una plantilla para generar el formato unico'}
-              </p>
-            </div>
+            <button
+              onClick={() => setShowHistory(!showHistory)}
+              className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-xl text-xs font-black text-slate-600 hover:border-slate-300 transition-all uppercase tracking-widest shadow-sm"
+            >
+              <History className="w-4 h-4" />
+              Historial de versiones
+            </button>
 
-            <div className="flex items-center gap-2">
+            {canUpload ? (
               <button
-                onClick={() => setWorkspaceMode('preview')}
-                disabled={!draft}
-                className="flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-5 py-3 text-xs font-black uppercase tracking-widest text-slate-600 shadow-sm transition-all hover:border-blue-300 hover:text-blue-600 disabled:cursor-not-allowed disabled:text-slate-300"
+                onClick={() => onUploadFinal(requirement)}
+                className="flex items-center gap-3 px-8 py-3 bg-blue-600 text-white rounded-2xl font-black text-sm uppercase tracking-widest shadow-xl shadow-blue-200 hover:bg-blue-700 hover:-translate-y-0.5 transition-all active:translate-y-0"
               >
-                <Eye className="h-4 w-4" />
-                Vista previa
+                <Upload className="w-5 h-5" />
+                Subir archivo final
               </button>
-              <button
-                onClick={handleDownloadGeneratedDocument}
-                disabled={!draft}
-                className="flex items-center gap-3 px-8 py-3 bg-blue-600 text-white rounded-2xl font-black text-sm uppercase tracking-widest shadow-xl shadow-blue-200 hover:bg-blue-700 hover:-translate-y-0.5 transition-all active:translate-y-0 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:shadow-none"
-              >
-                <FileDown className="w-5 h-5" />
-                Descargar y guardar
-              </button>
-            </div>
+            ) : (
+              <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+                Solo el coordinador puede cargar versiones
+              </span>
+            )}
           </div>
+
+          <AnimatePresence>
+            {showHistory && (
+              <motion.div
+                initial={{ opacity: 0, x: -300 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -300 }}
+                className="absolute inset-y-0 left-0 w-[560px] max-w-full bg-white border-r border-slate-200 shadow-2xl z-30 p-6 flex flex-col"
+              >
+                <div className="flex items-center justify-between mb-6">
+                  <h3 className="font-black text-slate-800 text-sm uppercase tracking-tight flex items-center gap-2">
+                    <History className="w-4 h-4" />
+                    Historial de versiones y borradores
+                  </h3>
+                  <button onClick={() => setShowHistory(false)}>
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+
+                <div className="space-y-6 overflow-y-auto">
+                  <div>
+                    <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">Versiones de evidencia</h4>
+                    {files.length > 0 ? (
+                      <EvidenceVersionHistory files={[...files].sort((a, b) => b.version - a.version)} />
+                    ) : (
+                      <div className="rounded-2xl border border-slate-200 bg-slate-50 p-6 text-sm text-slate-500">
+                        No existen archivos cargados para esta evidencia todavia.
+                      </div>
+                    )}
+                  </div>
+
+                  {canDraft && (
+                    <div>
+                      <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">Historial de borradores</h4>
+                      <div className="space-y-3">
+                        {DraftService.getDraftHistory(indicator.code, requirement.id).map(entry => (
+                          <div key={entry.id} className="p-4 border border-slate-100 rounded-xl hover:bg-slate-50 transition-colors">
+                            <div className="flex items-center justify-between mb-1">
+                              <span className="text-[10px] font-black text-blue-600 bg-blue-50 px-2 py-0.5 rounded">V.{entry.version}</span>
+                              <span className="text-[10px] font-medium text-slate-400">{new Date(entry.updatedAt).toLocaleString()}</span>
+                            </div>
+                            <p className="text-xs text-slate-600 font-bold">{entry.updatedBy}</p>
+                            <p className="text-[10px] text-slate-400 mt-1">{entry.changes}</p>
+                          </div>
+                        ))}
+                        {DraftService.getDraftHistory(indicator.code, requirement.id).length === 0 && (
+                          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-6 text-sm text-slate-500">
+                            Aun no existe historial de borradores para esta evidencia.
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
 
         <div className="w-full md:w-[400px] flex flex-col h-full shrink-0">
-          <CoordinatorAIGuidePanel
-            isGenerating={isGenerating}
-            aiResponse={aiResponse}
-            onAction={handleRequestAI}
-            onApplySuggestion={handleApplySuggestion}
-          />
+          {canUseAI ? (
+            <CoordinatorAIGuidePanel
+              isGenerating={isGenerating}
+              aiResponse={aiResponse}
+              onAction={handleRequestAI}
+              onApplySuggestion={handleApplySuggestion}
+            />
+          ) : (
+            <EvaluatorReviewGuidePanel currentFile={currentFile} />
+          )}
         </div>
       </motion.div>
     </div>

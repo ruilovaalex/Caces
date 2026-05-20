@@ -10,7 +10,6 @@ import { IndicatorStatsCards } from '../components/indicators/IndicatorStatsCard
 import { IndicatorContent } from '../components/indicators/IndicatorContent';
 import { EvidenceTable } from '../components/evidences/EvidenceTable';
 import { EvidenceUploadModal } from '../components/evidences/EvidenceUploadModal';
-import { EvidenceHistoryModal } from '../components/evidences/EvidenceHistoryModal';
 import { CoordinatorEvidenceEditor } from '../components/coordinator/CoordinatorEvidenceEditor';
 
 import { useAuth } from '../hooks/useAuth';
@@ -19,8 +18,8 @@ import { useEvidences } from '../hooks/useEvidences';
 import { useNotifications } from '../hooks/useNotifications';
 import { useFileUpload } from '../hooks/useFileUpload';
 
-import { calculateIndicatorProgress, getIndicatorStats } from '../utils/progressUtils';
-import { Indicator, Requirement } from '../types';
+import { calculateIndicatorProgress, getIndicatorCurrentStatus, getIndicatorStats } from '../utils/progressUtils';
+import { Indicator, Requirement, Status } from '../types';
 
 export default function App() {
   const { isAuthenticated, userRole, login, logout, switchRole, user } = useAuth();
@@ -39,12 +38,12 @@ export default function App() {
   const [activeRequirement, setActiveRequirement] = useState<Requirement | null>(null);
   const [isUploadOpen, setIsUploadOpen] = useState(false);
   const [isEditorOpen, setIsEditorOpen] = useState(false);
-  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
 
   const {
     allFiles,
     getRequirementFiles,
-    uploadFile
+    uploadFile,
+    updateStatus
   } = useEvidences();
 
   const {
@@ -64,6 +63,14 @@ export default function App() {
     reset: resetUpload
   } = useFileUpload();
 
+  const handleGoToDashboard = () => {
+    setIsEditorOpen(false);
+    setIsUploadOpen(false);
+    setActiveRequirement(null);
+    setSelectedIndicator(null);
+    setViewMode('dashboard');
+  };
+
   const handleIndicatorSelect = (indicator: Indicator) => {
     selectIndicator(indicator);
     setViewMode('indicator');
@@ -80,6 +87,11 @@ export default function App() {
     } catch (error) {
       console.error(error);
     }
+  };
+
+  const handleReviewUpdate = (evidenceId: string, status: Status, observation?: string) => {
+    updateStatus(evidenceId, status, observation);
+    refreshNotifications();
   };
 
   const getVisibleNodes = () => {
@@ -161,10 +173,7 @@ export default function App() {
         focusedNodeId={focusedNodeId}
         userRole={userRole}
         onIndicatorSelect={handleIndicatorSelect}
-        onDashboardClick={() => {
-          setSelectedIndicator(null);
-          setViewMode('dashboard');
-        }}
+        onDashboardClick={handleGoToDashboard}
         onToggleNode={toggleNode}
         onSetFocusedNode={setFocusedNodeId}
         onKeyDown={handleKeyDown}
@@ -179,6 +188,8 @@ export default function App() {
           onToggleNotifications={toggleShow}
           onMarkAsRead={markAsRead}
           onClearAllNotifications={clearAll}
+          userName={user?.name}
+          userRole={userRole}
         />
 
         <div className="flex-1 overflow-y-auto p-8">
@@ -195,7 +206,7 @@ export default function App() {
               <ChecklistView
                 mockData={mockData}
                 onIndicatorSelect={handleIndicatorSelect}
-                onBackToDashboard={() => setViewMode('dashboard')}
+                onBackToDashboard={handleGoToDashboard}
               />
             ) : (
               <motion.div
@@ -204,14 +215,21 @@ export default function App() {
                 animate={{ opacity: 1, x: 0 }}
                 className="max-w-5xl mx-auto"
               >
+                {(() => {
+                  const currentProgress = calculateIndicatorProgress(selectedIndicator, allFiles);
+                  const currentStats = getIndicatorStats(selectedIndicator, allFiles);
+                  const currentStatus = getIndicatorCurrentStatus(selectedIndicator, allFiles);
+
+                  return (
                 <IndicatorContent>
                   <IndicatorHeader
                     indicator={selectedIndicator}
-                    progress={calculateIndicatorProgress(selectedIndicator, allFiles)}
-                    onBackToDashboard={() => setViewMode('dashboard')}
+                    status={currentStatus}
+                    progress={currentProgress}
+                    onBackToDashboard={handleGoToDashboard}
                   />
 
-                  <IndicatorStatsCards stats={getIndicatorStats(selectedIndicator, allFiles)} />
+                  <IndicatorStatsCards stats={currentStats} />
 
                   <EvidenceTable
                     indicator={selectedIndicator}
@@ -226,12 +244,10 @@ export default function App() {
                       setActiveRequirement(requirement);
                       setIsEditorOpen(true);
                     }}
-                    onOpenHistory={requirement => {
-                      setActiveRequirement(requirement);
-                      setIsHistoryOpen(true);
-                    }}
                   />
                 </IndicatorContent>
+                  );
+                })()}
               </motion.div>
             )}
           </AnimatePresence>
@@ -249,21 +265,23 @@ export default function App() {
         isGenerating={false}
       />
 
-      <EvidenceHistoryModal
-        isOpen={isHistoryOpen}
-        onClose={() => setIsHistoryOpen(false)}
-        activeRequirement={activeRequirement}
-        files={selectedIndicator && activeRequirement ? getRequirementFiles(activeRequirement.id, selectedIndicator.code) : []}
-      />
-
       <AnimatePresence>
         {isEditorOpen && selectedIndicator && activeRequirement && (
           <CoordinatorEvidenceEditor
             indicator={selectedIndicator}
             requirement={activeRequirement}
             files={getRequirementFiles(activeRequirement.id, selectedIndicator.code)}
+            userRole={userRole}
             currentUser={user}
             onClose={() => setIsEditorOpen(false)}
+            onGoHome={handleGoToDashboard}
+            onUploadFinal={requirement => {
+              setActiveRequirement(requirement);
+              setIsEditorOpen(false);
+              setIsUploadOpen(true);
+              resetUpload();
+            }}
+            onUpdateEvidenceStatus={handleReviewUpdate}
           />
         )}
       </AnimatePresence>

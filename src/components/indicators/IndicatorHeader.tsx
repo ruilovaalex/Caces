@@ -1,18 +1,20 @@
 import React from 'react';
 import { LayoutDashboard } from 'lucide-react';
-import { Indicator } from '../../types';
+import { Indicator, Status } from '../../types';
 import { EvidenceStatusBadge as StatusBadge } from '../evidences/EvidenceStatusBadge';
 
 import { IndicatorProgress } from './IndicatorProgress';
 
 interface IndicatorHeaderProps {
   indicator: Indicator;
+  status: Status;
   progress: number;
   onBackToDashboard: () => void;
 }
 
 export const IndicatorHeader = ({
   indicator,
+  status,
   progress,
   onBackToDashboard
 }: IndicatorHeaderProps) => {
@@ -24,7 +26,7 @@ export const IndicatorHeader = ({
         </div>
         <div>
           <div className="flex items-center gap-3 mb-1">
-            <StatusBadge status={indicator.status} />
+            <StatusBadge status={status} />
             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Criterio {indicator.code.split('.')[0]}</span>
           </div>
           <h2 className="text-2xl font-black text-slate-800 tracking-tight leading-tight">
