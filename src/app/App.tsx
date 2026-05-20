@@ -18,6 +18,7 @@ import { useNotifications } from '../hooks/useNotifications';
 import { useFileUpload } from '../hooks/useFileUpload';
 
 import { calculateIndicatorProgress, getIndicatorStats } from '../utils/progressUtils';
+import { getReadableAllowedFormats, isFileAllowedForRequirement } from '../utils/evidenceFormatUtils';
 import { Indicator, Requirement } from '../types';
 
 export default function App() {
@@ -40,7 +41,8 @@ export default function App() {
   const {
     allFiles,
     getRequirementFiles,
-    uploadFile
+    uploadFile,
+    deleteEvidence
   } = useEvidences();
 
   const {
@@ -73,6 +75,10 @@ export default function App() {
 
   const handleSaveUpload = async () => {
     if (!activeRequirement || !selectedIndicator || !uploadFileContent || !user) return;
+    if (!isFileAllowedForRequirement(uploadFileContent, activeRequirement)) {
+      window.alert(`Formato no permitido. Para esta evidencia solo se acepta: ${getReadableAllowedFormats(activeRequirement.format)}.`);
+      return;
+    }
 
     try {
       await uploadFile(uploadFileContent, selectedIndicator, activeRequirement, user.name, uploadObs);
@@ -237,6 +243,7 @@ export default function App() {
         onClose={() => setIsHistoryOpen(false)}
         activeRequirement={activeRequirement}
         files={selectedIndicator && activeRequirement ? getRequirementFiles(activeRequirement.id, selectedIndicator.code) : []}
+        onDeleteFile={deleteEvidence}
       />
 
       <AnimatePresence>

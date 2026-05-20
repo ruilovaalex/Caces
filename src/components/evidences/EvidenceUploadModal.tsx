@@ -2,6 +2,7 @@ import React from 'react';
 import { Upload, CheckCircle2, FileText } from 'lucide-react';
 import { Modal } from '../common/Modal';
 import { Requirement } from '../../types';
+import { getAcceptAttribute, getReadableAllowedFormats, isFileAllowedForRequirement } from '../../utils/evidenceFormatUtils';
 
 interface EvidenceUploadModalProps {
   isOpen: boolean;
@@ -26,6 +27,9 @@ export const EvidenceUploadModal = ({
 }: EvidenceUploadModalProps) => {
   if (!activeRequirement) return null;
 
+  const allowedFormats = getReadableAllowedFormats(activeRequirement.format);
+  const isInvalidFile = Boolean(uploadForm.file && !isFileAllowedForRequirement(uploadForm.file, activeRequirement));
+
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Cargar Evidencia">
       <div className="p-8 border-t border-slate-50 space-y-6">
@@ -39,6 +43,7 @@ export const EvidenceUploadModal = ({
           <input 
             type="file" 
             id="file-upload" 
+            accept={getAcceptAttribute(activeRequirement.format)}
             className="hidden" 
             onChange={onFileChange}
           />
@@ -51,11 +56,17 @@ export const EvidenceUploadModal = ({
                 {uploadForm.file ? uploadForm.file.name : 'Seleccionar archivo local'}
               </p>
               <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">
-                {uploadForm.file ? `${(uploadForm.file.size / 1024).toFixed(1)} KB` : 'PDF, XLSX o DOCX hasta 20MB'}
+                {uploadForm.file ? `${(uploadForm.file.size / 1024).toFixed(1)} KB` : `${allowedFormats} hasta 20MB`}
               </p>
             </div>
           </label>
         </div>
+
+        {isInvalidFile && (
+          <div className="rounded-2xl border border-rose-100 bg-rose-50 px-4 py-3 text-xs font-bold text-rose-600">
+            Este archivo no corresponde al formato requerido. Para esta evidencia solo se acepta: {allowedFormats}.
+          </div>
+        )}
 
         <div className="space-y-3">
           <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Observación de la Versión</label>
@@ -75,7 +86,7 @@ export const EvidenceUploadModal = ({
             Cancelar
           </button>
           <button 
-            disabled={!uploadForm.file || isGenerating}
+            disabled={!uploadForm.file || isInvalidFile || isGenerating}
             onClick={onSave}
             className="flex-1 py-4 bg-slate-900 text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-slate-800 transition-all disabled:opacity-50 text-nowrap"
           >
