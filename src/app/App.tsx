@@ -17,9 +17,9 @@ import { useEvidences } from '../hooks/useEvidences';
 import { useNotifications } from '../hooks/useNotifications';
 import { useFileUpload } from '../hooks/useFileUpload';
 
-import { calculateIndicatorProgress, getIndicatorStats } from '../utils/progressUtils';
+import { calculateIndicatorProgress, getIndicatorCurrentStatus, getIndicatorStats } from '../utils/progressUtils';
 import { getReadableAllowedFormats, isFileAllowedForRequirement } from '../utils/evidenceFormatUtils';
-import { Indicator, Requirement } from '../types';
+import { Indicator, Requirement, Status } from '../types';
 
 export default function App() {
   const { isAuthenticated, userRole, login, logout, switchRole, user } = useAuth();
@@ -42,6 +42,7 @@ export default function App() {
     allFiles,
     getRequirementFiles,
     uploadFile,
+    updateStatus,
     deleteEvidence
   } = useEvidences();
 
@@ -66,6 +67,16 @@ export default function App() {
     selectIndicator(indicator);
   };
 
+  const handleGoToStart = () => {
+    setIsEditorOpen(false);
+    setIsUploadOpen(false);
+    setIsHistoryOpen(false);
+    setActiveRequirement(null);
+
+    const firstIndicator = mockData[0]?.criteria[0]?.subCriteria[0]?.indicators[0];
+    if (firstIndicator) selectIndicator(firstIndicator);
+  };
+
   useEffect(() => {
     if (selectedIndicator || mockData.length === 0) return;
 
@@ -88,6 +99,11 @@ export default function App() {
     } catch (error) {
       console.error(error);
     }
+  };
+
+  const handleReviewUpdate = (evidenceId: string, status: Status, observation?: string) => {
+    updateStatus(evidenceId, status, observation);
+    refreshNotifications();
   };
 
   const getVisibleNodes = () => {
@@ -183,6 +199,8 @@ export default function App() {
           onToggleNotifications={toggleShow}
           onMarkAsRead={markAsRead}
           onClearAllNotifications={clearAll}
+          userName={user?.name}
+          userRole={userRole}
         />
 
         <div className="flex-1 overflow-y-auto p-8">
@@ -197,7 +215,9 @@ export default function App() {
                 <IndicatorContent>
                   <IndicatorHeader
                     indicator={selectedIndicator}
+                    status={getIndicatorCurrentStatus(selectedIndicator, allFiles)}
                     progress={calculateIndicatorProgress(selectedIndicator, allFiles)}
+                    onBackToDashboard={handleGoToStart}
                   />
 
                   <IndicatorStatsCards stats={getIndicatorStats(selectedIndicator, allFiles)} />
@@ -252,8 +272,11 @@ export default function App() {
             indicator={selectedIndicator}
             requirement={activeRequirement}
             files={getRequirementFiles(activeRequirement.id, selectedIndicator.code)}
+            userRole={userRole}
             currentUser={user}
             onClose={() => setIsEditorOpen(false)}
+            onGoHome={handleGoToStart}
+            onUpdateEvidenceStatus={handleReviewUpdate}
           />
         )}
       </AnimatePresence>

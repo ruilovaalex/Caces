@@ -17,22 +17,28 @@ export const useEvidences = () => {
   }, [loadData]);
 
   const getRequirementFiles = (reqId: string, indicatorCode: string) => {
-    return allFiles.filter(f => f.requirementId === reqId && f.indicatorCode === indicatorCode);
+    return allFiles.filter(file => file.requirementId === reqId && file.indicatorCode === indicatorCode);
   };
 
-  const uploadFile = async (file: File, indicator: Indicator, requirement: Requirement, userName: string, observation?: string) => {
+  const uploadFile = async (
+    file: File,
+    indicator: Indicator,
+    requirement: Requirement,
+    userName: string,
+    observation?: string
+  ) => {
     try {
       await EvidenceService.upload(file, {
         indicatorCode: indicator.code,
         requirementId: requirement.id,
         requirementLabel: requirement.label,
         uploadedBy: userName,
-        observation: observation
+        observation
       });
       loadData();
       NotificationService.add({
         title: 'Documento Cargado',
-        message: `Nueva versión de ${requirement.label} subida correctamente.`,
+        message: `Nueva version de ${requirement.label} subida correctamente.`,
         type: 'success'
       });
     } catch (error) {
@@ -44,6 +50,11 @@ export const useEvidences = () => {
   const updateStatus = (evidenceId: string, status: Status, observation?: string) => {
     EvidenceService.updateStatus(evidenceId, status, observation);
     loadData();
+    NotificationService.add({
+      title: 'Revision Actualizada',
+      message: `La evidencia fue marcada como ${status}.`,
+      type: status === 'Validado' ? 'success' : status === 'Observado' ? 'warning' : 'error'
+    });
   };
 
   const deleteEvidence = (id: string) => {

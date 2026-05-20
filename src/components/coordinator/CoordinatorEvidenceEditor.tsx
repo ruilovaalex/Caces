@@ -11,12 +11,17 @@ import {
   FileDown,
   Eye,
   Layout,
+  LayoutDashboard,
   CheckCircle2,
   Clock,
   Info,
   PenSquare,
   Bot,
-  Wand2
+  Wand2,
+  ClipboardCheck,
+  ShieldAlert,
+  ShieldCheck,
+  ShieldX
 } from 'lucide-react';
 import {
   Indicator,
@@ -24,10 +29,13 @@ import {
   EvidenceDraft,
   EvidenceTemplate,
   DraftStatus,
-  UploadedFile
+  UploadedFile,
+  UserRole,
+  Status
 } from '../../types';
 import { EVIDENCE_TEMPLATES } from '../../data/evidenceTemplates';
 import { CoordinatorAIGuidePanel } from '../ai/CoordinatorAIGuidePanel';
+import { EvaluatorReviewGuidePanel } from '../evaluator/EvaluatorReviewGuidePanel';
 import { DraftService } from '../../services/draftService';
 import { AIService } from '../../services/aiService';
 import { EvidenceService } from '../../services/evidenceService';
@@ -36,7 +44,10 @@ interface CoordinatorEvidenceEditorProps {
   indicator: Indicator;
   requirement: Requirement;
   files: UploadedFile[];
+  userRole: UserRole;
   onClose: () => void;
+  onGoHome: () => void;
+  onUpdateEvidenceStatus: (evidenceId: string, status: Status, observation?: string) => void;
   currentUser: any;
 }
 
@@ -44,7 +55,10 @@ export const CoordinatorEvidenceEditor = ({
   indicator,
   requirement,
   files,
+  userRole,
   onClose,
+  onGoHome,
+  onUpdateEvidenceStatus,
   currentUser
 }: CoordinatorEvidenceEditorProps) => {
   const [draft, setDraft] = useState<EvidenceDraft | null>(null);
@@ -54,6 +68,7 @@ export const CoordinatorEvidenceEditor = ({
   const [activeSectionId, setActiveSectionId] = useState<string | null>(null);
   const [workspaceMode, setWorkspaceMode] = useState<'compose' | 'preview'>('compose');
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
+  const [reviewObservation, setReviewObservation] = useState('');
 
   const templates = EVIDENCE_TEMPLATES.filter(
     template => template.indicatorCode === indicator.code && template.requirementId === requirement.id
@@ -71,6 +86,8 @@ export const CoordinatorEvidenceEditor = ({
 
   const currentUserName = currentUser?.name || 'Coordinador';
   const currentFile = files.find(file => file.isCurrentVersion);
+  const evaluatorMode = userRole === 'EVALUADOR';
+  const canDraft = userRole === 'ADMIN' || userRole === 'COORDINADOR';
 
   const createBlankDraft = (): EvidenceDraft => ({
     id: crypto.randomUUID(),
@@ -250,6 +267,15 @@ export const CoordinatorEvidenceEditor = ({
     setActiveSectionId(targetSectionId);
   };
 
+  useEffect(() => {
+    setReviewObservation(currentFile?.observation || requirement.observation || '');
+  }, [currentFile?.id, currentFile?.observation, requirement.observation]);
+
+  const handleReviewDecision = (status: Status) => {
+    if (!currentFile) return;
+    onUpdateEvidenceStatus(currentFile.id, status, reviewObservation.trim() || undefined);
+  };
+
   const normalizeFileName = (value: string) => value
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
@@ -411,6 +437,13 @@ export const CoordinatorEvidenceEditor = ({
 
             <div className="flex items-center gap-2">
               <button
+                onClick={onGoHome}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-slate-200 bg-white text-xs font-black uppercase tracking-widest text-slate-600 hover:border-blue-300 hover:text-blue-600 transition-all"
+              >
+                <LayoutDashboard className="w-4 h-4" />
+                Volver al inicio
+              </button>
+              <button
                 onClick={handleSaveDraft}
                 disabled={!draft || saveStatus === 'saving'}
                 className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${
@@ -492,7 +525,9 @@ export const CoordinatorEvidenceEditor = ({
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="rounded-2xl border border-slate-200 bg-white p-4">
                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Estado actual</p>
-                <p className="mt-2 text-sm font-bold text-slate-700">{draft?.status?.replace(/_/g, ' ') || 'Pendiente'}</p>
+                <p className="mt-2 text-sm font-bold text-slate-700">
+                  {evaluatorMode ? (currentFile?.status || 'Pendiente') : (draft?.status?.replace(/_/g, ' ') || 'Pendiente')}
+                </p>
                 <p className="mt-1 text-xs text-slate-400">El avance se centra en el borrador, la vista previa y el documento institucional generado.</p>
               </div>
               <div className="rounded-2xl border border-slate-200 bg-white p-4">
@@ -506,7 +541,65 @@ export const CoordinatorEvidenceEditor = ({
               </div>
             </div>
 
-            <div className="space-y-4">
+            {evaluatorMode && (
+              <div className="rounded-2xl border border-amber-100 bg-white p-6 space-y-5">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-sm font-black text-slate-800 uppercase tracking-tight">Panel de evaluacion</h3>
+                    <p className="text-xs text-slate-500 mt-1">Revisa la version cargada por el coordinador y decide el estado de la evidencia.</p>
+                  </div>
+                  <div className="text-right text-[10px] font-black uppercase tracking-widest text-slate-400">
+                    {currentFile ? `Version actual: v${currentFile.version}` : 'Sin archivo para evaluar'}
+                  </div>
+                </div>
+
+                {!currentFile ? (
+                  <div className="rounded-xl border border-amber-100 bg-amber-50 p-4 text-sm text-amber-700">
+                    Todavia no existe un archivo cargado para esta evidencia. El evaluador solo puede revisar evidencias que ya fueron subidas.
+                  </div>
+                ) : (
+                  <>
+                    <div className="space-y-3">
+                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">
+                        Observacion del evaluador
+                      </label>
+                      <textarea
+                        value={reviewObservation}
+                        onChange={(event) => setReviewObservation(event.target.value)}
+                        placeholder="Describe con precision lo que cumple o lo que debe corregirse."
+                        className="w-full min-h-[120px] rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600 focus:outline-none focus:ring-2 focus:ring-amber-200 resize-none"
+                      />
+                    </div>
+
+                    <div className="flex flex-wrap gap-3">
+                      <button
+                        onClick={() => handleReviewDecision('Validado')}
+                        className="inline-flex items-center gap-2 px-4 py-3 rounded-xl bg-emerald-600 text-white text-xs font-black uppercase tracking-widest hover:bg-emerald-700 transition-all"
+                      >
+                        <ShieldCheck className="w-4 h-4" />
+                        Validar evidencia
+                      </button>
+                      <button
+                        onClick={() => handleReviewDecision('Observado')}
+                        className="inline-flex items-center gap-2 px-4 py-3 rounded-xl bg-amber-500 text-white text-xs font-black uppercase tracking-widest hover:bg-amber-600 transition-all"
+                      >
+                        <ShieldAlert className="w-4 h-4" />
+                        Marcar observacion
+                      </button>
+                      <button
+                        onClick={() => handleReviewDecision('Rechazado')}
+                        className="inline-flex items-center gap-2 px-4 py-3 rounded-xl bg-rose-600 text-white text-xs font-black uppercase tracking-widest hover:bg-rose-700 transition-all"
+                      >
+                        <ShieldX className="w-4 h-4" />
+                        Rechazar evidencia
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
+            )}
+
+            {canDraft && <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <h3 className="font-black text-slate-800 text-sm uppercase tracking-tight">Plantilla sugerida</h3>
                 {draft && (
@@ -656,20 +749,24 @@ export const CoordinatorEvidenceEditor = ({
                   ))}
                 </div>
               )}
-            </div>
+            </div>}
           </div>
 
           <div className="p-6 border-t border-slate-100 bg-slate-50 flex items-center justify-between">
             <div className="flex flex-col gap-1">
               <p className="text-xs text-slate-500 leading-relaxed">
-                Este flujo no sube archivos al final: genera y guarda un documento institucional descargable.
+                {evaluatorMode
+                  ? 'Este flujo es de revision: el evaluador registra el estado y las observaciones de la evidencia.'
+                  : 'Este flujo no sube archivos al final: genera y guarda un documento institucional descargable.'}
               </p>
               <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">
-                {generatedDocument ? `${generatedDocument.fileName}.doc` : 'Selecciona una plantilla para generar el formato unico'}
+                {evaluatorMode
+                  ? (currentFile ? `Revisando ${currentFile.fileName}` : 'Sin archivo cargado para revisar')
+                  : (generatedDocument ? `${generatedDocument.fileName}.doc` : 'Selecciona una plantilla para generar el formato unico')}
               </p>
             </div>
 
-            <div className="flex items-center gap-2">
+            {canDraft && <div className="flex items-center gap-2">
               <button
                 onClick={() => setWorkspaceMode('preview')}
                 disabled={!draft}
@@ -686,17 +783,21 @@ export const CoordinatorEvidenceEditor = ({
                 <FileDown className="w-5 h-5" />
                 Descargar y guardar
               </button>
-            </div>
+            </div>}
           </div>
         </div>
 
         <div className="w-full md:w-[400px] flex flex-col h-full shrink-0">
-          <CoordinatorAIGuidePanel
-            isGenerating={isGenerating}
-            aiResponse={aiResponse}
-            onAction={handleRequestAI}
-            onApplySuggestion={handleApplySuggestion}
-          />
+          {evaluatorMode ? (
+            <EvaluatorReviewGuidePanel currentFile={currentFile} />
+          ) : (
+            <CoordinatorAIGuidePanel
+              isGenerating={isGenerating}
+              aiResponse={aiResponse}
+              onAction={handleRequestAI}
+              onApplySuggestion={handleApplySuggestion}
+            />
+          )}
         </div>
       </motion.div>
     </div>

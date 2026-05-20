@@ -2,7 +2,7 @@ import React from 'react';
 import { TopBar } from './TopBar';
 import { UserPanel } from './UserPanel';
 import { NotificationBell } from './NotificationBell';
-import { Notification } from '../../types';
+import { Notification, UserRole } from '../../types';
 
 interface HeaderProps {
   onLogout: () => void;
@@ -11,6 +11,8 @@ interface HeaderProps {
   onToggleNotifications: () => void;
   onMarkAsRead: (id: string) => void;
   onClearAllNotifications: () => void;
+  userName?: string;
+  userRole?: UserRole;
 }
 
 export const Header = ({
@@ -19,8 +21,17 @@ export const Header = ({
   showNotifications,
   onToggleNotifications,
   onMarkAsRead,
-  onClearAllNotifications
+  onClearAllNotifications,
+  userName = 'Usuario',
+  userRole = 'ADMIN'
 }: HeaderProps) => {
+  const roleLabel =
+    userRole === 'ADMIN'
+      ? 'Administrador'
+      : userRole === 'COORDINADOR'
+        ? 'Coordinacion Academica'
+        : 'Evaluacion Externa';
+
   return (
     <TopBar>
       <div className="flex items-center gap-4">
@@ -29,7 +40,7 @@ export const Header = ({
         <div className="flex items-center gap-2 px-3 py-1 bg-blue-50 rounded-full border border-blue-100">
           <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse" />
           <span className="text-[10px] font-black text-blue-600 uppercase tracking-widest">
-            En proceso de acreditacion
+            {userRole === 'EVALUADOR' ? 'Modo de revision activa' : 'En proceso de acreditacion'}
           </span>
         </div>
       </div>
@@ -45,8 +56,8 @@ export const Header = ({
 
         <UserPanel
           onLogout={onLogout}
-          userName="Coordinador Academico"
-          userRole="SUDAMERICANO"
+          userName={userName}
+          userRole={roleLabel}
         />
       </div>
     </TopBar>

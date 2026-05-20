@@ -1,4 +1,4 @@
-import { Indicator, UploadedFile } from '../types';
+import { Indicator, UploadedFile, Status } from '../types';
 
 export const calculateIndicatorProgress = (indicator: Indicator, allFiles: UploadedFile[]) => {
   const requirements = indicator.requirements;
@@ -37,4 +37,14 @@ export const getIndicatorStats = (indicator: Indicator, allFiles: UploadedFile[]
   const pending = total - loaded;
 
   return { total, valid, loaded, observed, rejected, pending };
+};
+
+export const getIndicatorCurrentStatus = (indicator: Indicator, allFiles: UploadedFile[]): Status => {
+  const stats = getIndicatorStats(indicator, allFiles);
+
+  if (stats.rejected > 0) return 'Rechazado';
+  if (stats.observed > 0) return 'Observado';
+  if (stats.valid === stats.total && stats.total > 0) return 'Validado';
+  if (stats.loaded > 0) return 'Cargado';
+  return 'Pendiente';
 };

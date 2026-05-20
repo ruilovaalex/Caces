@@ -1,7 +1,7 @@
 import React from 'react';
 import { Indicator, Requirement, UploadedFile, UserRole } from '../../types';
 import { EvidenceRow } from './EvidenceRow';
-import { Folder, Info, PenSquare, Settings2, Upload } from 'lucide-react';
+import { Folder, Info, PenSquare, ClipboardCheck, Upload } from 'lucide-react';
 
 interface EvidenceTableProps {
   indicator: Indicator;
@@ -20,6 +20,8 @@ export const EvidenceTable = ({
   onOpenEditor,
   onOpenHistory
 }: EvidenceTableProps) => {
+  const isEvaluator = userRole === 'EVALUADOR';
+
   return (
     <div className="flex-1 flex flex-col min-h-0">
       <div className="px-8 py-4 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
@@ -37,25 +39,47 @@ export const EvidenceTable = ({
           </div>
           <div className="flex-1">
             <p className="text-sm font-black text-slate-800">Como usar esta seccion</p>
-            <p className="mt-1 text-xs text-slate-500 leading-relaxed">
-              Para cada evidencia, edita el contenido con apoyo de IA, descarga el documento estandarizado y revisa el historial de archivos subidos desde su boton independiente.
-            </p>
-            <div className="mt-3 flex flex-wrap gap-2">
-              {userRole === 'COORDINADOR' && (
-                <span className="inline-flex items-center gap-2 rounded-xl bg-white px-3 py-2 text-[10px] font-black uppercase tracking-wider text-emerald-700 border border-emerald-100">
-                  <PenSquare className="w-3.5 h-3.5" />
-                  1. Editar evidencia completa
-                </span>
-              )}
-              <span className="inline-flex items-center gap-2 rounded-xl bg-white px-3 py-2 text-[10px] font-black uppercase tracking-wider text-slate-700 border border-slate-200">
-                <Settings2 className="w-3.5 h-3.5" />
-                Historial separado
-              </span>
-              <span className="inline-flex items-center gap-2 rounded-xl bg-white px-3 py-2 text-[10px] font-black uppercase tracking-wider text-blue-700 border border-blue-100">
-                <Upload className="w-3.5 h-3.5" />
-                Subir solo desde la tabla
-              </span>
-            </div>
+            {isEvaluator ? (
+              <>
+                <p className="mt-1 text-xs text-slate-500 leading-relaxed">
+                  Entra a revisar cada evidencia para evaluar lo cargado por el coordinador, dejar observaciones y decidir si se valida, se observa o se rechaza.
+                </p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <span className="inline-flex items-center gap-2 rounded-xl bg-white px-3 py-2 text-[10px] font-black uppercase tracking-wider text-amber-700 border border-amber-100">
+                    <ClipboardCheck className="w-3.5 h-3.5" />
+                    1. Revisar evidencia
+                  </span>
+                  <span className="inline-flex items-center gap-2 rounded-xl bg-white px-3 py-2 text-[10px] font-black uppercase tracking-wider text-slate-700 border border-slate-200">
+                    <Info className="w-3.5 h-3.5" />
+                    2. Analizar version actual
+                  </span>
+                  <span className="inline-flex items-center gap-2 rounded-xl bg-white px-3 py-2 text-[10px] font-black uppercase tracking-wider text-rose-700 border border-rose-100">
+                    <ClipboardCheck className="w-3.5 h-3.5" />
+                    3. Validar, observar o rechazar
+                  </span>
+                </div>
+              </>
+            ) : (
+              <>
+                <p className="mt-1 text-xs text-slate-500 leading-relaxed">
+                  Para cada evidencia, edita el contenido con apoyo de IA, descarga el documento estandarizado y revisa el historial de archivos subidos desde su boton independiente.
+                </p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <span className="inline-flex items-center gap-2 rounded-xl bg-white px-3 py-2 text-[10px] font-black uppercase tracking-wider text-emerald-700 border border-emerald-100">
+                    <PenSquare className="w-3.5 h-3.5" />
+                    1. Editar evidencia completa
+                  </span>
+                  <span className="inline-flex items-center gap-2 rounded-xl bg-white px-3 py-2 text-[10px] font-black uppercase tracking-wider text-slate-700 border border-slate-200">
+                    <Info className="w-3.5 h-3.5" />
+                    Historial separado
+                  </span>
+                  <span className="inline-flex items-center gap-2 rounded-xl bg-white px-3 py-2 text-[10px] font-black uppercase tracking-wider text-blue-700 border border-blue-100">
+                    <Upload className="w-3.5 h-3.5" />
+                    Subir solo desde la tabla
+                  </span>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </div>
@@ -71,12 +95,12 @@ export const EvidenceTable = ({
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-50">
-            {indicator.requirements.map((req) => (
+            {indicator.requirements.map(requirement => (
               <EvidenceRow
-                key={req.id}
-                requirement={req}
+                key={requirement.id}
+                requirement={requirement}
                 userRole={userRole}
-                files={getRequirementFiles(req.id)}
+                files={getRequirementFiles(requirement.id)}
                 onOpenUpload={onOpenUpload}
                 onOpenEditor={onOpenEditor}
                 onOpenHistory={onOpenHistory}
