@@ -10,6 +10,7 @@ import { IndicatorStatsCards } from '../components/indicators/IndicatorStatsCard
 import { IndicatorContent } from '../components/indicators/IndicatorContent';
 import { EvidenceTable } from '../components/evidences/EvidenceTable';
 import { EvidenceUploadModal } from '../components/evidences/EvidenceUploadModal';
+import { EvidenceHistoryModal } from '../components/evidences/EvidenceHistoryModal';
 import { CoordinatorEvidenceEditor } from '../components/coordinator/CoordinatorEvidenceEditor';
 
 import { useAuth } from '../hooks/useAuth';
@@ -38,6 +39,7 @@ export default function App() {
   const [activeRequirement, setActiveRequirement] = useState<Requirement | null>(null);
   const [isUploadOpen, setIsUploadOpen] = useState(false);
   const [isEditorOpen, setIsEditorOpen] = useState(false);
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
 
   const {
     allFiles,
@@ -224,6 +226,10 @@ export default function App() {
                       setActiveRequirement(requirement);
                       setIsEditorOpen(true);
                     }}
+                    onOpenHistory={requirement => {
+                      setActiveRequirement(requirement);
+                      setIsHistoryOpen(true);
+                    }}
                   />
                 </IndicatorContent>
               </motion.div>
@@ -243,6 +249,13 @@ export default function App() {
         isGenerating={false}
       />
 
+      <EvidenceHistoryModal
+        isOpen={isHistoryOpen}
+        onClose={() => setIsHistoryOpen(false)}
+        activeRequirement={activeRequirement}
+        files={selectedIndicator && activeRequirement ? getRequirementFiles(activeRequirement.id, selectedIndicator.code) : []}
+      />
+
       <AnimatePresence>
         {isEditorOpen && selectedIndicator && activeRequirement && (
           <CoordinatorEvidenceEditor
@@ -251,12 +264,6 @@ export default function App() {
             files={getRequirementFiles(activeRequirement.id, selectedIndicator.code)}
             currentUser={user}
             onClose={() => setIsEditorOpen(false)}
-            onUploadFinal={requirement => {
-              setActiveRequirement(requirement);
-              setIsEditorOpen(false);
-              setIsUploadOpen(true);
-              resetUpload();
-            }}
           />
         )}
       </AnimatePresence>

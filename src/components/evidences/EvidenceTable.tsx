@@ -9,6 +9,7 @@ interface EvidenceTableProps {
   getRequirementFiles: (reqId: string) => UploadedFile[];
   onOpenUpload: (req: Requirement) => void;
   onOpenEditor: (req: Requirement) => void;
+  onOpenHistory: (req: Requirement) => void;
 }
 
 export const EvidenceTable = ({
@@ -16,7 +17,8 @@ export const EvidenceTable = ({
   userRole,
   getRequirementFiles,
   onOpenUpload,
-  onOpenEditor
+  onOpenEditor,
+  onOpenHistory
 }: EvidenceTableProps) => {
   return (
     <div className="flex-1 flex flex-col min-h-0">
@@ -36,7 +38,7 @@ export const EvidenceTable = ({
           <div className="flex-1">
             <p className="text-sm font-black text-slate-800">Como usar esta seccion</p>
             <p className="mt-1 text-xs text-slate-500 leading-relaxed">
-              Para cada evidencia, entra a editar para trabajar el contenido, revisar observaciones, usar la IA y aplicar plantillas sugeridas. Afuera solo dejas el boton azul para cargar la version final.
+              Para cada evidencia, edita el contenido con apoyo de IA, descarga el documento estandarizado y revisa el historial de archivos subidos desde su boton independiente.
             </p>
             <div className="mt-3 flex flex-wrap gap-2">
               {userRole === 'COORDINADOR' && (
@@ -47,11 +49,11 @@ export const EvidenceTable = ({
               )}
               <span className="inline-flex items-center gap-2 rounded-xl bg-white px-3 py-2 text-[10px] font-black uppercase tracking-wider text-slate-700 border border-slate-200">
                 <Settings2 className="w-3.5 h-3.5" />
-                Incluye revision e IA
+                Historial separado
               </span>
               <span className="inline-flex items-center gap-2 rounded-xl bg-white px-3 py-2 text-[10px] font-black uppercase tracking-wider text-blue-700 border border-blue-100">
                 <Upload className="w-3.5 h-3.5" />
-                2. Subir version final
+                Subir solo desde la tabla
               </span>
             </div>
           </div>
@@ -77,6 +79,7 @@ export const EvidenceTable = ({
                 files={getRequirementFiles(req.id)}
                 onOpenUpload={onOpenUpload}
                 onOpenEditor={onOpenEditor}
+                onOpenHistory={onOpenHistory}
               />
             ))}
           </tbody>

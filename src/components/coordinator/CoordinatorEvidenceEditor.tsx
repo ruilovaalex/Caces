@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion } from 'motion/react';
 import {
   X,
   Save,
   Sparkles,
-  Upload,
   FileText,
   History,
   ChevronRight,
@@ -35,7 +34,6 @@ interface CoordinatorEvidenceEditorProps {
   requirement: Requirement;
   files: UploadedFile[];
   onClose: () => void;
-  onUploadFinal: (req: Requirement) => void;
   currentUser: any;
 }
 
@@ -44,7 +42,6 @@ export const CoordinatorEvidenceEditor = ({
   requirement,
   files,
   onClose,
-  onUploadFinal,
   currentUser
 }: CoordinatorEvidenceEditorProps) => {
   const [draft, setDraft] = useState<EvidenceDraft | null>(null);
@@ -52,7 +49,6 @@ export const CoordinatorEvidenceEditor = ({
   const [isGenerating, setIsGenerating] = useState(false);
   const [aiResponse, setAiResponse] = useState('');
   const [activeSectionId, setActiveSectionId] = useState<string | null>(null);
-  const [showHistory, setShowHistory] = useState(false);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
 
   const templates = EVIDENCE_TEMPLATES.filter(
@@ -243,6 +239,89 @@ export const CoordinatorEvidenceEditor = ({
     setActiveSectionId(targetSectionId);
   };
 
+  const normalizeFileName = (value: string) => value
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-zA-Z0-9]+/g, '_')
+    .replace(/^_+|_+$/g, '')
+    .toUpperCase();
+
+  const escapeHtml = (value: string) => value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+
+  const buildGeneratedDocument = () => {
+    if (!draft) return null;
+
+    const generatedAt = new Date();
+    const fileName = [
+      'SIG',
+      'EV',
+      normalizeFileName(indicator.code),
+      normalizeFileName(requirement.id),
+      generatedAt.toISOString().slice(0, 10).replace(/-/g, '')
+    ].join('-');
+
+    const sections = draft.sections.map(section => `
+      <h2>${escapeHtml(section.title)}</h2>
+      <p>${escapeHtml(section.content || section.placeholder).replace(/\n/g, '<br />')}</p>
+    `).join('');
+
+    const html = `
+      <!doctype html>
+      <html>
+        <head>
+          <meta charset="utf-8" />
+          <title>${fileName}</title>
+          <style>
+            body { font-family: Arial, sans-serif; color: #1f2937; line-height: 1.55; margin: 48px; }
+            h1 { font-size: 22px; margin: 0 0 8px; text-transform: uppercase; }
+            h2 { font-size: 15px; margin: 28px 0 8px; color: #0f172a; text-transform: uppercase; border-bottom: 1px solid #dbeafe; padding-bottom: 6px; }
+            p { font-size: 12px; margin: 0 0 10px; }
+            .meta { border: 1px solid #cbd5e1; padding: 14px; margin: 20px 0 24px; }
+            .meta p { margin: 4px 0; }
+          </style>
+        </head>
+        <body>
+          <h1>Documento unico de evidencia</h1>
+          <p><strong>Codigo:</strong> ${fileName}</p>
+          <div class="meta">
+            <p><strong>Indicador:</strong> ${escapeHtml(indicator.code)} - ${escapeHtml(indicator.name)}</p>
+            <p><strong>Evidencia:</strong> ${escapeHtml(requirement.label)}</p>
+            <p><strong>Formato requerido:</strong> ${escapeHtml(requirement.format)}</p>
+            <p><strong>Generado por:</strong> ${escapeHtml(currentUserName)}</p>
+            <p><strong>Fecha:</strong> ${generatedAt.toLocaleString()}</p>
+          </div>
+          <h2>Descripcion de la evidencia</h2>
+          <p>${escapeHtml(requirement.description)}</p>
+          ${sections}
+        </body>
+      </html>
+    `;
+
+    return { fileName, html };
+  };
+
+  const handleDownloadGeneratedDocument = () => {
+    const generatedDocument = buildGeneratedDocument();
+    if (!generatedDocument) return;
+
+    const blob = new Blob(['\ufeff', generatedDocument.html], {
+      type: 'application/msword;charset=utf-8'
+    });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${generatedDocument.fileName}.doc`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
   const getStatusBadge = (status: DraftStatus) => {
     const styles = {
       SIN_INICIAR: 'bg-slate-100 text-slate-500',
@@ -318,7 +397,7 @@ export const CoordinatorEvidenceEditor = ({
                 <div>
                   <h4 className="text-xs font-black text-slate-700 uppercase tracking-widest">Flujo recomendado</h4>
                   <p className="mt-1 text-sm text-slate-600 leading-relaxed">
-                    1. Elige una plantilla o empieza en blanco. 2. Redacta seccion por seccion. 3. Usa <span className="font-bold">Ayuda IA</span> para pedir borradores o mejoras. 4. Guarda el borrador y sube el archivo final cuando este listo.
+                    1. Elige una plantilla o empieza en blanco. 2. Redacta seccion por seccion. 3. Usa <span className="font-bold">Ayuda IA</span> para pedir borradores o mejoras. 4. Guarda el borrador y descarga el documento unico cuando este listo.
                   </p>
                 </div>
               </div>
@@ -473,60 +552,20 @@ export const CoordinatorEvidenceEditor = ({
 
           <div className="p-6 border-t border-slate-100 bg-slate-50 flex items-center justify-between">
             <div className="flex gap-2">
-              <button className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-xl text-xs font-black text-slate-600 hover:border-slate-300 transition-all uppercase tracking-widest shadow-sm">
-                <FileDown className="w-4 h-4" />
-                PDF
-              </button>
-              <button
-                onClick={() => setShowHistory(!showHistory)}
-                className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-xl text-xs font-black text-slate-600 hover:border-slate-300 transition-all uppercase tracking-widest shadow-sm"
-              >
-                <History className="w-4 h-4" />
-                Historial
-              </button>
+              <p className="text-xs text-slate-500 leading-relaxed">
+                El historial de documentos subidos se consulta desde la tabla de evidencias.
+              </p>
             </div>
 
             <button
-              onClick={() => onUploadFinal(requirement)}
-              className="flex items-center gap-3 px-8 py-3 bg-blue-600 text-white rounded-2xl font-black text-sm uppercase tracking-widest shadow-xl shadow-blue-200 hover:bg-blue-700 hover:-translate-y-0.5 transition-all active:translate-y-0"
+              onClick={handleDownloadGeneratedDocument}
+              disabled={!draft}
+              className="flex items-center gap-3 px-8 py-3 bg-blue-600 text-white rounded-2xl font-black text-sm uppercase tracking-widest shadow-xl shadow-blue-200 hover:bg-blue-700 hover:-translate-y-0.5 transition-all active:translate-y-0 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:shadow-none"
             >
-              <Upload className="w-5 h-5" />
-              Subir archivo final
+              <FileDown className="w-5 h-5" />
+              Descargar documento
             </button>
           </div>
-
-          <AnimatePresence>
-            {showHistory && (
-              <motion.div
-                initial={{ opacity: 0, x: -300 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -300 }}
-                className="absolute inset-y-0 left-0 w-80 bg-white border-r border-slate-200 shadow-2xl z-30 p-6 flex flex-col"
-              >
-                <div className="flex items-center justify-between mb-6">
-                  <h3 className="font-black text-slate-800 text-sm uppercase tracking-tight flex items-center gap-2">
-                    <History className="w-4 h-4" />
-                    Historial de borradores
-                  </h3>
-                  <button onClick={() => setShowHistory(false)}>
-                    <X className="w-4 h-4" />
-                  </button>
-                </div>
-                <div className="flex-1 overflow-y-auto space-y-3">
-                  {DraftService.getDraftHistory(indicator.code, requirement.id).map(entry => (
-                    <div key={entry.id} className="p-4 border border-slate-100 rounded-xl hover:bg-slate-50 transition-colors">
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="text-[10px] font-black text-blue-600 bg-blue-50 px-2 py-0.5 rounded">V.{entry.version}</span>
-                        <span className="text-[10px] font-medium text-slate-400">{new Date(entry.updatedAt).toLocaleString()}</span>
-                      </div>
-                      <p className="text-xs text-slate-600 font-bold">{entry.updatedBy}</p>
-                      <p className="text-[10px] text-slate-400 mt-1">{entry.changes}</p>
-                    </div>
-                  ))}
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
         </div>
 
         <div className="w-full md:w-[400px] flex flex-col h-full shrink-0">

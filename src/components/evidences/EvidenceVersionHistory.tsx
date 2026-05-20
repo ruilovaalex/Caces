@@ -1,5 +1,5 @@
 import React from 'react';
-import { Requirement, UploadedFile } from '../../types';
+import { UploadedFile } from '../../types';
 import { EvidenceStatusBadge as StatusBadge } from './EvidenceStatusBadge';
 import { FileText } from 'lucide-react';
 
@@ -16,6 +16,9 @@ export const EvidenceVersionHistory = ({ files }: EvidenceVersionHistoryProps) =
             <th className="px-6 py-4">Versión</th>
             <th className="px-6 py-4">Fecha</th>
             <th className="px-6 py-4">Estado</th>
+            <th className="px-6 py-4">Tipo</th>
+            <th className="px-6 py-4">Tamano</th>
+            <th className="px-6 py-4">Subido por</th>
             <th className="px-6 py-4">Archivo</th>
           </tr>
         </thead>
@@ -25,8 +28,13 @@ export const EvidenceVersionHistory = ({ files }: EvidenceVersionHistoryProps) =
               <td className="px-6 py-5 font-black text-slate-400">v{file.version}</td>
               <td className="px-6 py-5 text-[10px] font-bold text-slate-500">{file.uploadDate}</td>
               <td className="px-6 py-5"><StatusBadge status={file.status} /></td>
+              <td className="px-6 py-5 text-[10px] font-black text-slate-500 uppercase">{file.fileType}</td>
+              <td className="px-6 py-5 text-[10px] font-bold text-slate-500">{file.fileSize}</td>
+              <td className="px-6 py-5 text-[10px] font-bold text-slate-500">{file.uploadedBy}</td>
               <td className="px-6 py-5 text-right">
-                <button className="p-2 bg-slate-100 rounded-lg text-slate-400"><FileText className="w-4 h-4" /></button>
+                <button className="p-2 bg-slate-100 rounded-lg text-slate-400" title={file.fileName}>
+                  <FileText className="w-4 h-4" />
+                </button>
               </td>
             </tr>
           ))}

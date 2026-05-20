@@ -1,7 +1,7 @@
 import React from 'react';
 import { Requirement, UploadedFile, UserRole } from '../../types';
 import { EvidenceStatusBadge as StatusBadge } from './EvidenceStatusBadge';
-import { Upload, AlertCircle, Edit3 } from 'lucide-react';
+import { Upload, AlertCircle, Edit3, History } from 'lucide-react';
 
 interface EvidenceRowProps {
   requirement: Requirement;
@@ -9,6 +9,7 @@ interface EvidenceRowProps {
   files: UploadedFile[];
   onOpenUpload: (req: Requirement) => void;
   onOpenEditor: (req: Requirement) => void;
+  onOpenHistory: (req: Requirement) => void;
 }
 
 export const EvidenceRow = ({
@@ -16,7 +17,8 @@ export const EvidenceRow = ({
   userRole,
   files,
   onOpenUpload,
-  onOpenEditor
+  onOpenEditor,
+  onOpenHistory
 }: EvidenceRowProps) => {
   const currentFile = files.find(file => file.isCurrentVersion);
   const status = currentFile ? currentFile.status : 'Pendiente';
@@ -55,15 +57,19 @@ export const EvidenceRow = ({
           {userRole === 'COORDINADOR' && (
             <button
               onClick={() => onOpenEditor(requirement)}
-              className="flex items-center gap-2 px-3 py-2 bg-emerald-50 text-emerald-600 hover:bg-emerald-600 hover:text-white rounded-xl transition-all shadow-sm group"
+              className="p-2.5 bg-emerald-50 text-emerald-600 hover:bg-emerald-600 hover:text-white rounded-xl transition-all shadow-sm group"
               title="Editar evidencia"
             >
-              <Edit3 className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
-              <span className="text-[10px] font-black uppercase tracking-widest hidden lg:block">
-                Editar evidencia
-              </span>
+              <Edit3 className="w-4 h-4 group-hover:scale-110 transition-transform" />
             </button>
           )}
+          <button
+            onClick={() => onOpenHistory(requirement)}
+            className="p-2.5 bg-slate-50 text-slate-500 hover:bg-slate-900 hover:text-white rounded-xl transition-all shadow-sm"
+            title="Ver historial de documentos subidos"
+          >
+            <History className="w-4 h-4" />
+          </button>
           <button
             onClick={() => onOpenUpload(requirement)}
             className={`p-2.5 rounded-xl transition-all shadow-sm ${
