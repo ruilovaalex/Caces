@@ -1,9 +1,7 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { Sidebar } from '../components/layout/Sidebar';
 import { Header } from '../components/layout/Header';
-import { Dashboard } from '../components/layout/Dashboard';
-import { ChecklistView } from '../components/layout/ChecklistView';
 import { LoginScreen } from '../components/auth/LoginScreen';
 import { IndicatorHeader } from '../components/indicators/IndicatorHeader';
 import { IndicatorStatsCards } from '../components/indicators/IndicatorStatsCards';
@@ -29,13 +27,11 @@ export default function App() {
     selectedIndicator,
     expandedNodes,
     focusedNodeId,
-    setSelectedIndicator,
     setFocusedNodeId,
     toggleNode,
     selectIndicator
   } = useIndicators();
 
-  const [viewMode, setViewMode] = useState<'dashboard' | 'indicator' | 'checklist'>('dashboard');
   const [activeRequirement, setActiveRequirement] = useState<Requirement | null>(null);
   const [isUploadOpen, setIsUploadOpen] = useState(false);
   const [isEditorOpen, setIsEditorOpen] = useState(false);
@@ -66,8 +62,14 @@ export default function App() {
 
   const handleIndicatorSelect = (indicator: Indicator) => {
     selectIndicator(indicator);
-    setViewMode('indicator');
   };
+
+  useEffect(() => {
+    if (selectedIndicator || mockData.length === 0) return;
+
+    const firstIndicator = mockData[0]?.criteria[0]?.subCriteria[0]?.indicators[0];
+    if (firstIndicator) selectIndicator(firstIndicator);
+  }, [mockData, selectIndicator, selectedIndicator]);
 
   const handleSaveUpload = async () => {
     if (!activeRequirement || !selectedIndicator || !uploadFileContent || !user) return;
@@ -161,10 +163,6 @@ export default function App() {
         focusedNodeId={focusedNodeId}
         userRole={userRole}
         onIndicatorSelect={handleIndicatorSelect}
-        onDashboardClick={() => {
-          setSelectedIndicator(null);
-          setViewMode('dashboard');
-        }}
         onToggleNode={toggleNode}
         onSetFocusedNode={setFocusedNodeId}
         onKeyDown={handleKeyDown}
@@ -183,21 +181,7 @@ export default function App() {
 
         <div className="flex-1 overflow-y-auto p-8">
           <AnimatePresence mode="wait">
-            {!selectedIndicator ? (
-              <Dashboard
-                mockData={mockData}
-                allFiles={allFiles}
-                onIndicatorSelect={handleIndicatorSelect}
-                onViewChecklist={() => setViewMode('checklist')}
-                onToggleNode={toggleNode}
-              />
-            ) : viewMode === 'checklist' ? (
-              <ChecklistView
-                mockData={mockData}
-                onIndicatorSelect={handleIndicatorSelect}
-                onBackToDashboard={() => setViewMode('dashboard')}
-              />
-            ) : (
+            {selectedIndicator && (
               <motion.div
                 key={selectedIndicator.code}
                 initial={{ opacity: 0, x: 20 }}
@@ -208,7 +192,6 @@ export default function App() {
                   <IndicatorHeader
                     indicator={selectedIndicator}
                     progress={calculateIndicatorProgress(selectedIndicator, allFiles)}
-                    onBackToDashboard={() => setViewMode('dashboard')}
                   />
 
                   <IndicatorStatsCards stats={getIndicatorStats(selectedIndicator, allFiles)} />

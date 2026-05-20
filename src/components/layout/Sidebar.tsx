@@ -3,8 +3,7 @@ import {
   ChevronRight, 
   ChevronDown, 
   FileText, 
-  Folder, 
-  LayoutDashboard
+  Folder
 } from 'lucide-react';
 import { Indicator, YearPeriod, UserRole } from '../../types';
 
@@ -15,7 +14,6 @@ interface SidebarProps {
   focusedNodeId: string | null;
   userRole: UserRole;
   onIndicatorSelect: (ind: Indicator) => void;
-  onDashboardClick: () => void;
   onToggleNode: (id: string) => void;
   onSetFocusedNode: (id: string) => void;
   onKeyDown: (e: React.KeyboardEvent) => void;
@@ -29,7 +27,6 @@ export const Sidebar = ({
   focusedNodeId,
   userRole,
   onIndicatorSelect,
-  onDashboardClick,
   onToggleNode,
   onSetFocusedNode,
   onKeyDown,
@@ -55,13 +52,6 @@ export const Sidebar = ({
       >
         <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-2 mb-4 flex items-center justify-between">
           <span>Gestión de Periodos</span>
-          <button 
-            onClick={onDashboardClick}
-            className="p-1 hover:bg-blue-100 rounded text-blue-600 transition-all"
-            title="Ir al Dashboard Global"
-          >
-            <LayoutDashboard className="w-3.5 h-3.5" />
-          </button>
         </div>
         
         {mockData.map((yearPeriod) => (
