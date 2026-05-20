@@ -14,10 +14,13 @@ export interface AIGuideResponse {
 export interface GeneratedDoc {
   id: string;
   indicatorCode: string;
+  requirementId?: string;
+  requirementLabel?: string;
   templateId: string;
   content: string;
   timestamp: string;
   label?: string;
+  fileName?: string;
   isUpload?: boolean;
   fileSize?: string;
   fileType?: string;

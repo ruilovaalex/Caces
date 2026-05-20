@@ -18,7 +18,7 @@ export interface EvidenceTemplate {
   recommendedFileName: string;
 }
 
-export type DraftStatus = 'SIN_INICIAR' | 'EN_EDICION' | 'BORRADOR_GUARDADO' | 'LISTO_PARA_SUBIR' | 'ARCHIVO_FINAL_CARGADO';
+export type DraftStatus = 'SIN_INICIAR' | 'EN_EDICION' | 'BORRADOR_GUARDADO' | 'DOCUMENTO_GENERADO' | 'LISTO_PARA_SUBIR' | 'ARCHIVO_FINAL_CARGADO';
 
 export interface EvidenceDraft {
   id: string;
