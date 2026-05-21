@@ -1,7 +1,7 @@
 import React from 'react';
 import { Requirement, UploadedFile, UserRole } from '../../types';
 import { EvidenceStatusBadge as StatusBadge } from './EvidenceStatusBadge';
-import { Upload, AlertCircle, Edit3, ClipboardCheck } from 'lucide-react';
+import { Upload, AlertCircle, Edit3, ClipboardCheck, History } from 'lucide-react';
 import { canUserUpload } from '../../utils/permissions';
 
 interface EvidenceRowProps {
@@ -10,6 +10,7 @@ interface EvidenceRowProps {
   files: UploadedFile[];
   onOpenUpload: (req: Requirement) => void;
   onOpenEditor: (req: Requirement) => void;
+  onOpenHistory: (req: Requirement) => void;
 }
 
 export const EvidenceRow = ({
@@ -17,7 +18,8 @@ export const EvidenceRow = ({
   userRole,
   files,
   onOpenUpload,
-  onOpenEditor
+  onOpenEditor,
+  onOpenHistory
 }: EvidenceRowProps) => {
   const currentFile = files.find(file => file.isCurrentVersion);
   const status = currentFile ? currentFile.status : 'Pendiente';
@@ -69,6 +71,14 @@ export const EvidenceRow = ({
           >
             <EditorIcon className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
             <span className="text-[10px] font-black uppercase tracking-widest hidden lg:block">{editorLabel}</span>
+          </button>
+
+          <button
+            onClick={() => onOpenHistory(requirement)}
+            className="p-2.5 bg-slate-50 text-slate-500 hover:bg-slate-900 hover:text-white rounded-xl transition-all shadow-sm"
+            title="Ver historial de documentos subidos"
+          >
+            <History className="w-4 h-4" />
           </button>
 
           {canUploadFile && (

@@ -60,6 +60,11 @@ export const useEvidences = () => {
   const deleteEvidence = (id: string) => {
     EvidenceService.deleteEvidence(id);
     loadData();
+    NotificationService.add({
+      title: 'Documento eliminado',
+      message: 'La version seleccionada fue retirada del historial de evidencia.',
+      type: 'warning'
+    });
   };
 
   return {

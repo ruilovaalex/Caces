@@ -2,7 +2,6 @@ import React from 'react';
 import { LayoutDashboard } from 'lucide-react';
 import { Indicator, Status } from '../../types';
 import { EvidenceStatusBadge as StatusBadge } from '../evidences/EvidenceStatusBadge';
-
 import { IndicatorProgress } from './IndicatorProgress';
 
 interface IndicatorHeaderProps {
@@ -38,7 +37,7 @@ export const IndicatorHeader = ({
         </div>
       </div>
       <div className="flex flex-col items-end gap-3">
-        <button 
+        <button
           onClick={onBackToDashboard}
           className="flex items-center gap-2 px-5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-50 transition-all shadow-sm"
         >
@@ -46,9 +45,9 @@ export const IndicatorHeader = ({
           Volver al Dashboard
         </button>
         <div className="w-48">
-          <IndicatorProgress 
-            progress={progress} 
-            label="Progreso Real" 
+          <IndicatorProgress
+            progress={progress}
+            label="Progreso Real"
             showValue={true}
           />
         </div>

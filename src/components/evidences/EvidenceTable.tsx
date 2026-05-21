@@ -1,7 +1,7 @@
 import React from 'react';
 import { Indicator, Requirement, UploadedFile, UserRole } from '../../types';
 import { EvidenceRow } from './EvidenceRow';
-import { Folder, Info, PenSquare, ClipboardCheck, Upload } from 'lucide-react';
+import { Folder, Info, PenSquare, ClipboardCheck, Upload, History } from 'lucide-react';
 
 interface EvidenceTableProps {
   indicator: Indicator;
@@ -9,6 +9,7 @@ interface EvidenceTableProps {
   getRequirementFiles: (reqId: string) => UploadedFile[];
   onOpenUpload: (req: Requirement) => void;
   onOpenEditor: (req: Requirement) => void;
+  onOpenHistory: (req: Requirement) => void;
 }
 
 export const EvidenceTable = ({
@@ -16,7 +17,8 @@ export const EvidenceTable = ({
   userRole,
   getRequirementFiles,
   onOpenUpload,
-  onOpenEditor
+  onOpenEditor,
+  onOpenHistory
 }: EvidenceTableProps) => {
   const isEvaluator = userRole === 'EVALUADOR';
 
@@ -60,7 +62,7 @@ export const EvidenceTable = ({
             ) : (
               <>
                 <p className="mt-1 text-xs text-slate-500 leading-relaxed">
-                  Para cada evidencia, entra a editar para trabajar el contenido, revisar observaciones, usar la IA y aplicar plantillas sugeridas. Afuera solo dejas el boton azul para cargar la version final.
+                  Para cada evidencia, edita el contenido con apoyo de IA, genera el documento institucional y revisa el historial de archivos subidos desde su boton independiente. La carga final sigue en el boton azul de la tabla.
                 </p>
                 <div className="mt-3 flex flex-wrap gap-2">
                   <span className="inline-flex items-center gap-2 rounded-xl bg-white px-3 py-2 text-[10px] font-black uppercase tracking-wider text-emerald-700 border border-emerald-100">
@@ -68,12 +70,12 @@ export const EvidenceTable = ({
                     1. Editar evidencia completa
                   </span>
                   <span className="inline-flex items-center gap-2 rounded-xl bg-white px-3 py-2 text-[10px] font-black uppercase tracking-wider text-slate-700 border border-slate-200">
-                    <Info className="w-3.5 h-3.5" />
-                    Incluye revision e IA
+                    <History className="w-3.5 h-3.5" />
+                    2. Revisar historial
                   </span>
                   <span className="inline-flex items-center gap-2 rounded-xl bg-white px-3 py-2 text-[10px] font-black uppercase tracking-wider text-blue-700 border border-blue-100">
                     <Upload className="w-3.5 h-3.5" />
-                    2. Subir version final
+                    3. Subir version final
                   </span>
                 </div>
               </>
@@ -101,6 +103,7 @@ export const EvidenceTable = ({
                 files={getRequirementFiles(requirement.id)}
                 onOpenUpload={onOpenUpload}
                 onOpenEditor={onOpenEditor}
+                onOpenHistory={onOpenHistory}
               />
             ))}
           </tbody>
