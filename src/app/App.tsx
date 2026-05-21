@@ -1,7 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { Sidebar } from '../components/layout/Sidebar';
 import { Header } from '../components/layout/Header';
+import { Dashboard } from '../components/layout/Dashboard';
+import { ChecklistView } from '../components/layout/ChecklistView';
 import { LoginScreen } from '../components/auth/LoginScreen';
 import { IndicatorHeader } from '../components/indicators/IndicatorHeader';
 import { IndicatorStatsCards } from '../components/indicators/IndicatorStatsCards';
@@ -28,6 +30,7 @@ export default function App() {
     selectedIndicator,
     expandedNodes,
     focusedNodeId,
+    setSelectedIndicator,
     setFocusedNodeId,
     toggleNode,
     selectIndicator
@@ -37,6 +40,7 @@ export default function App() {
   const [isUploadOpen, setIsUploadOpen] = useState(false);
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+  const [isChecklistOpen, setIsChecklistOpen] = useState(false);
 
   const {
     allFiles,
@@ -64,6 +68,7 @@ export default function App() {
   } = useFileUpload();
 
   const handleIndicatorSelect = (indicator: Indicator) => {
+    setIsChecklistOpen(false);
     selectIndicator(indicator);
   };
 
@@ -71,18 +76,10 @@ export default function App() {
     setIsEditorOpen(false);
     setIsUploadOpen(false);
     setIsHistoryOpen(false);
+    setIsChecklistOpen(false);
     setActiveRequirement(null);
-
-    const firstIndicator = mockData[0]?.criteria[0]?.subCriteria[0]?.indicators[0];
-    if (firstIndicator) selectIndicator(firstIndicator);
+    setSelectedIndicator(null);
   };
-
-  useEffect(() => {
-    if (selectedIndicator || mockData.length === 0) return;
-
-    const firstIndicator = mockData[0]?.criteria[0]?.subCriteria[0]?.indicators[0];
-    if (firstIndicator) selectIndicator(firstIndicator);
-  }, [mockData, selectIndicator, selectedIndicator]);
 
   const handleSaveUpload = async () => {
     if (!activeRequirement || !selectedIndicator || !uploadFileContent || !user) return;
@@ -205,6 +202,24 @@ export default function App() {
 
         <div className="flex-1 overflow-y-auto p-8">
           <AnimatePresence mode="wait">
+            {!selectedIndicator && !isChecklistOpen && (
+              <Dashboard
+                mockData={mockData}
+                allFiles={allFiles}
+                onIndicatorSelect={handleIndicatorSelect}
+                onViewChecklist={() => setIsChecklistOpen(true)}
+                onToggleNode={toggleNode}
+              />
+            )}
+
+            {!selectedIndicator && isChecklistOpen && (
+              <ChecklistView
+                mockData={mockData}
+                onIndicatorSelect={handleIndicatorSelect}
+                onBackToDashboard={handleGoToStart}
+              />
+            )}
+
             {selectedIndicator && (
               <motion.div
                 key={selectedIndicator.code}
