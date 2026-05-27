@@ -35,11 +35,11 @@ export const Header = ({
   return (
     <TopBar>
       <div className="flex items-center gap-4">
-        <h2 className="text-xl font-black text-slate-800 tracking-tight">Repositorio CACES 2025</h2>
-        <div className="h-6 w-[1px] bg-slate-200 mx-2" />
-        <div className="flex items-center gap-2 px-3 py-1 bg-blue-50 rounded-full border border-blue-100">
-          <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse" />
-          <span className="text-[10px] font-black text-blue-600 uppercase tracking-widest">
+        <h2 className="text-xl font-black text-white tracking-tight">Repositorio CACES 2025</h2>
+        <div className="h-6 w-[1px] bg-white/15 mx-2" />
+        <div className="flex items-center gap-2 px-3 py-1 bg-white/10 rounded-full border border-white/10">
+          <div className="w-1.5 h-1.5 bg-[#22c55e] rounded-full animate-pulse" />
+          <span className="text-[10px] font-black text-[#aac4e8] uppercase tracking-widest">
             {userRole === 'EVALUADOR' ? 'Modo de revision activa' : 'Gestion de acreditacion'}
           </span>
         </div>

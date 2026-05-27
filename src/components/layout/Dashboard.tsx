@@ -76,27 +76,27 @@ export const Dashboard = ({
       />
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-white p-5 rounded-lg border border-slate-100 shadow-sm space-y-2">
-          <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none">Total Evidencias</span>
-          <h3 className="text-2xl font-black text-slate-800">
+        <div className="premium-card bg-white p-5 rounded-lg border-l-4 border-l-[#2563eb] space-y-2">
+          <span className="text-[9px] font-black text-[#64748b] uppercase tracking-widest leading-none">Total Evidencias</span>
+          <h3 className="text-2xl font-black text-[#0f172a]">
             {dashboardStats.totalEvidences}
           </h3>
         </div>
-        <div className="bg-white p-5 rounded-lg border border-slate-100 shadow-sm space-y-2">
-          <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none">Cargadas</span>
-          <h3 className="text-2xl font-black text-blue-600">
+        <div className="premium-card bg-white p-5 rounded-lg border-l-4 border-l-[#2563eb] space-y-2">
+          <span className="text-[9px] font-black text-[#64748b] uppercase tracking-widest leading-none">Cargadas</span>
+          <h3 className="text-2xl font-black text-[#2563eb]">
              {dashboardStats.loaded}
           </h3>
         </div>
-        <div className="bg-white p-5 rounded-lg border border-slate-100 shadow-sm space-y-2">
-          <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none">Validadas</span>
-          <h3 className="text-2xl font-black text-emerald-600">
+        <div className="premium-card bg-white p-5 rounded-lg border-l-4 border-l-[#15803d] space-y-2">
+          <span className="text-[9px] font-black text-[#64748b] uppercase tracking-widest leading-none">Validadas</span>
+          <h3 className="text-2xl font-black text-[#15803d]">
              {dashboardStats.validated}
           </h3>
         </div>
-        <div className="bg-white p-5 rounded-lg border border-slate-100 shadow-sm space-y-2">
-          <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none">Observadas</span>
-          <h3 className="text-2xl font-black text-amber-500">
+        <div className="premium-card bg-white p-5 rounded-lg border-l-4 border-l-[#dc2626] space-y-2">
+          <span className="text-[9px] font-black text-[#64748b] uppercase tracking-widest leading-none">Observadas</span>
+          <h3 className="text-2xl font-black text-[#dc2626]">
              {dashboardStats.observed}
           </h3>
         </div>
@@ -114,16 +114,16 @@ export const Dashboard = ({
               type="button"
               key={crit.id} 
               onClick={() => onOpenCriterionSubCriteria(mockData[0].year, crit.id)}
-              className="bg-white p-6 rounded-lg border border-slate-100 shadow-sm hover:border-blue-200 transition-all cursor-pointer group text-left"
+              className="premium-card bg-white p-6 rounded-lg border border-[#e2e8f0] hover:border-[#2563eb] transition-all cursor-pointer group text-left"
             >
               <div className="flex justify-between items-start mb-4">
-                <div className="p-3 bg-slate-50 rounded-lg text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-all">
+                <div className="p-3 bg-[#2563eb] rounded-lg text-white transition-all">
                   <Folder className="w-6 h-6" />
                 </div>
                 <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Criterio {crit.id}</span>
               </div>
-              <h4 className="font-bold text-slate-800 mb-1">{crit.name}</h4>
-              <p className="text-[10px] text-slate-400 font-bold uppercase mb-6">
+              <h4 className="font-bold text-[#0f172a] mb-1">{crit.name}</h4>
+              <p className="text-[10px] text-[#64748b] font-bold uppercase mb-6">
                 {crit.subCriteria.length} Subcriterios • {crit.subCriteria.reduce((acc, sub) => acc + sub.indicators.length, 0)} Indicadores
               </p>
               <div className="space-y-4">
@@ -132,11 +132,11 @@ export const Dashboard = ({
                    return (
                      <div key={sub.id} className="space-y-2">
                        <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-wider">
-                         <span className="text-slate-400 truncate max-w-[80%]">{sub.name}</span>
-                         <span className="text-blue-600">{subProgress}%</span>
+                         <span className="text-[#64748b] truncate max-w-[80%]">{sub.name}</span>
+                         <span className="text-[#2563eb]">{subProgress}%</span>
                        </div>
-                       <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                         <div className="h-full bg-blue-500 transition-all duration-700" style={{ width: `${subProgress}%` }} />
+                       <div className="w-full h-1.5 bg-[#f1f5f9] rounded-full overflow-hidden">
+                         <div className="h-full bg-[#22c55e] transition-all duration-700" style={{ width: `${subProgress}%` }} />
                        </div>
                      </div>
                    );
@@ -146,8 +146,8 @@ export const Dashboard = ({
           ))}
         </div>
 
-        <div className="bg-white rounded-lg border border-slate-100 shadow-sm overflow-hidden">
-          <div className="p-6 border-b border-slate-50 flex items-center justify-between bg-slate-50/50">
+        <div className="premium-card bg-white rounded-lg border border-[#e2e8f0] overflow-hidden">
+          <div className="p-6 border-b border-[#f1f5f9] flex items-center justify-between bg-white">
             <div className="flex items-center gap-3">
               <AlertCircle className="w-5 h-5 text-amber-500" />
               <h3 className="text-sm font-black text-slate-800 uppercase tracking-tight">Atención Requerida: Evidencias Pendientes</h3>

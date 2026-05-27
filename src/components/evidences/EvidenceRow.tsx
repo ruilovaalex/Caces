@@ -64,8 +64,8 @@ export const EvidenceRow = ({
             onClick={() => onOpenEditor(requirement)}
             className={`h-10 w-10 inline-flex items-center justify-center rounded-xl transition-all shadow-sm group ${
               userRole === 'EVALUADOR'
-                ? 'bg-amber-50 text-amber-700 hover:bg-amber-500 hover:text-white'
-                : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-600 hover:text-white'
+                ? 'bg-amber-50 text-[#d97706] hover:bg-[#d97706] hover:text-white'
+                : 'bg-blue-50 text-[#2563eb] hover:bg-[#2563eb] hover:text-white'
             }`}
             title={editorLabel}
             aria-label={editorLabel}
@@ -75,7 +75,7 @@ export const EvidenceRow = ({
 
           <button
             onClick={() => onOpenHistory(requirement)}
-            className="p-2.5 bg-slate-50 text-slate-500 hover:bg-slate-900 hover:text-white rounded-xl transition-all shadow-sm"
+            className="p-2.5 bg-slate-50 text-[#64748b] hover:bg-[#1e2d4a] hover:text-white rounded-xl transition-all shadow-sm"
             title="Ver historial de documentos subidos"
           >
             <History className="w-4 h-4" />
@@ -86,8 +86,8 @@ export const EvidenceRow = ({
               onClick={() => onOpenUpload(requirement)}
               className={`p-2.5 rounded-xl transition-all shadow-sm ${
                 status === 'Observado' || status === 'Pendiente' || status === 'Rechazado'
-                  ? 'bg-blue-600 text-white hover:bg-blue-700'
-                  : 'bg-slate-50 text-slate-400 hover:bg-slate-100'
+                  ? 'bg-[#2563eb] text-white hover:bg-blue-700'
+                  : 'bg-slate-50 text-[#94a3b8] hover:bg-slate-100'
               }`}
               title={currentFile ? 'Reemplazar archivo (nueva version)' : 'Subir archivo'}
             >

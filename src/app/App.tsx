@@ -210,7 +210,7 @@ export default function App() {
   }
 
   return (
-    <div className="flex h-screen bg-[#F8FAFC] font-sans text-slate-800">
+    <div className="flex h-screen bg-[#f4f6f9] font-sans text-slate-800">
       <Sidebar
         mockData={mockData}
         selectedIndicator={selectedIndicator}
@@ -239,7 +239,7 @@ export default function App() {
           userRole={userRole}
         />
 
-        <div className="flex-1 overflow-y-auto p-8">
+        <div className="flex-1 overflow-y-auto p-8 bg-[#f4f6f9]">
           {!selectedIndicator && !isChecklistOpen && !isAssignmentsOpen && (
             <Dashboard
               mockData={mockData}

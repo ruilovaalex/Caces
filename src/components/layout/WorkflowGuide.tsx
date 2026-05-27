@@ -68,18 +68,18 @@ export const WorkflowGuide = ({
   const CurrentIcon = current.icon;
 
   return (
-    <section className="bg-white border border-slate-200 rounded-lg shadow-sm p-4">
+    <section className="premium-hero border border-white/10 rounded-2xl shadow-[0_18px_40px_-26px_rgba(15,23,42,0.8)] p-5">
       <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
         <div className="flex items-start gap-3">
-          <div className="h-10 w-10 rounded-lg bg-blue-600 text-white flex items-center justify-center shrink-0">
+          <div className="h-10 w-10 rounded-lg bg-[#2563eb] text-white flex items-center justify-center shrink-0">
             <CurrentIcon className="h-5 w-5" />
           </div>
           <div className="min-w-0">
-            <p className="text-[10px] font-black uppercase tracking-widest text-blue-700">{current.label}</p>
-            <h2 className="text-base font-black text-slate-800 tracking-tight">{current.title}</h2>
-            <p className="mt-1 text-xs text-slate-500 leading-relaxed">{current.detail}</p>
-            <p className="mt-2 inline-flex items-center gap-2 text-xs font-bold text-slate-700">
-              <ArrowRight className="h-3.5 w-3.5 text-blue-600" />
+            <p className="text-[10px] font-black uppercase tracking-widest text-[#aac4e8]">{current.label}</p>
+            <h2 className="text-base font-black text-white tracking-tight">{current.title}</h2>
+            <p className="mt-1 text-xs text-white/60 leading-relaxed">{current.detail}</p>
+            <p className="mt-2 inline-flex items-center gap-2 text-xs font-bold text-white">
+              <ArrowRight className="h-3.5 w-3.5 text-[#22c55e]" />
               {current.next}
             </p>
           </div>
@@ -91,7 +91,7 @@ export const WorkflowGuide = ({
               <span
                 key={step.id}
                 className={`rounded-md px-2.5 py-1 text-[10px] font-black uppercase tracking-widest ${
-                  step.id === activeStep ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-500'
+                  step.id === activeStep ? 'bg-[#2563eb] text-white' : 'bg-white/10 text-[#aac4e8]'
                 }`}
               >
                 {index + 1}. {step.title}
@@ -103,7 +103,7 @@ export const WorkflowGuide = ({
             {onOpenRepository && (
               <button
                 onClick={onOpenRepository}
-                className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-[10px] font-black uppercase tracking-widest text-slate-600 hover:border-blue-300 hover:text-blue-700"
+                className="rounded-lg border border-white/15 bg-white/10 px-3 py-2 text-[10px] font-black uppercase tracking-widest text-white hover:bg-white/15"
               >
                 Repositorio
               </button>
@@ -111,7 +111,7 @@ export const WorkflowGuide = ({
             {canManageAssignments && onOpenAssignments && (
               <button
                 onClick={onOpenAssignments}
-                className="rounded-lg bg-slate-900 px-3 py-2 text-[10px] font-black uppercase tracking-widest text-white hover:bg-slate-800"
+                className="rounded-lg bg-[#2563eb] px-3 py-2 text-[10px] font-black uppercase tracking-widest text-white hover:bg-blue-700"
               >
                 Asignar evidencia
               </button>

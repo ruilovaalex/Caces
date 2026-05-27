@@ -5,9 +5,31 @@
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
 }
 
+:root {
+  --color-night: #0f172a;
+  --color-navy: #1e2d4a;
+  --color-primary: #2563eb;
+  --color-app-bg: #f4f6f9;
+  --color-title: #0f172a;
+  --color-title-soft: #1e293b;
+  --color-muted: #64748b;
+  --color-muted-light: #94a3b8;
+  --color-border: #e2e8f0;
+  --color-border-soft: #f1f5f9;
+  --color-pending: #d97706;
+  --color-valid: #15803d;
+  --color-observed: #dc2626;
+  --color-progress: #22c55e;
+}
+
+body {
+  background: var(--color-app-bg);
+  color: var(--color-title);
+}
+
 @layer components {
   .indicator-card {
-    @apply bg-white rounded-xl border border-slate-200 shadow-[0_4px_6px_-1px_rgba(0,0,0,0.05),0_2px_4px_-1px_rgba(0,0,0,0.03)] transition-all duration-300;
+    @apply bg-white rounded-xl border border-slate-200 shadow-[0_12px_30px_-20px_rgba(15,23,42,0.35)] transition-all duration-300;
   }
 
   .evidence-btn {
@@ -19,7 +41,16 @@
   }
 
   .tree-item-active {
-    @apply bg-slate-100 border-l-[3px] border-blue-600 text-blue-700;
+    @apply bg-blue-50 border-l-[3px] border-blue-600 text-blue-700;
+  }
+
+  .premium-card {
+    @apply bg-white border border-slate-200 shadow-[0_14px_30px_-22px_rgba(15,23,42,0.45)];
+  }
+
+  .premium-hero {
+    background: var(--color-navy);
+    color: white;
   }
 }
 
@@ -34,10 +65,10 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #CBD5E1;
+  background: #94a3b8;
   border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #94A3B8;
+  background: #64748b;
 }

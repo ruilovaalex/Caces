@@ -11,13 +11,13 @@ export const UserPanel = ({ onLogout, userName = 'Usuario', userRole = 'Perfil' 
   return (
     <div className="flex items-center gap-3">
       <div className="text-right hidden sm:block">
-        <p className="text-xs font-black text-slate-800 leading-none">{userName}</p>
-        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">{userRole}</p>
+        <p className="text-xs font-black text-white leading-none">{userName}</p>
+        <p className="text-[10px] font-bold text-[#aac4e8] uppercase tracking-widest mt-0.5">{userRole}</p>
       </div>
       
       <div className="relative group">
         <button 
-          className="h-10 w-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-700 font-black text-xs border border-blue-100 shadow-sm transition-all hover:bg-blue-100"
+          className="h-10 w-10 rounded-full bg-[#2563eb] flex items-center justify-center text-white font-black text-xs border border-white/20 shadow-sm transition-all hover:bg-blue-500"
         >
           <User className="w-5 h-5" />
         </button>

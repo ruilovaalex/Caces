@@ -51,24 +51,24 @@ export const Sidebar = ({
   };
 
   return (
-    <aside className="w-80 bg-white border-r border-slate-200 flex flex-col shadow-sm">
-      <div className="p-6 border-b border-slate-100 flex items-center gap-3">
-        <div className="bg-blue-600 p-2 rounded shadow-lg shadow-blue-600/20">
+    <aside className="w-80 bg-white border-r border-[#e2e8f0] flex flex-col shadow-sm">
+      <div className="p-6 border-b border-[#e2e8f0] flex items-center gap-3 bg-[#1e2d4a]">
+        <div className="bg-[#2563eb] p-2 rounded-lg shadow-lg shadow-blue-600/20">
           <FileText className="w-6 h-6 text-white" />
         </div>
         <div>
-          <h1 className="font-bold text-lg tracking-tight text-slate-800 leading-none">CACES</h1>
-          <span className="text-[10px] text-slate-400 font-bold uppercase tracking-[0.2em]">Acreditacion</span>
+          <h1 className="font-bold text-lg tracking-tight text-white leading-none">CACES</h1>
+          <span className="text-[10px] text-[#aac4e8] font-bold uppercase tracking-[0.2em]">Acreditacion</span>
         </div>
       </div>
 
-      <div className="p-4 border-b border-slate-100 space-y-2">
+      <div className="p-4 border-b border-[#e2e8f0] space-y-2">
         <button
           onClick={onOpenDashboard}
           className={`w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-colors ${
             activeView === 'dashboard' || activeView === 'indicator' || activeView === 'checklist'
-              ? 'bg-blue-50 text-blue-700'
-              : 'text-slate-500 hover:bg-slate-50'
+              ? 'bg-[#2563eb] text-white'
+              : 'text-[#64748b] hover:bg-[#f4f6f9]'
           }`}
         >
           <Folder className="w-4 h-4" />
@@ -80,8 +80,8 @@ export const Sidebar = ({
             onClick={onOpenAssignments}
             className={`w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-colors ${
               activeView === 'assignments'
-                ? 'bg-emerald-50 text-emerald-700'
-                : 'text-slate-500 hover:bg-slate-50'
+                ? 'bg-[#2563eb] text-white'
+                : 'text-[#64748b] hover:bg-[#f4f6f9]'
             }`}
           >
             <ClipboardList className="w-4 h-4" />
@@ -96,7 +96,7 @@ export const Sidebar = ({
         tabIndex={0}
         aria-label="Explorador de indicadores"
       >
-        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-2 mb-4">
+        <div className="text-[10px] font-bold text-[#94a3b8] uppercase tracking-widest px-2 mb-4">
           Gestion de periodos
         </div>
 
@@ -104,7 +104,7 @@ export const Sidebar = ({
           <div key={yearPeriod.year} className="space-y-1">
             <button
               onClick={() => { onToggleNode(yearPeriod.year.toString()); onSetFocusedNode(yearPeriod.year.toString()); }}
-              className={`w-full flex items-center gap-2 px-2 py-2 hover:bg-slate-50 rounded-md transition-colors text-sm font-semibold text-slate-700 outline-none ${focusedNodeId === yearPeriod.year.toString() ? 'bg-slate-100 ring-1 ring-slate-200' : ''}`}
+              className={`w-full flex items-center gap-2 px-2 py-2 hover:bg-[#f4f6f9] rounded-md transition-colors text-sm font-semibold text-[#1e293b] outline-none ${focusedNodeId === yearPeriod.year.toString() ? 'bg-[#dbeafe] ring-1 ring-blue-100' : ''}`}
             >
               <ChevronRight className={`w-4 h-4 text-slate-400 transition-transform ${expandedNodes.has(yearPeriod.year.toString()) ? 'rotate-90' : ''}`} />
               <Folder className="w-4 h-4 text-amber-500/70" />
@@ -117,7 +117,7 @@ export const Sidebar = ({
                   <div key={crit.id}>
                     <button
                       onClick={() => { onToggleNode(`crit-${crit.id}`); onSetFocusedNode(`crit-${crit.id}`); }}
-                      className={`w-full flex items-center gap-2 px-2 py-1.5 hover:bg-slate-50 rounded-md transition-colors text-xs font-bold text-slate-500 uppercase tracking-wide truncate text-left outline-none ${focusedNodeId === `crit-${crit.id}` ? 'bg-slate-100 ring-1 ring-slate-200' : ''}`}
+                      className={`w-full flex items-center gap-2 px-2 py-1.5 hover:bg-[#f4f6f9] rounded-md transition-colors text-xs font-bold text-[#64748b] uppercase tracking-wide truncate text-left outline-none ${focusedNodeId === `crit-${crit.id}` ? 'bg-[#dbeafe] ring-1 ring-blue-100' : ''}`}
                     >
                       <ChevronRight className={`w-3 h-3 text-slate-400 transition-transform ${expandedNodes.has(`crit-${crit.id}`) ? 'rotate-90' : ''}`} />
                       <Folder className="w-4 h-4 text-blue-600/70 shrink-0" />
@@ -130,7 +130,7 @@ export const Sidebar = ({
                           <div key={sub.id}>
                             <button
                               onClick={() => { onToggleNode(`sub-${sub.id}`); onSetFocusedNode(`sub-${sub.id}`); }}
-                              className={`w-full flex items-center gap-2 px-2 py-1.5 hover:bg-slate-50 rounded-md transition-colors text-[11px] font-semibold text-slate-400 text-left outline-none ${focusedNodeId === `sub-${sub.id}` ? 'bg-slate-100 ring-1 ring-slate-200' : ''}`}
+                              className={`w-full flex items-center gap-2 px-2 py-1.5 hover:bg-[#f4f6f9] rounded-md transition-colors text-[11px] font-semibold text-[#64748b] text-left outline-none ${focusedNodeId === `sub-${sub.id}` ? 'bg-[#dbeafe] ring-1 ring-blue-100' : ''}`}
                             >
                               <ChevronRight className={`w-2.5 h-2.5 text-slate-300 transition-transform ${expandedNodes.has(`sub-${sub.id}`) ? 'rotate-90' : ''}`} />
                               <Folder className="w-3.5 h-3.5 text-blue-400/60 shrink-0" />
@@ -146,7 +146,7 @@ export const Sidebar = ({
                                     className={`w-full flex items-center gap-2 px-3 py-1.5 rounded transition-all text-[11px] font-medium leading-tight text-left outline-none ${
                                       selectedIndicator?.code === indicator.code
                                         ? 'tree-item-active shadow-sm'
-                                        : (focusedNodeId === `ind-${indicator.code}` ? 'bg-slate-100 ring-1 ring-slate-200' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50')
+                                        : (focusedNodeId === `ind-${indicator.code}` ? 'bg-[#dbeafe] ring-1 ring-blue-100' : 'text-[#64748b] hover:text-[#1e293b] hover:bg-[#f4f6f9]')
                                     }`}
                                   >
                                     <FileText className="w-3 h-3 text-slate-300 shrink-0" />
@@ -170,7 +170,7 @@ export const Sidebar = ({
       </nav>
 
       <div
-        className="p-4 border-t border-slate-100 bg-slate-50 cursor-pointer hover:bg-slate-100 transition-colors"
+        className="p-4 border-t border-[#e2e8f0] bg-[#f4f6f9] cursor-pointer hover:bg-white transition-colors"
         onClick={() => {
           const roles: UserRole[] = ['ADMIN', 'COORDINADOR', 'EVALUADOR'];
           const next = roles[(roles.indexOf(userRole) + 1) % roles.length];
@@ -179,13 +179,13 @@ export const Sidebar = ({
       >
         <div className="flex items-center gap-3">
           <div className={`h-9 w-9 rounded-xl flex items-center justify-center text-white font-black text-xs ring-4 ring-white shadow-lg ${
-            userRole === 'ADMIN' ? 'bg-slate-900' : userRole === 'COORDINADOR' ? 'bg-blue-600' : 'bg-emerald-600'
+            userRole === 'ADMIN' ? 'bg-[#1e2d4a]' : userRole === 'COORDINADOR' ? 'bg-[#2563eb]' : 'bg-[#15803d]'
           }`}>
             {roleInitials[userRole]}
           </div>
           <div className="text-[10px]">
-            <p className="font-bold text-slate-700 leading-tight">{roleNames[userRole]}</p>
-            <p className="text-slate-400 font-black uppercase tracking-widest text-[8px] mt-0.5">{userRole} (clic para cambiar)</p>
+            <p className="font-bold text-[#1e293b] leading-tight">{roleNames[userRole]}</p>
+            <p className="text-[#64748b] font-black uppercase tracking-widest text-[8px] mt-0.5">{userRole} (clic para cambiar)</p>
           </div>
         </div>
       </div>
