@@ -10,7 +10,7 @@ interface EvidenceManageModalProps {
   onClose: () => void;
   activeRequirement: Requirement | null;
   files: UploadedFile[];
-  onRequestAI: (req: Requirement) => void;
+  onOpenEditor: (req: Requirement) => void;
   onOpenUpload: (req: Requirement) => void;
 }
 
@@ -19,7 +19,7 @@ export const EvidenceManageModal = ({
   onClose,
   activeRequirement,
   files,
-  onRequestAI,
+  onOpenEditor,
   onOpenUpload
 }: EvidenceManageModalProps) => {
   if (!activeRequirement) return null;
@@ -70,11 +70,11 @@ export const EvidenceManageModal = ({
             <div className="space-y-6">
               <div className="bg-slate-900 rounded-[32px] p-6 text-white space-y-4">
                 <button 
-                  onClick={() => { onRequestAI(activeRequirement); onClose(); }}
+                  onClick={() => { onOpenEditor(activeRequirement); onClose(); }}
                   className="w-full py-4 bg-blue-600 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-blue-700 transition-all flex items-center justify-center gap-2"
                 >
                   <Lightbulb className="w-4 h-4" />
-                  Guía IA
+                  Preparar evidencia
                 </button>
                 <button 
                   onClick={() => { onOpenUpload(activeRequirement); onClose(); }}

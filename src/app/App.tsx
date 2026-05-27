@@ -1,5 +1,4 @@
-import React, { useState } from 'react';
-import { AnimatePresence, motion } from 'motion/react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { Sidebar } from '../components/layout/Sidebar';
 import { Header } from '../components/layout/Header';
 import { Dashboard } from '../components/layout/Dashboard';
@@ -12,12 +11,14 @@ import { EvidenceTable } from '../components/evidences/EvidenceTable';
 import { EvidenceUploadModal } from '../components/evidences/EvidenceUploadModal';
 import { EvidenceHistoryModal } from '../components/evidences/EvidenceHistoryModal';
 import { CoordinatorEvidenceEditor } from '../components/coordinator/CoordinatorEvidenceEditor';
+import { AssignmentsView } from '../components/assignments/AssignmentsView';
 
 import { useAuth } from '../hooks/useAuth';
 import { useIndicators } from '../hooks/useIndicators';
 import { useEvidences } from '../hooks/useEvidences';
 import { useNotifications } from '../hooks/useNotifications';
 import { useFileUpload } from '../hooks/useFileUpload';
+import { useAssignments } from '../hooks/useAssignments';
 
 import { calculateIndicatorProgress, getIndicatorCurrentStatus, getIndicatorStats } from '../utils/progressUtils';
 import { getReadableAllowedFormats, isFileAllowedForRequirement } from '../utils/evidenceFormatUtils';
@@ -33,7 +34,8 @@ export default function App() {
     setSelectedIndicator,
     setFocusedNodeId,
     toggleNode,
-    selectIndicator
+    selectIndicator,
+    openCriterionSubCriteria
   } = useIndicators();
 
   const [activeRequirement, setActiveRequirement] = useState<Requirement | null>(null);
@@ -41,6 +43,7 @@ export default function App() {
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const [isChecklistOpen, setIsChecklistOpen] = useState(false);
+  const [isAssignmentsOpen, setIsAssignmentsOpen] = useState(false);
 
   const {
     allFiles,
@@ -67,19 +70,33 @@ export default function App() {
     reset: resetUpload
   } = useFileUpload();
 
-  const handleIndicatorSelect = (indicator: Indicator) => {
-    setIsChecklistOpen(false);
-    selectIndicator(indicator);
-  };
+  useAssignments();
 
-  const handleGoToStart = () => {
+  const handleIndicatorSelect = useCallback((indicator: Indicator) => {
+    setIsChecklistOpen(false);
+    setIsAssignmentsOpen(false);
+    selectIndicator(indicator);
+  }, [selectIndicator]);
+
+  const handleGoToStart = useCallback(() => {
+    setIsEditorOpen(false);
+    setIsUploadOpen(false);
+    setIsHistoryOpen(false);
+    setIsChecklistOpen(false);
+    setIsAssignmentsOpen(false);
+    setActiveRequirement(null);
+    setSelectedIndicator(null);
+  }, [setSelectedIndicator]);
+
+  const handleOpenAssignments = useCallback(() => {
     setIsEditorOpen(false);
     setIsUploadOpen(false);
     setIsHistoryOpen(false);
     setIsChecklistOpen(false);
     setActiveRequirement(null);
     setSelectedIndicator(null);
-  };
+    setIsAssignmentsOpen(true);
+  }, [setSelectedIndicator]);
 
   const handleSaveUpload = async () => {
     if (!activeRequirement || !selectedIndicator || !uploadFileContent || !user) return;
@@ -103,7 +120,7 @@ export default function App() {
     refreshNotifications();
   };
 
-  const getVisibleNodes = () => {
+  const visibleNodes = useMemo(() => {
     const nodes: { id: string; type: string; data?: any }[] = [];
 
     mockData.forEach(yearPeriod => {
@@ -129,10 +146,9 @@ export default function App() {
     });
 
     return nodes;
-  };
+  }, [expandedNodes, mockData]);
 
   const handleKeyDown = (event: React.KeyboardEvent) => {
-    const visibleNodes = getVisibleNodes();
     const currentIndex = visibleNodes.findIndex(node => node.id === focusedNodeId);
 
     switch (event.key) {
@@ -169,6 +185,26 @@ export default function App() {
     }
   };
 
+  const activeView = selectedIndicator ? 'indicator' : isAssignmentsOpen ? 'assignments' : isChecklistOpen ? 'checklist' : 'dashboard';
+  const selectedIndicatorContext = useMemo(() => {
+    if (!selectedIndicator) return null;
+
+    for (const yearPeriod of mockData) {
+      for (const criterion of yearPeriod.criteria) {
+        for (const subCriterion of criterion.subCriteria) {
+          if (subCriterion.indicators.some(indicator => indicator.code === selectedIndicator.code)) {
+            return {
+              criterionName: criterion.name,
+              subCriterionName: subCriterion.name
+            };
+          }
+        }
+      }
+    }
+
+    return null;
+  }, [mockData, selectedIndicator]);
+
   if (!isAuthenticated) {
     return <LoginScreen onLogin={login} />;
   }
@@ -186,6 +222,9 @@ export default function App() {
         onSetFocusedNode={setFocusedNodeId}
         onKeyDown={handleKeyDown}
         onSwitchRole={switchRole}
+        activeView={activeView}
+        onOpenDashboard={handleGoToStart}
+        onOpenAssignments={handleOpenAssignments}
       />
 
       <main className="flex-1 flex flex-col overflow-hidden">
@@ -201,64 +240,66 @@ export default function App() {
         />
 
         <div className="flex-1 overflow-y-auto p-8">
-          <AnimatePresence mode="wait">
-            {!selectedIndicator && !isChecklistOpen && (
-              <Dashboard
-                mockData={mockData}
-                allFiles={allFiles}
-                onIndicatorSelect={handleIndicatorSelect}
-                onViewChecklist={() => setIsChecklistOpen(true)}
-                onToggleNode={toggleNode}
-              />
-            )}
+          {!selectedIndicator && !isChecklistOpen && !isAssignmentsOpen && (
+            <Dashboard
+              mockData={mockData}
+              allFiles={allFiles}
+              onIndicatorSelect={handleIndicatorSelect}
+              onViewChecklist={() => setIsChecklistOpen(true)}
+              onOpenCriterionSubCriteria={openCriterionSubCriteria}
+              onOpenAssignments={handleOpenAssignments}
+              canManageAssignments={userRole === 'ADMIN' || userRole === 'COORDINADOR'}
+            />
+          )}
 
-            {!selectedIndicator && isChecklistOpen && (
-              <ChecklistView
-                mockData={mockData}
-                onIndicatorSelect={handleIndicatorSelect}
-                onBackToDashboard={handleGoToStart}
-              />
-            )}
+          {!selectedIndicator && isChecklistOpen && !isAssignmentsOpen && (
+            <ChecklistView
+              mockData={mockData}
+              onIndicatorSelect={handleIndicatorSelect}
+              onBackToDashboard={handleGoToStart}
+            />
+          )}
 
-            {selectedIndicator && (
-              <motion.div
-                key={selectedIndicator.code}
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                className="max-w-5xl mx-auto"
-              >
-                <IndicatorContent>
-                  <IndicatorHeader
-                    indicator={selectedIndicator}
-                    status={getIndicatorCurrentStatus(selectedIndicator, allFiles)}
-                    progress={calculateIndicatorProgress(selectedIndicator, allFiles)}
-                    onBackToDashboard={handleGoToStart}
-                  />
+          {!selectedIndicator && isAssignmentsOpen && (
+            <AssignmentsView />
+          )}
 
-                  <IndicatorStatsCards stats={getIndicatorStats(selectedIndicator, allFiles)} />
+          {selectedIndicator && (
+            <div
+              key={selectedIndicator.code}
+              className="max-w-5xl mx-auto"
+            >
+              <IndicatorContent>
+                <IndicatorHeader
+                  indicator={selectedIndicator}
+                  status={getIndicatorCurrentStatus(selectedIndicator, allFiles)}
+                  progress={calculateIndicatorProgress(selectedIndicator, allFiles)}
+                  onBackToDashboard={handleGoToStart}
+                />
 
-                  <EvidenceTable
-                    indicator={selectedIndicator}
-                    userRole={userRole}
-                    getRequirementFiles={requirementId => getRequirementFiles(requirementId, selectedIndicator.code)}
-                    onOpenUpload={requirement => {
-                      setActiveRequirement(requirement);
-                      setIsUploadOpen(true);
-                      resetUpload();
-                    }}
-                    onOpenEditor={requirement => {
-                      setActiveRequirement(requirement);
-                      setIsEditorOpen(true);
-                    }}
-                    onOpenHistory={requirement => {
-                      setActiveRequirement(requirement);
-                      setIsHistoryOpen(true);
-                    }}
-                  />
-                </IndicatorContent>
-              </motion.div>
-            )}
-          </AnimatePresence>
+                <IndicatorStatsCards stats={getIndicatorStats(selectedIndicator, allFiles)} />
+
+                <EvidenceTable
+                  indicator={selectedIndicator}
+                  userRole={userRole}
+                  getRequirementFiles={requirementId => getRequirementFiles(requirementId, selectedIndicator.code)}
+                  onOpenUpload={requirement => {
+                    setActiveRequirement(requirement);
+                    setIsUploadOpen(true);
+                    resetUpload();
+                  }}
+                  onOpenEditor={requirement => {
+                    setActiveRequirement(requirement);
+                    setIsEditorOpen(true);
+                  }}
+                  onOpenHistory={requirement => {
+                    setActiveRequirement(requirement);
+                    setIsHistoryOpen(true);
+                  }}
+                />
+              </IndicatorContent>
+            </div>
+          )}
         </div>
       </main>
 
@@ -281,20 +322,20 @@ export default function App() {
         onDeleteFile={deleteEvidence}
       />
 
-      <AnimatePresence>
-        {isEditorOpen && selectedIndicator && activeRequirement && (
-          <CoordinatorEvidenceEditor
-            indicator={selectedIndicator}
-            requirement={activeRequirement}
-            files={getRequirementFiles(activeRequirement.id, selectedIndicator.code)}
-            userRole={userRole}
-            currentUser={user}
-            onClose={() => setIsEditorOpen(false)}
-            onGoHome={handleGoToStart}
-            onUpdateEvidenceStatus={handleReviewUpdate}
-          />
-        )}
-      </AnimatePresence>
+      {isEditorOpen && selectedIndicator && activeRequirement && (
+        <CoordinatorEvidenceEditor
+          indicator={selectedIndicator}
+          requirement={activeRequirement}
+          files={getRequirementFiles(activeRequirement.id, selectedIndicator.code)}
+          userRole={userRole}
+          currentUser={user}
+          criterionName={selectedIndicatorContext?.criterionName}
+          subCriterionName={selectedIndicatorContext?.subCriterionName}
+          onClose={() => setIsEditorOpen(false)}
+          onGoHome={handleGoToStart}
+          onUpdateEvidenceStatus={handleReviewUpdate}
+        />
+      )}
     </div>
   );
 }

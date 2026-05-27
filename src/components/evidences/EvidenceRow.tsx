@@ -62,15 +62,15 @@ export const EvidenceRow = ({
         <div className="flex justify-end gap-2 shrink-0">
           <button
             onClick={() => onOpenEditor(requirement)}
-            className={`flex items-center gap-2 px-3 py-2 rounded-xl transition-all shadow-sm group ${
+            className={`h-10 w-10 inline-flex items-center justify-center rounded-xl transition-all shadow-sm group ${
               userRole === 'EVALUADOR'
                 ? 'bg-amber-50 text-amber-700 hover:bg-amber-500 hover:text-white'
                 : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-600 hover:text-white'
             }`}
             title={editorLabel}
+            aria-label={editorLabel}
           >
-            <EditorIcon className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
-            <span className="text-[10px] font-black uppercase tracking-widest hidden lg:block">{editorLabel}</span>
+            <EditorIcon className="w-4 h-4 group-hover:scale-110 transition-transform" />
           </button>
 
           <button

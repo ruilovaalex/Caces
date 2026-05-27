@@ -1,12 +1,17 @@
 import React from 'react';
 import { ClipboardCheck, AlertTriangle, CheckCircle2, XCircle, FileSearch } from 'lucide-react';
-import { UploadedFile } from '../../types';
+import { Indicator, Requirement, UploadedFile } from '../../types';
+import { buildRequirementWorkGuide } from '../../utils/workGuideUtils';
 
 interface EvaluatorReviewGuidePanelProps {
   currentFile: UploadedFile | undefined;
+  indicator?: Indicator;
+  requirement?: Requirement;
 }
 
-export const EvaluatorReviewGuidePanel = ({ currentFile }: EvaluatorReviewGuidePanelProps) => {
+export const EvaluatorReviewGuidePanel = ({ currentFile, indicator, requirement }: EvaluatorReviewGuidePanelProps) => {
+  const workGuide = indicator && requirement ? buildRequirementWorkGuide(indicator, requirement) : null;
+
   return (
     <div className="flex flex-col h-full bg-slate-50 border-l border-slate-200 shadow-inner">
       <div className="p-4 border-b border-slate-200 bg-white">
@@ -23,25 +28,35 @@ export const EvaluatorReviewGuidePanel = ({ currentFile }: EvaluatorReviewGuideP
         <div className="rounded-xl border border-amber-100 bg-amber-50/70 p-3">
           <p className="text-[10px] font-black uppercase tracking-widest text-amber-700">Que revisar</p>
           <p className="mt-1 text-xs text-slate-600 leading-relaxed">
-            Verifica que la evidencia sea pertinente, completa, formal y consistente con el indicador antes de decidir su estado.
+            {workGuide
+              ? `Revisa que cumpla con: ${workGuide.title}.`
+              : 'Verifica que la evidencia sea pertinente, completa, formal y consistente con el indicador antes de decidir su estado.'}
           </p>
         </div>
       </div>
 
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
-        <div className="bg-white rounded-2xl border border-slate-200 p-4 space-y-3">
+        {workGuide && (
+          <div className="bg-white rounded-lg border border-slate-200 p-4">
+            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Descripcion CACES</p>
+            <p className="mt-2 text-xs text-slate-600 leading-relaxed">{workGuide.cacesDescription}</p>
+            <p className="mt-3 text-[10px] font-black uppercase tracking-widest text-slate-500">Formato esperado: {workGuide.format}</p>
+          </div>
+        )}
+
+        <div className="bg-white rounded-lg border border-slate-200 p-4 space-y-3">
           <div className="flex items-start gap-3">
             <FileSearch className="w-4 h-4 text-blue-600 mt-0.5" />
             <div>
               <p className="text-xs font-black text-slate-700 uppercase tracking-widest">Pertinencia</p>
-              <p className="text-xs text-slate-500 mt-1">El archivo debe corresponder exactamente a la evidencia pedida por el indicador.</p>
+              <p className="text-xs text-slate-500 mt-1">{workGuide?.focus || 'El archivo debe corresponder exactamente a la evidencia pedida por el indicador.'}</p>
             </div>
           </div>
           <div className="flex items-start gap-3">
             <CheckCircle2 className="w-4 h-4 text-emerald-600 mt-0.5" />
             <div>
               <p className="text-xs font-black text-slate-700 uppercase tracking-widest">Completitud</p>
-              <p className="text-xs text-slate-500 mt-1">Revisa si contiene firmas, fechas, responsables, anexos y toda la informacion clave.</p>
+              <p className="text-xs text-slate-500 mt-1">{workGuide?.checks.join(' ') || 'Revisa si contiene firmas, fechas, responsables, anexos y toda la informacion clave.'}</p>
             </div>
           </div>
           <div className="flex items-start gap-3">
@@ -60,7 +75,7 @@ export const EvaluatorReviewGuidePanel = ({ currentFile }: EvaluatorReviewGuideP
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl border border-slate-200 p-4">
+        <div className="bg-white rounded-lg border border-slate-200 p-4">
           <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Version actual</p>
           <p className="mt-2 text-sm font-bold text-slate-700">{currentFile?.fileName || 'Sin archivo cargado'}</p>
           <p className="mt-1 text-xs text-slate-500">

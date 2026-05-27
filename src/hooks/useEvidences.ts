@@ -16,11 +16,11 @@ export const useEvidences = () => {
     loadData();
   }, [loadData]);
 
-  const getRequirementFiles = (reqId: string, indicatorCode: string) => {
+  const getRequirementFiles = useCallback((reqId: string, indicatorCode: string) => {
     return allFiles.filter(file => file.requirementId === reqId && file.indicatorCode === indicatorCode);
-  };
+  }, [allFiles]);
 
-  const uploadFile = async (
+  const uploadFile = useCallback(async (
     file: File,
     indicator: Indicator,
     requirement: Requirement,
@@ -45,9 +45,9 @@ export const useEvidences = () => {
       console.error(error);
       throw error;
     }
-  };
+  }, [loadData]);
 
-  const updateStatus = (evidenceId: string, status: Status, observation?: string) => {
+  const updateStatus = useCallback((evidenceId: string, status: Status, observation?: string) => {
     EvidenceService.updateStatus(evidenceId, status, observation);
     loadData();
     NotificationService.add({
@@ -55,9 +55,9 @@ export const useEvidences = () => {
       message: `La evidencia fue marcada como ${status}.`,
       type: status === 'Validado' ? 'success' : status === 'Observado' ? 'warning' : 'error'
     });
-  };
+  }, [loadData]);
 
-  const deleteEvidence = (id: string) => {
+  const deleteEvidence = useCallback((id: string) => {
     EvidenceService.deleteEvidence(id);
     loadData();
     NotificationService.add({
@@ -65,7 +65,7 @@ export const useEvidences = () => {
       message: 'La version seleccionada fue retirada del historial de evidencia.',
       type: 'warning'
     });
-  };
+  }, [loadData]);
 
   return {
     allFiles,

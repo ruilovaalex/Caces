@@ -1,9 +1,9 @@
 import React from 'react';
-import { 
-  ChevronRight, 
-  ChevronDown, 
-  FileText, 
-  Folder
+import {
+  ChevronRight,
+  FileText,
+  Folder,
+  ClipboardList
 } from 'lucide-react';
 import { Indicator, YearPeriod, UserRole } from '../../types';
 
@@ -13,11 +13,14 @@ interface SidebarProps {
   expandedNodes: Set<string>;
   focusedNodeId: string | null;
   userRole: UserRole;
+  activeView: 'dashboard' | 'checklist' | 'assignments' | 'indicator';
   onIndicatorSelect: (ind: Indicator) => void;
   onToggleNode: (id: string) => void;
   onSetFocusedNode: (id: string) => void;
   onKeyDown: (e: React.KeyboardEvent) => void;
   onSwitchRole: (role: UserRole) => void;
+  onOpenDashboard: () => void;
+  onOpenAssignments: () => void;
 }
 
 export const Sidebar = ({
@@ -26,12 +29,27 @@ export const Sidebar = ({
   expandedNodes,
   focusedNodeId,
   userRole,
+  activeView,
   onIndicatorSelect,
   onToggleNode,
   onSetFocusedNode,
   onKeyDown,
-  onSwitchRole
+  onSwitchRole,
+  onOpenDashboard,
+  onOpenAssignments
 }: SidebarProps) => {
+  const roleNames: Record<UserRole, string> = {
+    ADMIN: 'Admin Sudamericano',
+    COORDINADOR: 'Coord. Academico',
+    EVALUADOR: 'Evaluador Externo'
+  };
+
+  const roleInitials: Record<UserRole, string> = {
+    ADMIN: 'AD',
+    COORDINADOR: 'CO',
+    EVALUADOR: 'EV'
+  };
+
   return (
     <aside className="w-80 bg-white border-r border-slate-200 flex flex-col shadow-sm">
       <div className="p-6 border-b border-slate-100 flex items-center gap-3">
@@ -40,23 +58,51 @@ export const Sidebar = ({
         </div>
         <div>
           <h1 className="font-bold text-lg tracking-tight text-slate-800 leading-none">CACES</h1>
-          <span className="text-[10px] text-slate-400 font-bold uppercase tracking-[0.2em]">Acreditación</span>
+          <span className="text-[10px] text-slate-400 font-bold uppercase tracking-[0.2em]">Acreditacion</span>
         </div>
       </div>
 
-      <nav 
+      <div className="p-4 border-b border-slate-100 space-y-2">
+        <button
+          onClick={onOpenDashboard}
+          className={`w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-colors ${
+            activeView === 'dashboard' || activeView === 'indicator' || activeView === 'checklist'
+              ? 'bg-blue-50 text-blue-700'
+              : 'text-slate-500 hover:bg-slate-50'
+          }`}
+        >
+          <Folder className="w-4 h-4" />
+          1. Repositorio
+        </button>
+
+        {(userRole === 'ADMIN' || userRole === 'COORDINADOR') && (
+          <button
+            onClick={onOpenAssignments}
+            className={`w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-colors ${
+              activeView === 'assignments'
+                ? 'bg-emerald-50 text-emerald-700'
+                : 'text-slate-500 hover:bg-slate-50'
+            }`}
+          >
+            <ClipboardList className="w-4 h-4" />
+            2. Asignaciones
+          </button>
+        )}
+      </div>
+
+      <nav
         className="flex-1 overflow-y-auto p-4 space-y-1 outline-none"
         onKeyDown={onKeyDown}
         tabIndex={0}
         aria-label="Explorador de indicadores"
       >
-        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-2 mb-4 flex items-center justify-between">
-          <span>Gestión de Periodos</span>
+        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-2 mb-4">
+          Gestion de periodos
         </div>
-        
+
         {mockData.map((yearPeriod) => (
           <div key={yearPeriod.year} className="space-y-1">
-            <button 
+            <button
               onClick={() => { onToggleNode(yearPeriod.year.toString()); onSetFocusedNode(yearPeriod.year.toString()); }}
               className={`w-full flex items-center gap-2 px-2 py-2 hover:bg-slate-50 rounded-md transition-colors text-sm font-semibold text-slate-700 outline-none ${focusedNodeId === yearPeriod.year.toString() ? 'bg-slate-100 ring-1 ring-slate-200' : ''}`}
             >
@@ -69,7 +115,7 @@ export const Sidebar = ({
               <div className="ml-4 space-y-1 border-l border-slate-200 pl-2">
                 {yearPeriod.criteria.map((crit) => (
                   <div key={crit.id}>
-                    <button 
+                    <button
                       onClick={() => { onToggleNode(`crit-${crit.id}`); onSetFocusedNode(`crit-${crit.id}`); }}
                       className={`w-full flex items-center gap-2 px-2 py-1.5 hover:bg-slate-50 rounded-md transition-colors text-xs font-bold text-slate-500 uppercase tracking-wide truncate text-left outline-none ${focusedNodeId === `crit-${crit.id}` ? 'bg-slate-100 ring-1 ring-slate-200' : ''}`}
                     >
@@ -82,7 +128,7 @@ export const Sidebar = ({
                       <div className="ml-4 mt-1 space-y-1 border-l border-slate-100 pl-2">
                         {crit.subCriteria.map((sub) => (
                           <div key={sub.id}>
-                            <button 
+                            <button
                               onClick={() => { onToggleNode(`sub-${sub.id}`); onSetFocusedNode(`sub-${sub.id}`); }}
                               className={`w-full flex items-center gap-2 px-2 py-1.5 hover:bg-slate-50 rounded-md transition-colors text-[11px] font-semibold text-slate-400 text-left outline-none ${focusedNodeId === `sub-${sub.id}` ? 'bg-slate-100 ring-1 ring-slate-200' : ''}`}
                             >
@@ -94,13 +140,13 @@ export const Sidebar = ({
                             {expandedNodes.has(`sub-${sub.id}`) && (
                               <div className="ml-5 mt-1 space-y-0.5 border-l border-slate-50 pl-2">
                                 {sub.indicators.map((indicator) => (
-                                  <button 
+                                  <button
                                     key={indicator.code}
                                     onClick={() => onIndicatorSelect(indicator)}
                                     className={`w-full flex items-center gap-2 px-3 py-1.5 rounded transition-all text-[11px] font-medium leading-tight text-left outline-none ${
-                                      selectedIndicator?.code === indicator.code 
-                                      ? 'tree-item-active shadow-sm' 
-                                      : (focusedNodeId === `ind-${indicator.code}` ? 'bg-slate-100 ring-1 ring-slate-200' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50')
+                                      selectedIndicator?.code === indicator.code
+                                        ? 'tree-item-active shadow-sm'
+                                        : (focusedNodeId === `ind-${indicator.code}` ? 'bg-slate-100 ring-1 ring-slate-200' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50')
                                     }`}
                                   >
                                     <FileText className="w-3 h-3 text-slate-300 shrink-0" />
@@ -123,7 +169,7 @@ export const Sidebar = ({
         ))}
       </nav>
 
-      <div 
+      <div
         className="p-4 border-t border-slate-100 bg-slate-50 cursor-pointer hover:bg-slate-100 transition-colors"
         onClick={() => {
           const roles: UserRole[] = ['ADMIN', 'COORDINADOR', 'EVALUADOR'];
@@ -135,13 +181,11 @@ export const Sidebar = ({
           <div className={`h-9 w-9 rounded-xl flex items-center justify-center text-white font-black text-xs ring-4 ring-white shadow-lg ${
             userRole === 'ADMIN' ? 'bg-slate-900' : userRole === 'COORDINADOR' ? 'bg-blue-600' : 'bg-emerald-600'
           }`}>
-            {userRole === 'ADMIN' ? 'PM' : userRole === 'COORDINADOR' ? 'CO' : 'EV'}
+            {roleInitials[userRole]}
           </div>
           <div className="text-[10px]">
-            <p className="font-bold text-slate-700 leading-tight">
-              {userRole === 'ADMIN' ? 'Admin Sudamericano' : userRole === 'COORDINADOR' ? 'Coord. Académico' : 'Evaluador Externo'}
-            </p>
-            <p className="text-slate-400 font-black uppercase tracking-widest text-[8px] mt-0.5">{userRole} (Clic para cambiar)</p>
+            <p className="font-bold text-slate-700 leading-tight">{roleNames[userRole]}</p>
+            <p className="text-slate-400 font-black uppercase tracking-widest text-[8px] mt-0.5">{userRole} (clic para cambiar)</p>
           </div>
         </div>
       </div>

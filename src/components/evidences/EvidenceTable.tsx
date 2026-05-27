@@ -2,6 +2,7 @@ import React from 'react';
 import { Indicator, Requirement, UploadedFile, UserRole } from '../../types';
 import { EvidenceRow } from './EvidenceRow';
 import { Folder, Info, PenSquare, ClipboardCheck, Upload, History } from 'lucide-react';
+import { WorkflowGuide } from '../layout/WorkflowGuide';
 
 interface EvidenceTableProps {
   indicator: Indicator;
@@ -24,6 +25,10 @@ export const EvidenceTable = ({
 
   return (
     <div className="flex-1 flex flex-col min-h-0">
+      <div className="m-8 mb-0">
+        <WorkflowGuide activeStep={isEvaluator ? 'review' : 'evidence'} />
+      </div>
+
       <div className="px-8 py-4 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
         <h3 className="text-[11px] font-black text-slate-500 uppercase tracking-[0.2em] flex items-center gap-2">
           <Folder className="w-4 h-4 text-blue-600" />
@@ -32,7 +37,7 @@ export const EvidenceTable = ({
         <span className="text-[10px] font-bold text-blue-600/60 uppercase tracking-widest">Modelo de Evaluacion v.2024</span>
       </div>
 
-      <div className="mx-8 mt-5 rounded-2xl border border-blue-100 bg-gradient-to-r from-blue-50 via-white to-emerald-50 p-4">
+      <div className="mx-8 mt-5 rounded-lg border border-blue-100 bg-white p-4">
         <div className="flex items-start gap-3">
           <div className="mt-0.5 rounded-xl bg-white p-2 text-blue-600 shadow-sm border border-blue-100">
             <Info className="w-4 h-4" />
@@ -45,15 +50,15 @@ export const EvidenceTable = ({
                   Entra a revisar cada evidencia para evaluar lo cargado por el coordinador, dejar observaciones y decidir si se valida, se observa o se rechaza.
                 </p>
                 <div className="mt-3 flex flex-wrap gap-2">
-                  <span className="inline-flex items-center gap-2 rounded-xl bg-white px-3 py-2 text-[10px] font-black uppercase tracking-wider text-amber-700 border border-amber-100">
+                  <span className="inline-flex items-center gap-2 rounded-lg bg-white px-3 py-2 text-[10px] font-black uppercase tracking-wider text-amber-700 border border-amber-100">
                     <ClipboardCheck className="w-3.5 h-3.5" />
                     1. Revisar evidencia
                   </span>
-                  <span className="inline-flex items-center gap-2 rounded-xl bg-white px-3 py-2 text-[10px] font-black uppercase tracking-wider text-slate-700 border border-slate-200">
+                  <span className="inline-flex items-center gap-2 rounded-lg bg-white px-3 py-2 text-[10px] font-black uppercase tracking-wider text-slate-700 border border-slate-200">
                     <Info className="w-3.5 h-3.5" />
                     2. Analizar version actual
                   </span>
-                  <span className="inline-flex items-center gap-2 rounded-xl bg-white px-3 py-2 text-[10px] font-black uppercase tracking-wider text-rose-700 border border-rose-100">
+                  <span className="inline-flex items-center gap-2 rounded-lg bg-white px-3 py-2 text-[10px] font-black uppercase tracking-wider text-rose-700 border border-rose-100">
                     <ClipboardCheck className="w-3.5 h-3.5" />
                     3. Validar, observar o rechazar
                   </span>
@@ -62,18 +67,18 @@ export const EvidenceTable = ({
             ) : (
               <>
                 <p className="mt-1 text-xs text-slate-500 leading-relaxed">
-                  Para cada evidencia, edita el contenido con apoyo de IA, genera el documento institucional y revisa el historial de archivos subidos desde su boton independiente. La carga final sigue en el boton azul de la tabla.
+                  Para cada evidencia, prepara el contenido con plantilla manual, genera el documento institucional y revisa el historial de archivos subidos desde su boton independiente. La carga final sigue en el boton azul de la tabla.
                 </p>
                 <div className="mt-3 flex flex-wrap gap-2">
-                  <span className="inline-flex items-center gap-2 rounded-xl bg-white px-3 py-2 text-[10px] font-black uppercase tracking-wider text-emerald-700 border border-emerald-100">
+                  <span className="inline-flex items-center gap-2 rounded-lg bg-white px-3 py-2 text-[10px] font-black uppercase tracking-wider text-emerald-700 border border-emerald-100">
                     <PenSquare className="w-3.5 h-3.5" />
-                    1. Editar evidencia completa
+                    1. Preparar evidencia
                   </span>
-                  <span className="inline-flex items-center gap-2 rounded-xl bg-white px-3 py-2 text-[10px] font-black uppercase tracking-wider text-slate-700 border border-slate-200">
+                  <span className="inline-flex items-center gap-2 rounded-lg bg-white px-3 py-2 text-[10px] font-black uppercase tracking-wider text-slate-700 border border-slate-200">
                     <History className="w-3.5 h-3.5" />
                     2. Revisar historial
                   </span>
-                  <span className="inline-flex items-center gap-2 rounded-xl bg-white px-3 py-2 text-[10px] font-black uppercase tracking-wider text-blue-700 border border-blue-100">
+                  <span className="inline-flex items-center gap-2 rounded-lg bg-white px-3 py-2 text-[10px] font-black uppercase tracking-wider text-blue-700 border border-blue-100">
                     <Upload className="w-3.5 h-3.5" />
                     3. Subir version final
                   </span>

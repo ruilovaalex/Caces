@@ -21,6 +21,20 @@ export const useIndicators = () => {
     setFocusedNodeId(`ind-${indicator.code}`);
   }, []);
 
+  const openCriterionSubCriteria = useCallback((year: number, criterionId: string) => {
+    const yearId = year.toString();
+    const criterionNodeId = `crit-${criterionId}`;
+
+    setSelectedIndicator(null);
+    setFocusedNodeId(criterionNodeId);
+    setExpandedNodes(prev => {
+      const next = new Set(prev);
+      next.add(yearId);
+      next.add(criterionNodeId);
+      return next;
+    });
+  }, []);
+
   return {
     mockData: MOCK_DATA,
     selectedIndicator,
@@ -29,6 +43,7 @@ export const useIndicators = () => {
     setSelectedIndicator,
     setFocusedNodeId,
     toggleNode,
-    selectIndicator
+    selectIndicator,
+    openCriterionSubCriteria
   };
 };

@@ -9,7 +9,6 @@ export interface Requirement {
   status: Status;
   observation?: string;
   editableNote?: string;
-  isAI?: boolean;
 }
 
 export interface Indicator {

@@ -1,15 +1,17 @@
-import React from 'react';
-import { motion } from 'motion/react';
+import React, { useMemo } from 'react';
 import { Folder, ChevronRight, AlertCircle } from 'lucide-react';
 import { YearPeriod, UploadedFile, Indicator } from '../../types';
 import { calculateIndicatorProgress } from '../../utils/progressUtils';
+import { WorkflowGuide } from './WorkflowGuide';
 
 interface DashboardProps {
   mockData: YearPeriod[];
   allFiles: UploadedFile[];
   onIndicatorSelect: (ind: Indicator) => void;
   onViewChecklist: () => void;
-  onToggleNode: (id: string) => void;
+  onOpenCriterionSubCriteria: (year: number, criterionId: string) => void;
+  onOpenAssignments: () => void;
+  canManageAssignments: boolean;
 }
 
 export const Dashboard = ({
@@ -17,37 +19,85 @@ export const Dashboard = ({
   allFiles,
   onIndicatorSelect,
   onViewChecklist,
-  onToggleNode
+  onOpenCriterionSubCriteria,
+  onOpenAssignments,
+  canManageAssignments
 }: DashboardProps) => {
+  const dashboardStats = useMemo(() => {
+    const totalEvidences = mockData[0].criteria.reduce(
+      (acc, criterion) => acc + criterion.subCriteria.reduce(
+        (subAcc, subCriterion) => subAcc + subCriterion.indicators.reduce(
+          (indicatorAcc, indicator) => indicatorAcc + indicator.requirements.length,
+          0
+        ),
+        0
+      ),
+      0
+    );
+
+    return {
+      totalEvidences,
+      loaded: allFiles.filter(file => file.isCurrentVersion).length,
+      validated: allFiles.filter(file => file.status === 'Validado' && file.isCurrentVersion).length,
+      observed: allFiles.filter(file => file.status === 'Observado' && file.isCurrentVersion).length
+    };
+  }, [allFiles, mockData]);
+
+  const pendingIndicators = useMemo(
+    () => mockData[0].criteria
+      .flatMap(criterion => criterion.subCriteria.flatMap(subCriterion => subCriterion.indicators))
+      .filter(indicator => indicator.status === 'Pendiente')
+      .slice(0, 5),
+    [mockData]
+  );
+
+  const subCriterionProgress = useMemo(() => {
+    const progressBySubCriterion = new Map<string, number>();
+
+    mockData[0].criteria.forEach(criterion => {
+      criterion.subCriteria.forEach(subCriterion => {
+        const progress = Math.round(
+          subCriterion.indicators.reduce((sum, indicator) => sum + calculateIndicatorProgress(indicator, allFiles), 0) /
+          (subCriterion.indicators.length || 1)
+        );
+        progressBySubCriterion.set(subCriterion.id, progress);
+      });
+    });
+
+    return progressBySubCriterion;
+  }, [allFiles, mockData]);
+
   return (
-    <motion.div 
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="max-w-6xl mx-auto space-y-8"
-    >
+    <div className="max-w-6xl mx-auto space-y-8">
+      <WorkflowGuide
+        activeStep="repository"
+        canManageAssignments={canManageAssignments}
+        onOpenAssignments={onOpenAssignments}
+      />
+
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm space-y-2">
+        <div className="bg-white p-5 rounded-lg border border-slate-100 shadow-sm space-y-2">
           <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none">Total Evidencias</span>
           <h3 className="text-2xl font-black text-slate-800">
-            {mockData[0].criteria.reduce((acc, c) => acc + c.subCriteria.reduce((acc2, s) => acc2 + s.indicators.reduce((acc3, i) => acc3 + i.requirements.length, 0), 0), 0)}
+            {dashboardStats.totalEvidences}
           </h3>
         </div>
-        <div className="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm space-y-2">
+        <div className="bg-white p-5 rounded-lg border border-slate-100 shadow-sm space-y-2">
           <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none">Cargadas</span>
           <h3 className="text-2xl font-black text-blue-600">
-             {allFiles.filter(f => f.isCurrentVersion).length}
+             {dashboardStats.loaded}
           </h3>
         </div>
-        <div className="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm space-y-2">
+        <div className="bg-white p-5 rounded-lg border border-slate-100 shadow-sm space-y-2">
           <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none">Validadas</span>
           <h3 className="text-2xl font-black text-emerald-600">
-             {allFiles.filter(f => f.status === 'Validado' && f.isCurrentVersion).length}
+             {dashboardStats.validated}
           </h3>
         </div>
-        <div className="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm space-y-2">
+        <div className="bg-white p-5 rounded-lg border border-slate-100 shadow-sm space-y-2">
           <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none">Observadas</span>
           <h3 className="text-2xl font-black text-amber-500">
-             {allFiles.filter(f => f.status === 'Observado' && f.isCurrentVersion).length}
+             {dashboardStats.observed}
           </h3>
         </div>
       </div>
@@ -60,13 +110,14 @@ export const Dashboard = ({
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pb-2">
           {mockData[0].criteria.map(crit => (
-            <div 
+            <button
+              type="button"
               key={crit.id} 
-              onClick={() => onToggleNode(`crit-${crit.id}`)}
-              className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm hover:border-blue-200 transition-all cursor-pointer group"
+              onClick={() => onOpenCriterionSubCriteria(mockData[0].year, crit.id)}
+              className="bg-white p-6 rounded-lg border border-slate-100 shadow-sm hover:border-blue-200 transition-all cursor-pointer group text-left"
             >
               <div className="flex justify-between items-start mb-4">
-                <div className="p-3 bg-slate-50 rounded-2xl text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-all">
+                <div className="p-3 bg-slate-50 rounded-lg text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-all">
                   <Folder className="w-6 h-6" />
                 </div>
                 <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Criterio {crit.id}</span>
@@ -77,7 +128,7 @@ export const Dashboard = ({
               </p>
               <div className="space-y-4">
                  {crit.subCriteria.map(sub => {
-                   const subProgress = Math.round(sub.indicators.reduce((sum, ind) => sum + calculateIndicatorProgress(ind, allFiles), 0) / (sub.indicators.length || 1));
+                   const subProgress = subCriterionProgress.get(sub.id) || 0;
                    return (
                      <div key={sub.id} className="space-y-2">
                        <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-wider">
@@ -91,11 +142,11 @@ export const Dashboard = ({
                    );
                  })}
               </div>
-            </div>
+            </button>
           ))}
         </div>
 
-        <div className="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
+        <div className="bg-white rounded-lg border border-slate-100 shadow-sm overflow-hidden">
           <div className="p-6 border-b border-slate-50 flex items-center justify-between bg-slate-50/50">
             <div className="flex items-center gap-3">
               <AlertCircle className="w-5 h-5 text-amber-500" />
@@ -104,7 +155,7 @@ export const Dashboard = ({
             <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Modelo CACES 2024</span>
           </div>
           <div className="divide-y divide-slate-50">
-            {mockData[0].criteria.flatMap(c => c.subCriteria.flatMap(s => s.indicators)).filter(i => i.status === 'Pendiente').slice(0, 5).map(ind => (
+            {pendingIndicators.map(ind => (
               <div 
                 key={ind.code} 
                 onClick={() => onIndicatorSelect(ind)}
@@ -137,6 +188,6 @@ export const Dashboard = ({
           </div>
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 };

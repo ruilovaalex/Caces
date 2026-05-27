@@ -7,4 +7,4 @@ export interface User {
   role: UserRole;
 }
 
-export type Permission = 'upload' | 'validate' | 'delete' | 'edit_obs' | 'request_ai';
+export type Permission = 'upload' | 'validate' | 'delete' | 'edit_obs' | 'assign';
