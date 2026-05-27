@@ -22,11 +22,11 @@ export const NotificationBell = ({
     <div className="relative">
       <button 
         onClick={onToggle}
-        className={`p-2.5 hover:bg-slate-100 rounded-xl transition-colors relative ${showNotifications ? 'bg-slate-100 text-blue-600' : 'text-slate-500'}`}
+        className={`relative flex h-9 w-9 items-center justify-center rounded-full transition-colors ${showNotifications ? 'bg-white text-[#2563eb]' : 'text-[#aac4e8] hover:bg-white/10 hover:text-white'}`}
       >
-        <Bell className="w-5 h-5" />
+        <Bell className="h-[18px] w-[18px]" />
         {notifications.some(n => !n.isRead) && (
-          <span className="absolute top-2 right-2 w-2 h-2 bg-rose-500 rounded-full border-2 border-white animate-pulse" />
+          <span className="absolute right-2 top-2 h-2 w-2 rounded-full border-2 border-[#1e2d4a] bg-rose-500 animate-pulse" />
         )}
       </button>
 

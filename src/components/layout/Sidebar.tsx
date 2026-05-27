@@ -52,13 +52,13 @@ export const Sidebar = ({
 
   return (
     <aside className="w-80 bg-white border-r border-[#e2e8f0] flex flex-col shadow-sm">
-      <div className="p-6 border-b border-[#e2e8f0] flex items-center gap-3 bg-[#1e2d4a]">
-        <div className="bg-[#2563eb] p-2 rounded-lg shadow-lg shadow-blue-600/20">
-          <FileText className="w-6 h-6 text-white" />
+      <div className="h-16 border-b border-white/10 flex items-center gap-3 bg-[#1e2d4a] px-6">
+        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#2563eb] shadow-lg shadow-blue-600/20">
+          <FileText className="w-5 h-5 text-white" />
         </div>
         <div>
-          <h1 className="font-bold text-lg tracking-tight text-white leading-none">CACES</h1>
-          <span className="text-[10px] text-[#aac4e8] font-bold uppercase tracking-[0.2em]">Acreditacion</span>
+          <h1 className="font-bold text-base tracking-tight text-white leading-none">CACES</h1>
+          <span className="text-[9px] text-[#aac4e8] font-bold uppercase tracking-[0.2em]">Acreditacion</span>
         </div>
       </div>
 

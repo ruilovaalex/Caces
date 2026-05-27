@@ -34,18 +34,18 @@ export const Header = ({
 
   return (
     <TopBar>
-      <div className="flex items-center gap-4">
-        <h2 className="text-xl font-black text-white tracking-tight">Repositorio CACES 2025</h2>
-        <div className="h-6 w-[1px] bg-white/15 mx-2" />
-        <div className="flex items-center gap-2 px-3 py-1 bg-white/10 rounded-full border border-white/10">
+      <div className="flex min-w-0 items-center gap-3">
+        <h2 className="truncate text-lg font-black text-white tracking-tight">Repositorio CACES 2025</h2>
+        <div className="h-5 w-px bg-white/15" />
+        <div className="flex h-7 items-center gap-2 rounded-full border border-white/10 bg-white/10 px-3">
           <div className="w-1.5 h-1.5 bg-[#22c55e] rounded-full animate-pulse" />
-          <span className="text-[10px] font-black text-[#aac4e8] uppercase tracking-widest">
+          <span className="whitespace-nowrap text-[9px] font-black text-[#aac4e8] uppercase tracking-widest">
             {userRole === 'EVALUADOR' ? 'Modo de revision activa' : 'Gestion de acreditacion'}
           </span>
         </div>
       </div>
 
-      <div className="flex items-center gap-3">
+      <div className="flex shrink-0 items-center gap-3">
         <NotificationBell
           notifications={notifications}
           showNotifications={showNotifications}
