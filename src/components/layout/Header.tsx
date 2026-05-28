@@ -40,7 +40,11 @@ export const Header = ({
         <div className="flex h-7 items-center gap-2 rounded-full border border-white/10 bg-white/10 px-3">
           <div className="w-1.5 h-1.5 bg-[#22c55e] rounded-full animate-pulse" />
           <span className="whitespace-nowrap text-[9px] font-black text-[#aac4e8] uppercase tracking-widest">
-            {userRole === 'EVALUADOR' ? 'Modo de revision activa' : 'Gestion de acreditacion'}
+            {userRole === 'EVALUADOR'
+              ? 'Modo de revision activa'
+              : userRole === 'ADMIN'
+                  ? 'Gestion de roles'
+                  : 'Gestion de acreditacion'}
           </span>
         </div>
       </div>

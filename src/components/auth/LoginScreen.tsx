@@ -58,7 +58,13 @@ export const LoginScreen = ({ onLogin }: LoginScreenProps) => {
                 </span>
                 <input
                   type="text"
-                  defaultValue="admin@edusudamericano.edu.ec"
+                  value={
+                    role === 'ADMIN'
+                      ? 'admin@edusudamericano.edu.ec'
+                      : role === 'COORDINADOR'
+                        ? 'coordinador@edusudamericano.edu.ec'
+                        : 'evaluador@edusudamericano.edu.ec'
+                  }
                   readOnly
                   className="w-full pl-12 pr-4 py-4 bg-[#f8fafc] border border-[#e2e8f0] rounded-2xl text-sm text-[#1e293b] focus:ring-2 focus:ring-[#2563eb] outline-none transition-all"
                 />

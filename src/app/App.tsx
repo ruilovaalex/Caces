@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Sidebar } from '../components/layout/Sidebar';
 import { Header } from '../components/layout/Header';
 import { Dashboard } from '../components/layout/Dashboard';
@@ -22,6 +22,7 @@ import { useAssignments } from '../hooks/useAssignments';
 
 import { calculateIndicatorProgress, getIndicatorCurrentStatus, getIndicatorStats } from '../utils/progressUtils';
 import { getReadableAllowedFormats, isFileAllowedForRequirement } from '../utils/evidenceFormatUtils';
+import { canUserAssign } from '../utils/permissions';
 import { Indicator, Requirement, Status } from '../types';
 
 export default function App() {
@@ -71,6 +72,17 @@ export default function App() {
   } = useFileUpload();
 
   useAssignments();
+
+  useEffect(() => {
+    if (userRole !== 'ADMIN') return;
+    setIsEditorOpen(false);
+    setIsUploadOpen(false);
+    setIsHistoryOpen(false);
+    setIsChecklistOpen(false);
+    setActiveRequirement(null);
+    setSelectedIndicator(null);
+    setIsAssignmentsOpen(true);
+  }, [setSelectedIndicator, userRole]);
 
   const handleIndicatorSelect = useCallback((indicator: Indicator) => {
     setIsChecklistOpen(false);
@@ -248,7 +260,7 @@ export default function App() {
               onViewChecklist={() => setIsChecklistOpen(true)}
               onOpenCriterionSubCriteria={openCriterionSubCriteria}
               onOpenAssignments={handleOpenAssignments}
-              canManageAssignments={userRole === 'ADMIN' || userRole === 'COORDINADOR'}
+              canManageAssignments={canUserAssign(userRole)}
             />
           )}
 
@@ -261,7 +273,7 @@ export default function App() {
           )}
 
           {!selectedIndicator && isAssignmentsOpen && (
-            <AssignmentsView />
+            <AssignmentsView userRole={userRole} mockData={mockData} />
           )}
 
           {selectedIndicator && (

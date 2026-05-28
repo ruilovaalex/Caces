@@ -63,17 +63,19 @@ export const Sidebar = ({
       </div>
 
       <div className="p-4 border-b border-[#e2e8f0] space-y-2">
-        <button
-          onClick={onOpenDashboard}
-          className={`w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-colors ${
-            activeView === 'dashboard' || activeView === 'indicator' || activeView === 'checklist'
-              ? 'bg-[#2563eb] text-white'
-              : 'text-[#64748b] hover:bg-[#f4f6f9]'
-          }`}
-        >
-          <Folder className="w-4 h-4" />
-          1. Repositorio
-        </button>
+        {userRole !== 'ADMIN' && (
+          <button
+            onClick={onOpenDashboard}
+            className={`w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-colors ${
+              activeView === 'dashboard' || activeView === 'indicator' || activeView === 'checklist'
+                ? 'bg-[#2563eb] text-white'
+                : 'text-[#64748b] hover:bg-[#f4f6f9]'
+            }`}
+          >
+            <Folder className="w-4 h-4" />
+            1. Repositorio
+          </button>
+        )}
 
         {(userRole === 'ADMIN' || userRole === 'COORDINADOR') && (
           <button
@@ -85,11 +87,12 @@ export const Sidebar = ({
             }`}
           >
             <ClipboardList className="w-4 h-4" />
-            2. Asignaciones
+            {userRole === 'ADMIN' ? '1. Roles' : '2. Docentes y tareas'}
           </button>
         )}
       </div>
 
+      {userRole !== 'ADMIN' ? (
       <nav
         className="flex-1 overflow-y-auto p-4 space-y-1 outline-none"
         onKeyDown={onKeyDown}
@@ -168,6 +171,16 @@ export const Sidebar = ({
           </div>
         ))}
       </nav>
+      ) : (
+        <div className="flex-1 p-4">
+          <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
+            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Administrador</p>
+            <p className="mt-2 text-sm font-bold leading-relaxed text-slate-700">
+              Perfil limitado a crear roles. La gestion de docentes, indicadores y evidencias queda a cargo del coordinador.
+            </p>
+          </div>
+        </div>
+      )}
 
       <div
         className="p-4 border-t border-[#e2e8f0] bg-[#f4f6f9] cursor-pointer hover:bg-white transition-colors"

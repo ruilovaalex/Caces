@@ -72,7 +72,7 @@ export const CoordinatorEvidenceEditor = ({
   const currentUserName = currentUser?.name || 'Usuario';
   const currentFile = files.find(file => file.isCurrentVersion);
   const evaluatorMode = userRole === 'EVALUADOR';
-  const canDraft = userRole === 'ADMIN' || userRole === 'COORDINADOR';
+  const canDraft = userRole === 'COORDINADOR';
   const workGuide = useMemo(
     () => buildRequirementWorkGuide(indicator, requirement),
     [indicator, requirement]

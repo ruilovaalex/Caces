@@ -3,7 +3,12 @@ import { UserRole, User } from '../types';
 import { NotificationService } from '../services/notificationService';
 
 const buildUserByRole = (role: UserRole): User => ({
-  id: '1',
+  id:
+    role === 'COORDINADOR'
+        ? 'coord-1'
+        : role === 'EVALUADOR'
+          ? 'eval-1'
+          : 'admin-1',
   email:
     role === 'ADMIN'
       ? 'admin@edusudamericano.edu.ec'
