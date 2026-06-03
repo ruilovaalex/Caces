@@ -1,10 +1,32 @@
-import React from 'react';
-import { Folder, Clock, CheckCircle2, AlertCircle, ChevronRight, FileText } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { motion } from 'motion/react';
+import { Clock, FileText } from 'lucide-react';
+import {
+  fadeInUp, fadeInRight, staggerContainer, easeOut, easeOutFast, hoverScale, tapScale,
+} from '../../utils/animations';
 
 interface DocenteDashboardProps {
   onViewAllFiles: () => void;
   onViewAllActivities: () => void;
 }
+
+// Animated counter hook
+const useCountUp = (target: number, duration = 1000) => {
+  const [count, setCount] = useState(0);
+  useEffect(() => {
+    const start = performance.now();
+    const tick = (now: number) => {
+      const elapsed = now - start;
+      const progress = Math.min(elapsed / duration, 1);
+      // easeOutCubic
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setCount(Math.round(eased * target));
+      if (progress < 1) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  }, [target, duration]);
+  return count;
+};
 
 export const DocenteDashboard = ({ onViewAllFiles, onViewAllActivities }: DocenteDashboardProps) => {
   const stats = {
@@ -13,6 +35,11 @@ export const DocenteDashboard = ({ onViewAllFiles, onViewAllActivities }: Docent
     validated: 1,
     observed: 1
   };
+
+  const uploadedCount = useCountUp(stats.uploaded);
+  const pendingCount = useCountUp(stats.pending);
+  const validatedCount = useCountUp(stats.validated);
+  const observedCount = useCountUp(stats.observed);
 
   const recentFiles = [
     { id: '1', name: 'Syllabus_Biologia_2024.pdf', date: '01/06/2026', status: 'Validado' },
@@ -31,67 +58,127 @@ export const DocenteDashboard = ({ onViewAllFiles, onViewAllActivities }: Docent
     }
   };
 
+  const statCards = [
+    { label: 'Subidas', value: uploadedCount, color: 'border-l-[#2563eb]', textColor: 'text-[#0f172a]' },
+    { label: 'Pendientes', value: pendingCount, color: 'border-l-slate-400', textColor: 'text-slate-600' },
+    { label: 'Validadas', value: validatedCount, color: 'border-l-[#15803d]', textColor: 'text-[#15803d]' },
+    { label: 'Observadas', value: observedCount, color: 'border-l-[#dc2626]', textColor: 'text-[#dc2626]' },
+  ];
+
   return (
-    <div className="space-y-8 animate-in fade-in duration-300">
-      <div className="flex items-center justify-between">
+    <div className="space-y-8">
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3, ease: 'easeOut' }}
+        className="flex items-center justify-between"
+      >
         <h2 className="text-2xl font-black text-slate-800 tracking-tight leading-tight">Dashboard General</h2>
         <p className="text-xs font-bold uppercase tracking-widest text-slate-400">Período 2025</p>
-      </div>
+      </motion.div>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="premium-card bg-white p-5 rounded-lg border-l-4 border-l-[#2563eb] space-y-2">
-          <span className="text-[9px] font-black text-[#64748b] uppercase tracking-widest leading-none">Subidas</span>
-          <h3 className="text-2xl font-black text-[#0f172a]">{stats.uploaded}</h3>
-        </div>
-        <div className="premium-card bg-white p-5 rounded-lg border-l-4 border-l-slate-400 space-y-2">
-          <span className="text-[9px] font-black text-[#64748b] uppercase tracking-widest leading-none">Pendientes</span>
-          <h3 className="text-2xl font-black text-slate-600">{stats.pending}</h3>
-        </div>
-        <div className="premium-card bg-white p-5 rounded-lg border-l-4 border-l-[#15803d] space-y-2">
-          <span className="text-[9px] font-black text-[#64748b] uppercase tracking-widest leading-none">Validadas</span>
-          <h3 className="text-2xl font-black text-[#15803d]">{stats.validated}</h3>
-        </div>
-        <div className="premium-card bg-white p-5 rounded-lg border-l-4 border-l-[#dc2626] space-y-2">
-          <span className="text-[9px] font-black text-[#64748b] uppercase tracking-widest leading-none">Observadas</span>
-          <h3 className="text-2xl font-black text-[#dc2626]">{stats.observed}</h3>
-        </div>
-      </div>
+      {/* Stat cards with staggered fade-in from below */}
+      <motion.div
+        className="grid grid-cols-1 md:grid-cols-4 gap-4"
+        variants={staggerContainer}
+        initial="initial"
+        animate="animate"
+      >
+        {statCards.map((card, i) => (
+          <motion.div
+            key={card.label}
+            variants={fadeInUp}
+            transition={{ duration: 0.4, ease: 'easeOut', delay: i * 0.1 }}
+            className={`premium-card bg-white p-5 rounded-lg border-l-4 ${card.color} space-y-2`}
+          >
+            <span className="text-[9px] font-black text-[#64748b] uppercase tracking-widest leading-none">{card.label}</span>
+            <h3 className={`text-2xl font-black ${card.textColor}`}>{card.value}</h3>
+          </motion.div>
+        ))}
+      </motion.div>
 
-      <div className="premium-card bg-white p-6 rounded-lg space-y-4">
+      {/* Animated progress bar */}
+      <motion.div
+        initial={{ opacity: 0, y: 15 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, ease: 'easeOut', delay: 0.4 }}
+        className="premium-card bg-white p-6 rounded-lg space-y-4"
+      >
         <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-wider">
           <span className="text-[#64748b]">Progreso General de mis Entregas</span>
           <span className="text-[#2563eb]">50%</span>
         </div>
         <div className="w-full h-2 bg-[#f1f5f9] rounded-full overflow-hidden">
-          <div className="h-full bg-[#2563eb] transition-all duration-700" style={{ width: '50%' }} />
+          <motion.div
+            className="h-full bg-[#2563eb] rounded-full"
+            initial={{ width: '0%' }}
+            animate={{ width: '50%' }}
+            transition={{ duration: 1.2, ease: 'easeOut', delay: 0.5 }}
+          />
         </div>
-      </div>
+      </motion.div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="premium-card bg-white rounded-lg overflow-hidden border border-[#e2e8f0]">
+      {/* Bottom cards entering from the right */}
+      <motion.div
+        className="grid grid-cols-1 md:grid-cols-2 gap-6"
+        variants={staggerContainer}
+        initial="initial"
+        animate="animate"
+      >
+        <motion.div
+          variants={fadeInRight}
+          transition={easeOut}
+          whileHover={hoverScale}
+          className="premium-card bg-white rounded-lg overflow-hidden border border-[#e2e8f0]"
+        >
           <div className="p-6 border-b border-[#f1f5f9] flex items-center justify-between bg-white">
             <div className="flex items-center gap-3">
               <Clock className="w-5 h-5 text-amber-500" />
               <h3 className="text-sm font-black text-slate-800 uppercase tracking-tight">Actividades Pendientes</h3>
             </div>
-            <button onClick={onViewAllActivities} className="text-[10px] font-black text-blue-600 uppercase tracking-widest hover:underline">Ver todas</button>
+            <motion.button
+              whileHover={hoverScale}
+              whileTap={tapScale}
+              onClick={onViewAllActivities}
+              className="text-[10px] font-black text-blue-600 uppercase tracking-widest hover:underline"
+            >
+              Ver todas
+            </motion.button>
           </div>
           <div className="p-5">
             <p className="text-sm text-slate-600 font-medium">Tienes 3 tareas pendientes de entrega. Revisa la pestaña de Actividades.</p>
           </div>
-        </div>
+        </motion.div>
 
-        <div className="premium-card bg-white rounded-lg overflow-hidden border border-[#e2e8f0]">
+        <motion.div
+          variants={fadeInRight}
+          transition={{ ...easeOut, delay: 0.1 }}
+          whileHover={hoverScale}
+          className="premium-card bg-white rounded-lg overflow-hidden border border-[#e2e8f0]"
+        >
           <div className="p-6 border-b border-[#f1f5f9] flex items-center justify-between bg-white">
             <div className="flex items-center gap-3">
               <FileText className="w-5 h-5 text-[#2563eb]" />
               <h3 className="text-sm font-black text-slate-800 uppercase tracking-tight">Archivos Recientes</h3>
             </div>
-            <button onClick={onViewAllFiles} className="text-[10px] font-black text-blue-600 uppercase tracking-widest hover:underline">Ver todos</button>
+            <motion.button
+              whileHover={hoverScale}
+              whileTap={tapScale}
+              onClick={onViewAllFiles}
+              className="text-[10px] font-black text-blue-600 uppercase tracking-widest hover:underline"
+            >
+              Ver todos
+            </motion.button>
           </div>
           <div className="divide-y divide-slate-50">
-            {recentFiles.map(file => (
-              <div key={file.id} className="p-4 flex items-center justify-between hover:bg-slate-50 transition-colors">
+            {recentFiles.map((file, i) => (
+              <motion.div
+                key={file.id}
+                initial={{ opacity: 0, x: 10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.3, ease: 'easeOut', delay: 0.6 + i * 0.08 }}
+                className="p-4 flex items-center justify-between hover:bg-slate-50 transition-colors"
+              >
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 bg-slate-100 rounded-lg flex items-center justify-center text-slate-400">
                     <FileText className="w-4 h-4" />
@@ -102,11 +189,11 @@ export const DocenteDashboard = ({ onViewAllFiles, onViewAllActivities }: Docent
                   </div>
                 </div>
                 {getStatusBadge(file.status)}
-              </div>
+              </motion.div>
             ))}
           </div>
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
     </div>
   );
 };
