@@ -5,7 +5,9 @@ import {
   Folder,
   ClipboardList
 } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
 import { Indicator, YearPeriod, UserRole } from '../../types';
+import { fadeInRight, slideDown, staggerContainerFast } from '../../utils/animations';
 
 interface SidebarProps {
   mockData: YearPeriod[];
@@ -53,7 +55,12 @@ export const Sidebar = ({
   };
 
   return (
-    <aside className="w-80 bg-white border-r border-[#e2e8f0] flex flex-col shadow-sm">
+    <motion.aside 
+      initial={{ x: -300, opacity: 0 }}
+      animate={{ x: 0, opacity: 1 }}
+      transition={{ duration: 0.4, ease: "easeOut" }}
+      className="w-80 bg-white border-r border-[#e2e8f0] flex flex-col shadow-sm"
+    >
       <div className="h-16 border-b border-white/10 flex items-center gap-3 bg-[#1e2d4a] px-6">
         <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#2563eb] shadow-lg shadow-blue-600/20">
           <FileText className="w-5 h-5 text-white" />
@@ -64,9 +71,16 @@ export const Sidebar = ({
         </div>
       </div>
 
-      <div className="p-4 border-b border-[#e2e8f0] space-y-2">
+      <motion.div 
+        variants={staggerContainerFast}
+        initial="initial"
+        animate="animate"
+        className="p-4 border-b border-[#e2e8f0] space-y-2"
+      >
         {(userRole === 'COORDINADOR' || userRole === 'EVALUADOR') && (
-          <button
+          <motion.button
+            variants={fadeInRight}
+            whileHover={{ x: 4, backgroundColor: 'rgba(244, 246, 249, 1)' }}
             onClick={onOpenDashboard}
             className={`w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-colors ${
               activeView === 'dashboard' || activeView === 'indicator' || activeView === 'checklist'
@@ -76,11 +90,13 @@ export const Sidebar = ({
           >
             <Folder className="w-4 h-4" />
             1. Repositorio
-          </button>
+          </motion.button>
         )}
 
         {(userRole === 'ADMIN' || userRole === 'COORDINADOR') && (
-          <button
+          <motion.button
+            variants={fadeInRight}
+            whileHover={{ x: 4, backgroundColor: 'rgba(244, 246, 249, 1)' }}
             onClick={onOpenAssignments}
             className={`w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-colors ${
               activeView === 'assignments'
@@ -90,9 +106,9 @@ export const Sidebar = ({
           >
             <ClipboardList className="w-4 h-4" />
             {userRole === 'ADMIN' ? '1. Roles' : '2. Docentes y tareas'}
-          </button>
+          </motion.button>
         )}
-      </div>
+      </motion.div>
 
       {userRole === 'COORDINADOR' || userRole === 'EVALUADOR' ? (
       <nav
@@ -107,46 +123,71 @@ export const Sidebar = ({
 
         {mockData.map((yearPeriod) => (
           <div key={yearPeriod.year} className="space-y-1">
-            <button
+            <motion.button
+              whileHover={{ x: 4 }}
               onClick={() => { onToggleNode(yearPeriod.year.toString()); onSetFocusedNode(yearPeriod.year.toString()); }}
               className={`w-full flex items-center gap-2 px-2 py-2 hover:bg-[#f4f6f9] rounded-md transition-colors text-sm font-semibold text-[#1e293b] outline-none ${focusedNodeId === yearPeriod.year.toString() ? 'bg-[#dbeafe] ring-1 ring-blue-100' : ''}`}
             >
               <ChevronRight className={`w-4 h-4 text-slate-400 transition-transform ${expandedNodes.has(yearPeriod.year.toString()) ? 'rotate-90' : ''}`} />
               <Folder className="w-4 h-4 text-amber-500/70" />
               Año {yearPeriod.year}
-            </button>
+            </motion.button>
 
-            {expandedNodes.has(yearPeriod.year.toString()) && (
-              <div className="ml-4 space-y-1 border-l border-slate-200 pl-2">
-                {yearPeriod.criteria.map((crit) => (
-                  <div key={crit.id}>
-                    <button
-                      onClick={() => { onToggleNode(`crit-${crit.id}`); onSetFocusedNode(`crit-${crit.id}`); }}
+            <AnimatePresence>
+              {expandedNodes.has(yearPeriod.year.toString()) && (
+                <motion.div 
+                  variants={slideDown}
+                  initial="initial"
+                  animate="animate"
+                  exit="exit"
+                  className="ml-4 space-y-1 border-l border-slate-200 pl-2 origin-top"
+                >
+                  {yearPeriod.criteria.map((crit) => (
+                    <div key={crit.id}>
+                      <motion.button
+                        whileHover={{ x: 4 }}
+                        onClick={() => { onToggleNode(`crit-${crit.id}`); onSetFocusedNode(`crit-${crit.id}`); }}
                       className={`w-full flex items-center gap-2 px-2 py-1.5 hover:bg-[#f4f6f9] rounded-md transition-colors text-xs font-bold text-[#64748b] uppercase tracking-wide truncate text-left outline-none ${focusedNodeId === `crit-${crit.id}` ? 'bg-[#dbeafe] ring-1 ring-blue-100' : ''}`}
                     >
                       <ChevronRight className={`w-3 h-3 text-slate-400 transition-transform ${expandedNodes.has(`crit-${crit.id}`) ? 'rotate-90' : ''}`} />
-                      <Folder className="w-4 h-4 text-blue-600/70 shrink-0" />
-                      <span className="truncate">{crit.name}</span>
-                    </button>
+                        <Folder className="w-4 h-4 text-blue-600/70 shrink-0" />
+                        <span className="truncate">{crit.name}</span>
+                      </motion.button>
 
-                    {expandedNodes.has(`crit-${crit.id}`) && (
-                      <div className="ml-4 mt-1 space-y-1 border-l border-slate-100 pl-2">
-                        {crit.subCriteria.map((sub) => (
-                          <div key={sub.id}>
-                            <button
-                              onClick={() => { onToggleNode(`sub-${sub.id}`); onSetFocusedNode(`sub-${sub.id}`); }}
+                      <AnimatePresence>
+                        {expandedNodes.has(`crit-${crit.id}`) && (
+                          <motion.div 
+                            variants={slideDown}
+                            initial="initial"
+                            animate="animate"
+                            exit="exit"
+                            className="ml-4 mt-1 space-y-1 border-l border-slate-100 pl-2 origin-top"
+                          >
+                            {crit.subCriteria.map((sub) => (
+                              <div key={sub.id}>
+                                <motion.button
+                                  whileHover={{ x: 4 }}
+                                  onClick={() => { onToggleNode(`sub-${sub.id}`); onSetFocusedNode(`sub-${sub.id}`); }}
                               className={`w-full flex items-center gap-2 px-2 py-1.5 hover:bg-[#f4f6f9] rounded-md transition-colors text-[11px] font-semibold text-[#64748b] text-left outline-none ${focusedNodeId === `sub-${sub.id}` ? 'bg-[#dbeafe] ring-1 ring-blue-100' : ''}`}
                             >
                               <ChevronRight className={`w-2.5 h-2.5 text-slate-300 transition-transform ${expandedNodes.has(`sub-${sub.id}`) ? 'rotate-90' : ''}`} />
-                              <Folder className="w-3.5 h-3.5 text-blue-400/60 shrink-0" />
-                              <span className="truncate">{sub.name}</span>
-                            </button>
+                                  <Folder className="w-3.5 h-3.5 text-blue-400/60 shrink-0" />
+                                  <span className="truncate">{sub.name}</span>
+                                </motion.button>
 
-                            {expandedNodes.has(`sub-${sub.id}`) && (
-                              <div className="ml-5 mt-1 space-y-0.5 border-l border-slate-50 pl-2">
-                                {sub.indicators.map((indicator) => (
-                                  <button
-                                    key={indicator.code}
+                                <AnimatePresence>
+                                  {expandedNodes.has(`sub-${sub.id}`) && (
+                                    <motion.div 
+                                      variants={slideDown}
+                                      initial="initial"
+                                      animate="animate"
+                                      exit="exit"
+                                      className="ml-5 mt-1 space-y-0.5 border-l border-slate-50 pl-2 origin-top"
+                                    >
+                                      {sub.indicators.map((indicator) => (
+                                        <motion.button
+                                          whileHover={{ x: 4 }}
+                                          key={indicator.code}
                                     onClick={() => onIndicatorSelect(indicator)}
                                     className={`w-full flex items-center gap-2 px-3 py-1.5 rounded transition-all text-[11px] font-medium leading-tight text-left outline-none ${
                                       selectedIndicator?.code === indicator.code
@@ -155,21 +196,24 @@ export const Sidebar = ({
                                     }`}
                                   >
                                     <FileText className="w-3 h-3 text-slate-300 shrink-0" />
-                                    <span className="flex-1 truncate">
-                                      {indicator.code} {indicator.name}
-                                    </span>
-                                  </button>
-                                ))}
-                              </div>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    )}
+                                        <span className="flex-1 truncate">
+                                          {indicator.code} {indicator.name}
+                                        </span>
+                                      </motion.button>
+                                    ))}
+                                  </motion.div>
+                                )}
+                                </AnimatePresence>
+                            </div>
+                          ))}
+                        </motion.div>
+                      )}
+                      </AnimatePresence>
                   </div>
                 ))}
-              </div>
+              </motion.div>
             )}
+            </AnimatePresence>
           </div>
         ))}
       </nav>
@@ -193,7 +237,8 @@ export const Sidebar = ({
         </div>
       )}
 
-      <div
+      <motion.div
+        whileTap={{ scale: 0.98 }}
         className="p-4 border-t border-[#e2e8f0] bg-[#f4f6f9] cursor-pointer hover:bg-white transition-colors"
         onClick={() => {
           const roles: UserRole[] = ['ADMIN', 'COORDINADOR', 'EVALUADOR', 'DOCENTE'];
@@ -212,7 +257,7 @@ export const Sidebar = ({
             <p className="text-[#64748b] font-black uppercase tracking-widest text-[8px] mt-0.5">{userRole} (clic para cambiar)</p>
           </div>
         </div>
-      </div>
-    </aside>
+      </motion.div>
+    </motion.aside>
   );
 };

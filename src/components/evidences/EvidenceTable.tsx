@@ -2,6 +2,8 @@ import React from 'react';
 import { Indicator, Requirement, UploadedFile, UserRole } from '../../types';
 import { EvidenceRow } from './EvidenceRow';
 import { Folder, Info, PenSquare, ClipboardCheck, Upload, History } from 'lucide-react';
+import { motion } from 'motion/react';
+import { staggerContainerFast, scaleIn } from '../../utils/animations';
 import { WorkflowGuide } from '../layout/WorkflowGuide';
 
 interface EvidenceTableProps {
@@ -37,7 +39,12 @@ export const EvidenceTable = ({
         <span className="text-[10px] font-bold text-blue-600/60 uppercase tracking-widest">Modelo de Evaluacion v.2024</span>
       </div>
 
-      <div className="mx-8 mt-5 rounded-lg border border-blue-100 bg-white p-4">
+      <motion.div 
+        variants={scaleIn}
+        initial="initial"
+        animate="animate"
+        className="mx-8 mt-5 rounded-lg border border-blue-100 bg-white p-4"
+      >
         <div className="flex items-start gap-3">
           <div className="mt-0.5 rounded-xl bg-white p-2 text-blue-600 shadow-sm border border-blue-100">
             <Info className="w-4 h-4" />
@@ -87,7 +94,7 @@ export const EvidenceTable = ({
             )}
           </div>
         </div>
-      </div>
+      </motion.div>
 
       <div className="flex-1 overflow-y-auto">
         <table className="w-full text-left border-collapse">
@@ -99,7 +106,12 @@ export const EvidenceTable = ({
               <th className="px-8 py-4 text-right">Acciones de Gestion</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-50">
+          <motion.tbody 
+            variants={staggerContainerFast}
+            initial="initial"
+            animate="animate"
+            className="divide-y divide-slate-50"
+          >
             {indicator.requirements.map(requirement => (
               <EvidenceRow
                 key={requirement.id}
@@ -111,7 +123,7 @@ export const EvidenceTable = ({
                 onOpenHistory={onOpenHistory}
               />
             ))}
-          </tbody>
+          </motion.tbody>
         </table>
       </div>
     </div>

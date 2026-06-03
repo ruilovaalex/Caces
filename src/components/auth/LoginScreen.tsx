@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { CheckCircle2, GraduationCap, Users } from 'lucide-react';
 import { UserRole } from '../../types';
+import { scaleIn, btnPrimary } from '../../utils/animations';
 
 interface LoginScreenProps {
   onLogin: (role: UserRole) => void;
@@ -11,11 +12,25 @@ export const LoginScreen = ({ onLogin }: LoginScreenProps) => {
   const [role, setRole] = useState<UserRole>('ADMIN');
 
   return (
-    <div className="min-h-screen bg-[#0f172a] flex items-center justify-center p-4 font-sans">
+    <div className="min-h-screen bg-[#0f172a] flex items-center justify-center p-4 font-sans overflow-hidden relative">
+      {/* Decorative background circles */}
+      <motion.div 
+        animate={{ y: [-10, 10, -10], opacity: [0.3, 0.5, 0.3] }} 
+        transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
+        className="absolute top-1/4 left-1/4 w-64 h-64 bg-blue-500/20 rounded-full blur-3xl pointer-events-none"
+      />
+      <motion.div 
+        animate={{ y: [10, -10, 10], opacity: [0.2, 0.4, 0.2] }} 
+        transition={{ repeat: Infinity, duration: 5, ease: "easeInOut" }}
+        className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-indigo-500/20 rounded-full blur-3xl pointer-events-none"
+      />
+
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-md bg-white rounded-[28px] shadow-2xl shadow-black/30 border border-white/10 overflow-hidden"
+        variants={scaleIn}
+        initial="initial"
+        animate="animate"
+        exit="exit"
+        className="w-full max-w-md bg-white rounded-[28px] shadow-2xl shadow-black/30 border border-white/10 overflow-hidden relative z-10"
       >
         <div className="p-10 text-center space-y-8">
           <div className="flex flex-col items-center space-y-4">
@@ -35,8 +50,9 @@ export const LoginScreen = ({ onLogin }: LoginScreenProps) => {
               <label className="text-[10px] font-black text-[#64748b] uppercase tracking-widest ml-1">Perfil de Acceso</label>
               <div className="grid grid-cols-2 gap-2">
                 {(['ADMIN', 'COORDINADOR', 'EVALUADOR', 'DOCENTE'] as UserRole[]).map(r => (
-                  <button
+                  <motion.button
                     key={r}
+                    whileHover={{ scale: 1.02 }}
                     onClick={() => setRole(r)}
                     className={`py-2 rounded-xl text-[9px] font-black border transition-all ${
                       role === r
@@ -45,7 +61,7 @@ export const LoginScreen = ({ onLogin }: LoginScreenProps) => {
                     }`}
                   >
                     {r}
-                  </button>
+                  </motion.button>
                 ))}
               </div>
             </div>
@@ -89,12 +105,13 @@ export const LoginScreen = ({ onLogin }: LoginScreenProps) => {
             </div>
           </div>
 
-          <button
+          <motion.button
+            {...btnPrimary}
             onClick={() => onLogin(role)}
             className="w-full py-4 bg-[#2563eb] hover:bg-blue-700 text-white rounded-2xl font-black text-xs uppercase tracking-widest transition-all shadow-lg shadow-blue-600/25 active:scale-95"
           >
             Iniciar sesion
-          </button>
+          </motion.button>
 
           <div className="pt-4 flex items-center justify-center gap-4 text-[10px] font-black text-[#64748b] uppercase tracking-widest">
             <span className="hover:text-[#2563eb] cursor-pointer transition-colors">Olvido su clave?</span>

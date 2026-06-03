@@ -2,7 +2,9 @@ import React from 'react';
 import { Requirement, UploadedFile, UserRole } from '../../types';
 import { EvidenceStatusBadge as StatusBadge } from './EvidenceStatusBadge';
 import { Upload, AlertCircle, Edit3, ClipboardCheck, History } from 'lucide-react';
+import { motion } from 'motion/react';
 import { canUserUpload } from '../../utils/permissions';
+import { fadeInUp, tapScale, hoverScale } from '../../utils/animations';
 
 interface EvidenceRowProps {
   requirement: Requirement;
@@ -33,7 +35,7 @@ export const EvidenceRow = ({
   const EditorIcon = userRole === 'EVALUADOR' ? ClipboardCheck : Edit3;
 
   return (
-    <tr className="group hover:bg-slate-50/80 transition-colors">
+    <motion.tr variants={fadeInUp} className="group hover:bg-slate-50/80 transition-colors">
       <td className="px-8 py-5">
         <div className="cursor-pointer group/item" onClick={() => onOpenEditor(requirement)}>
           <p className="text-sm font-bold text-slate-700 leading-tight group-hover/item:text-blue-600 transition-colors">
@@ -60,7 +62,9 @@ export const EvidenceRow = ({
       </td>
       <td className="px-8 py-5 text-right">
         <div className="flex justify-end gap-2 shrink-0">
-          <button
+          <motion.button
+            whileHover={hoverScale}
+            whileTap={tapScale}
             onClick={() => onOpenEditor(requirement)}
             className={`h-10 w-10 inline-flex items-center justify-center rounded-xl transition-all shadow-sm group ${
               userRole === 'EVALUADOR'
@@ -71,18 +75,22 @@ export const EvidenceRow = ({
             aria-label={editorLabel}
           >
             <EditorIcon className="w-4 h-4 group-hover:scale-110 transition-transform" />
-          </button>
+          </motion.button>
 
-          <button
+          <motion.button
+            whileHover={hoverScale}
+            whileTap={tapScale}
             onClick={() => onOpenHistory(requirement)}
             className="p-2.5 bg-slate-50 text-[#64748b] hover:bg-[#1e2d4a] hover:text-white rounded-xl transition-all shadow-sm"
             title="Ver historial de documentos subidos"
           >
             <History className="w-4 h-4" />
-          </button>
+          </motion.button>
 
           {canUploadFile && (
-            <button
+            <motion.button
+              whileHover={hoverScale}
+              whileTap={tapScale}
               onClick={() => onOpenUpload(requirement)}
               className={`p-2.5 rounded-xl transition-all shadow-sm ${
                 status === 'Observado' || status === 'Pendiente' || status === 'Rechazado'
@@ -92,10 +100,10 @@ export const EvidenceRow = ({
               title={currentFile ? 'Reemplazar archivo (nueva version)' : 'Subir archivo'}
             >
               <Upload className="w-4 h-4" />
-            </button>
+            </motion.button>
           )}
         </div>
       </td>
-    </tr>
+    </motion.tr>
   );
 };

@@ -1,5 +1,6 @@
 import React from 'react';
 import { LogOut, User } from 'lucide-react';
+import { motion } from 'motion/react';
 
 interface UserPanelProps {
   onLogout: () => void;
@@ -16,11 +17,12 @@ export const UserPanel = ({ onLogout, userName = 'Usuario', userRole = 'Perfil' 
       </div>
       
       <div className="relative group">
-        <button 
+        <motion.button 
+          whileHover={{ scale: 1.05 }}
           className="h-9 w-9 rounded-full bg-[#2563eb] flex items-center justify-center text-white font-black text-xs border border-white/20 shadow-sm transition-all hover:bg-blue-500"
         >
           <User className="w-4 h-4" />
-        </button>
+        </motion.button>
         
         <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-xl border border-slate-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 p-2">
           <button 
