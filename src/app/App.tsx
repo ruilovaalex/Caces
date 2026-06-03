@@ -12,6 +12,7 @@ import { EvidenceUploadModal } from '../components/evidences/EvidenceUploadModal
 import { EvidenceHistoryModal } from '../components/evidences/EvidenceHistoryModal';
 import { CoordinatorEvidenceEditor } from '../components/coordinator/CoordinatorEvidenceEditor';
 import { AssignmentsView } from '../components/assignments/AssignmentsView';
+import { DocenteView } from '../components/docente/DocenteView';
 
 import { useAuth } from '../hooks/useAuth';
 import { useIndicators } from '../hooks/useIndicators';
@@ -251,8 +252,11 @@ export default function App() {
           userRole={userRole}
         />
 
-        <div className="flex-1 overflow-y-auto p-8 bg-[#f4f6f9]">
-          {!selectedIndicator && !isChecklistOpen && !isAssignmentsOpen && (
+        {userRole === 'DOCENTE' ? (
+          <DocenteView onLogout={logout} />
+        ) : (
+          <div className="flex-1 overflow-y-auto p-8 bg-[#f4f6f9]">
+            {!selectedIndicator && !isChecklistOpen && !isAssignmentsOpen && (
             <Dashboard
               mockData={mockData}
               allFiles={allFiles}
@@ -313,6 +317,7 @@ export default function App() {
             </div>
           )}
         </div>
+        )}
       </main>
 
       <EvidenceUploadModal
