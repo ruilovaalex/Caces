@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { motion } from 'motion/react';
 import { Clock, FileText } from 'lucide-react';
 import {
-  fadeInUp, fadeInRight, staggerContainer, easeOut, easeOutFast, hoverScale, tapScale,
+  fadeInUp, fadeInRight, staggerContainer, easeOut, easeOutFast, hoverScale, tapScale, useCountUp
 } from '../../utils/animations';
 
 interface DocenteDashboardProps {
@@ -10,23 +10,7 @@ interface DocenteDashboardProps {
   onViewAllActivities: () => void;
 }
 
-// Animated counter hook
-const useCountUp = (target: number, duration = 1000) => {
-  const [count, setCount] = useState(0);
-  useEffect(() => {
-    const start = performance.now();
-    const tick = (now: number) => {
-      const elapsed = now - start;
-      const progress = Math.min(elapsed / duration, 1);
-      // easeOutCubic
-      const eased = 1 - Math.pow(1 - progress, 3);
-      setCount(Math.round(eased * target));
-      if (progress < 1) requestAnimationFrame(tick);
-    };
-    requestAnimationFrame(tick);
-  }, [target, duration]);
-  return count;
-};
+
 
 export const DocenteDashboard = ({ onViewAllFiles, onViewAllActivities }: DocenteDashboardProps) => {
   const stats = {

@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import { Sidebar } from '../components/layout/Sidebar';
 import { Header } from '../components/layout/Header';
 import { Dashboard } from '../components/layout/Dashboard';
@@ -24,6 +25,7 @@ import { useAssignments } from '../hooks/useAssignments';
 import { calculateIndicatorProgress, getIndicatorCurrentStatus, getIndicatorStats } from '../utils/progressUtils';
 import { getReadableAllowedFormats, isFileAllowedForRequirement } from '../utils/evidenceFormatUtils';
 import { canUserAssign } from '../utils/permissions';
+import { viewTransition } from '../utils/animations';
 import { Indicator, Requirement, Status } from '../types';
 
 export default function App() {
@@ -256,35 +258,46 @@ export default function App() {
           <DocenteView onLogout={logout} />
         ) : (
           <div className="flex-1 overflow-y-auto p-8 bg-[#f4f6f9]">
-            {!selectedIndicator && !isChecklistOpen && !isAssignmentsOpen && (
-            <Dashboard
-              mockData={mockData}
-              allFiles={allFiles}
-              onIndicatorSelect={handleIndicatorSelect}
-              onViewChecklist={() => setIsChecklistOpen(true)}
-              onOpenCriterionSubCriteria={openCriterionSubCriteria}
-              onOpenAssignments={handleOpenAssignments}
-              canManageAssignments={canUserAssign(userRole)}
-            />
-          )}
+            <AnimatePresence mode="wait">
+              {!selectedIndicator && !isChecklistOpen && !isAssignmentsOpen && (
+                <motion.div key="dashboard" variants={viewTransition} initial="initial" animate="animate" exit="exit">
+                  <Dashboard
+                    mockData={mockData}
+                    allFiles={allFiles}
+                    onIndicatorSelect={handleIndicatorSelect}
+                    onViewChecklist={() => setIsChecklistOpen(true)}
+                    onOpenCriterionSubCriteria={openCriterionSubCriteria}
+                    onOpenAssignments={handleOpenAssignments}
+                    canManageAssignments={canUserAssign(userRole)}
+                  />
+                </motion.div>
+              )}
 
-          {!selectedIndicator && isChecklistOpen && !isAssignmentsOpen && (
-            <ChecklistView
-              mockData={mockData}
-              onIndicatorSelect={handleIndicatorSelect}
-              onBackToDashboard={handleGoToStart}
-            />
-          )}
+              {!selectedIndicator && isChecklistOpen && !isAssignmentsOpen && (
+                <motion.div key="checklist" variants={viewTransition} initial="initial" animate="animate" exit="exit">
+                  <ChecklistView
+                    mockData={mockData}
+                    onIndicatorSelect={handleIndicatorSelect}
+                    onBackToDashboard={handleGoToStart}
+                  />
+                </motion.div>
+              )}
 
-          {!selectedIndicator && isAssignmentsOpen && (
-            <AssignmentsView userRole={userRole} mockData={mockData} />
-          )}
+              {!selectedIndicator && isAssignmentsOpen && (
+                <motion.div key="assignments" variants={viewTransition} initial="initial" animate="animate" exit="exit">
+                  <AssignmentsView userRole={userRole} mockData={mockData} />
+                </motion.div>
+              )}
 
-          {selectedIndicator && (
-            <div
-              key={selectedIndicator.code}
-              className="max-w-5xl mx-auto"
-            >
+              {selectedIndicator && (
+                <motion.div
+                  key="indicator"
+                  variants={viewTransition}
+                  initial="initial"
+                  animate="animate"
+                  exit="exit"
+                  className="max-w-5xl mx-auto"
+                >
               <IndicatorContent>
                 <IndicatorHeader
                   indicator={selectedIndicator}
@@ -314,9 +327,10 @@ export default function App() {
                   }}
                 />
               </IndicatorContent>
-            </div>
-          )}
-        </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
         )}
       </main>
 

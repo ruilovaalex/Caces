@@ -2,6 +2,7 @@ import React from 'react';
 import { Bell } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Notification } from '../../types';
+import { fadeInUp, staggerContainerFast } from '../../utils/animations';
 
 interface NotificationBellProps {
   notifications: Notification[];
@@ -47,10 +48,16 @@ export const NotificationBell = ({
                 Limpiar todo
               </button>
             </div>
-            <div className="max-h-[400px] overflow-y-auto">
+            <motion.div 
+              variants={staggerContainerFast}
+              initial="initial"
+              animate="animate"
+              className="max-h-[400px] overflow-y-auto"
+            >
               {notifications.length > 0 ? (
                 notifications.map((n) => (
-                  <div 
+                  <motion.div 
+                    variants={fadeInUp}
                     key={n.id} 
                     onClick={() => onMarkAsRead(n.id)}
                     className={`p-4 border-b border-slate-50 last:border-0 hover:bg-slate-50 cursor-pointer transition-colors relative ${!n.isRead ? 'bg-blue-50/30' : ''}`}
@@ -68,7 +75,7 @@ export const NotificationBell = ({
                         <p className="text-[8px] text-slate-400 font-bold uppercase">{n.timestamp}</p>
                       </div>
                     </div>
-                  </div>
+                  </motion.div>
                 ))
               ) : (
                 <div className="p-10 text-center space-y-3">
@@ -78,7 +85,7 @@ export const NotificationBell = ({
                   <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">No hay notificaciones</p>
                 </div>
               )}
-            </div>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>

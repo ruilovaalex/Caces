@@ -1,8 +1,12 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { Folder, ChevronRight, AlertCircle } from 'lucide-react';
+import { motion } from 'motion/react';
 import { YearPeriod, UploadedFile, Indicator } from '../../types';
 import { calculateIndicatorProgress } from '../../utils/progressUtils';
 import { WorkflowGuide } from './WorkflowGuide';
+import { staggerContainer, fadeInUp, hoverScale, tapScale, hoverCardLift, useCountUp } from '../../utils/animations';
+
+
 
 interface DashboardProps {
   mockData: YearPeriod[];
@@ -67,6 +71,11 @@ export const Dashboard = ({
     return progressBySubCriterion;
   }, [allFiles, mockData]);
 
+  const totalCount = useCountUp(dashboardStats.totalEvidences);
+  const loadedCount = useCountUp(dashboardStats.loaded);
+  const validCount = useCountUp(dashboardStats.validated);
+  const observedCount = useCountUp(dashboardStats.observed);
+
   return (
     <div className="max-w-6xl mx-auto space-y-8">
       <WorkflowGuide
@@ -75,32 +84,38 @@ export const Dashboard = ({
         onOpenAssignments={onOpenAssignments}
       />
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="premium-card bg-white p-5 rounded-lg border-l-4 border-l-[#2563eb] space-y-2">
+      <motion.div 
+        variants={staggerContainer}
+        initial="initial"
+        whileInView="animate"
+        viewport={{ once: true, margin: "-50px" }}
+        className="grid grid-cols-1 md:grid-cols-4 gap-4"
+      >
+        <motion.div variants={fadeInUp} className="premium-card bg-white p-5 rounded-lg border-l-4 border-l-[#2563eb] space-y-2">
           <span className="text-[9px] font-black text-[#64748b] uppercase tracking-widest leading-none">Total Evidencias</span>
           <h3 className="text-2xl font-black text-[#0f172a]">
-            {dashboardStats.totalEvidences}
+            {totalCount}
           </h3>
-        </div>
-        <div className="premium-card bg-white p-5 rounded-lg border-l-4 border-l-[#2563eb] space-y-2">
+        </motion.div>
+        <motion.div variants={fadeInUp} className="premium-card bg-white p-5 rounded-lg border-l-4 border-l-[#2563eb] space-y-2">
           <span className="text-[9px] font-black text-[#64748b] uppercase tracking-widest leading-none">Cargadas</span>
           <h3 className="text-2xl font-black text-[#2563eb]">
-             {dashboardStats.loaded}
+             {loadedCount}
           </h3>
-        </div>
-        <div className="premium-card bg-white p-5 rounded-lg border-l-4 border-l-[#15803d] space-y-2">
+        </motion.div>
+        <motion.div variants={fadeInUp} className="premium-card bg-white p-5 rounded-lg border-l-4 border-l-[#15803d] space-y-2">
           <span className="text-[9px] font-black text-[#64748b] uppercase tracking-widest leading-none">Validadas</span>
           <h3 className="text-2xl font-black text-[#15803d]">
-             {dashboardStats.validated}
+             {validCount}
           </h3>
-        </div>
-        <div className="premium-card bg-white p-5 rounded-lg border-l-4 border-l-[#dc2626] space-y-2">
+        </motion.div>
+        <motion.div variants={fadeInUp} className="premium-card bg-white p-5 rounded-lg border-l-4 border-l-[#dc2626] space-y-2">
           <span className="text-[9px] font-black text-[#64748b] uppercase tracking-widest leading-none">Observadas</span>
           <h3 className="text-2xl font-black text-[#dc2626]">
-             {dashboardStats.observed}
+             {observedCount}
           </h3>
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
 
       <div className="space-y-4">
         <div className="flex items-center justify-between">
@@ -108,9 +123,17 @@ export const Dashboard = ({
             Estructura Institucional de Calidad
           </h3>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pb-2">
-          {mockData[0].criteria.map(crit => (
-            <button
+        <motion.div 
+          variants={staggerContainer}
+          initial="initial"
+          whileInView="animate"
+          viewport={{ once: true, margin: "-50px" }}
+          className="grid grid-cols-1 md:grid-cols-2 gap-4 pb-2"
+        >
+          {mockData[0].criteria.map((crit, index) => (
+            <motion.button
+              variants={fadeInUp}
+              whileHover={hoverCardLift}
               type="button"
               key={crit.id} 
               onClick={() => onOpenCriterionSubCriteria(mockData[0].year, crit.id)}
@@ -136,15 +159,21 @@ export const Dashboard = ({
                          <span className="text-[#2563eb]">{subProgress}%</span>
                        </div>
                        <div className="w-full h-1.5 bg-[#f1f5f9] rounded-full overflow-hidden">
-                         <div className="h-full bg-[#22c55e] transition-all duration-700" style={{ width: `${subProgress}%` }} />
+                         <motion.div 
+                           className="h-full bg-[#22c55e] rounded-full" 
+                           initial={{ width: '0%' }}
+                           whileInView={{ width: `${subProgress}%` }}
+                           viewport={{ once: true }}
+                           transition={{ duration: 1.2, ease: "easeOut", delay: 0.2 + index * 0.1 }}
+                         />
                        </div>
                      </div>
                    );
                  })}
               </div>
-            </button>
+            </motion.button>
           ))}
-        </div>
+        </motion.div>
 
         <div className="premium-card bg-white rounded-lg border border-[#e2e8f0] overflow-hidden">
           <div className="p-6 border-b border-[#f1f5f9] flex items-center justify-between bg-white">
@@ -154,9 +183,16 @@ export const Dashboard = ({
             </div>
             <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Modelo CACES 2024</span>
           </div>
-          <div className="divide-y divide-slate-50">
+          <motion.div 
+            variants={staggerContainer}
+            initial="initial"
+            whileInView="animate"
+            viewport={{ once: true, margin: "-50px" }}
+            className="divide-y divide-slate-50"
+          >
             {pendingIndicators.map(ind => (
-              <div 
+              <motion.div 
+                variants={fadeInUp}
                 key={ind.code} 
                 onClick={() => onIndicatorSelect(ind)}
                 className="p-5 flex items-center justify-between hover:bg-slate-50 transition-colors cursor-pointer group"
@@ -175,16 +211,18 @@ export const Dashboard = ({
                   </div>
                 </div>
                 <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-blue-600 transition-all" />
-              </div>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
           <div className="p-4 bg-slate-50/50 text-center border-t border-slate-50">
-            <button 
+            <motion.button 
+              whileHover={hoverScale}
+              whileTap={tapScale}
               onClick={onViewChecklist}
               className="text-[10px] font-black text-slate-400 hover:text-blue-600 uppercase tracking-[0.2em] transition-colors"
             >
               Visualizar todos los requerimientos
-            </button>
+            </motion.button>
           </div>
         </div>
       </div>
