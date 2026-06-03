@@ -30,7 +30,9 @@ export const Header = ({
       ? 'Administrador'
       : userRole === 'COORDINADOR'
         ? 'Coordinacion Academica'
-        : 'Evaluacion Externa';
+        : userRole === 'DOCENTE'
+          ? 'Docente Adjunto'
+          : 'Evaluacion Externa';
 
   return (
     <TopBar>

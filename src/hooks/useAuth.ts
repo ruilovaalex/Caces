@@ -8,19 +8,25 @@ const buildUserByRole = (role: UserRole): User => ({
         ? 'coord-1'
         : role === 'EVALUADOR'
           ? 'eval-1'
-          : 'admin-1',
+          : role === 'DOCENTE'
+            ? 'docente-1'
+            : 'admin-1',
   email:
     role === 'ADMIN'
       ? 'admin@edusudamericano.edu.ec'
       : role === 'COORDINADOR'
         ? 'coordinador@edusudamericano.edu.ec'
-        : 'evaluador@edusudamericano.edu.ec',
+        : role === 'DOCENTE'
+          ? 'docente@edu.ec'
+          : 'evaluador@edusudamericano.edu.ec',
   name:
     role === 'ADMIN'
       ? 'Admin Sudamericano'
       : role === 'COORDINADOR'
         ? 'Coord. Academico'
-        : 'Evaluador Externo',
+        : role === 'DOCENTE'
+          ? 'Prof. Pablo Mora'
+          : 'Evaluador Externo',
   role
 });
 

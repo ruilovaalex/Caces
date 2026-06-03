@@ -33,8 +33,8 @@ export const LoginScreen = ({ onLogin }: LoginScreenProps) => {
           <div className="space-y-4">
             <div className="space-y-2 text-left">
               <label className="text-[10px] font-black text-[#64748b] uppercase tracking-widest ml-1">Perfil de Acceso</label>
-              <div className="grid grid-cols-3 gap-2">
-                {(['ADMIN', 'COORDINADOR', 'EVALUADOR'] as UserRole[]).map(r => (
+              <div className="grid grid-cols-2 gap-2">
+                {(['ADMIN', 'COORDINADOR', 'EVALUADOR', 'DOCENTE'] as UserRole[]).map(r => (
                   <button
                     key={r}
                     onClick={() => setRole(r)}
@@ -63,7 +63,9 @@ export const LoginScreen = ({ onLogin }: LoginScreenProps) => {
                       ? 'admin@edusudamericano.edu.ec'
                       : role === 'COORDINADOR'
                         ? 'coordinador@edusudamericano.edu.ec'
-                        : 'evaluador@edusudamericano.edu.ec'
+                        : role === 'DOCENTE'
+                          ? 'docente@edu.ec'
+                          : 'evaluador@edusudamericano.edu.ec'
                   }
                   readOnly
                   className="w-full pl-12 pr-4 py-4 bg-[#f8fafc] border border-[#e2e8f0] rounded-2xl text-sm text-[#1e293b] focus:ring-2 focus:ring-[#2563eb] outline-none transition-all"
@@ -79,7 +81,8 @@ export const LoginScreen = ({ onLogin }: LoginScreenProps) => {
                 </span>
                 <input
                   type="password"
-                  defaultValue="••••••••"
+                  value={role === 'DOCENTE' ? '123456' : '••••••••'}
+                  readOnly
                   className="w-full pl-12 pr-4 py-4 bg-[#f8fafc] border border-[#e2e8f0] rounded-2xl text-sm focus:ring-2 focus:ring-[#2563eb] outline-none transition-all"
                 />
               </div>
