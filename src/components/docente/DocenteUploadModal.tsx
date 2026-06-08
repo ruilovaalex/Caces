@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { X, Upload, Wand2, Smartphone, FileText, CheckCircle2 } from 'lucide-react';
+import { X, Upload, ClipboardList, Smartphone, FileText, CheckCircle2 } from 'lucide-react';
 import { hoverScale, tapScale } from '../../utils/animations';
 
 interface DocenteUploadModalProps {
@@ -9,7 +9,7 @@ interface DocenteUploadModalProps {
 }
 
 export const DocenteUploadModal = ({ isOpen, onClose }: DocenteUploadModalProps) => {
-  const [activeTab, setActiveTab] = useState<'upload' | 'ai' | 'scan'>('upload');
+  const [activeTab, setActiveTab] = useState<'upload' | 'draft' | 'scan'>('upload');
 
   return (
     <AnimatePresence>
@@ -63,11 +63,11 @@ export const DocenteUploadModal = ({ isOpen, onClose }: DocenteUploadModalProps)
                 <motion.button
                   whileHover={hoverScale}
                   whileTap={tapScale}
-                  onClick={() => setActiveTab('ai')}
-                  className={`flex-1 py-3 px-4 rounded-xl flex flex-col items-center justify-center gap-2 transition-all ${activeTab === 'ai' ? 'bg-emerald-50 border border-emerald-200 text-emerald-700' : 'bg-slate-50 border border-transparent text-slate-500 hover:bg-slate-100'}`}
+                  onClick={() => setActiveTab('draft')}
+                  className={`flex-1 py-3 px-4 rounded-xl flex flex-col items-center justify-center gap-2 transition-all ${activeTab === 'draft' ? 'bg-emerald-50 border border-emerald-200 text-emerald-700' : 'bg-slate-50 border border-transparent text-slate-500 hover:bg-slate-100'}`}
                 >
-                  <Wand2 className="w-5 h-5" />
-                  <span className="text-[10px] font-black uppercase tracking-widest">Generar con IA</span>
+                  <ClipboardList className="w-5 h-5" />
+                  <span className="text-[10px] font-black uppercase tracking-widest">Preparar borrador</span>
                 </motion.button>
                 <motion.button
                   whileHover={hoverScale}
@@ -139,11 +139,11 @@ export const DocenteUploadModal = ({ isOpen, onClose }: DocenteUploadModalProps)
                         </div>
                       )}
                       
-                      {activeTab === 'ai' && (
+                      {activeTab === 'draft' && (
                         <div className="mt-4 border border-emerald-200 bg-emerald-50 rounded-xl p-6 text-center">
-                          <Wand2 className="w-8 h-8 text-emerald-500 mx-auto mb-2" />
-                          <p className="text-sm font-bold text-emerald-800">Se generará un documento institucional estructurado.</p>
-                          <p className="text-xs text-emerald-600 mt-1">El contenido inicial será creado por IA basado en los datos de la asignatura o período seleccionado.</p>
+                          <ClipboardList className="w-8 h-8 text-emerald-500 mx-auto mb-2" />
+                          <p className="text-sm font-bold text-emerald-800">Prepara un documento institucional estructurado.</p>
+                          <p className="text-xs text-emerald-600 mt-1">Completa manualmente el contenido con los datos de la asignatura o periodo seleccionado antes de subirlo.</p>
                         </div>
                       )}
                     </>
@@ -168,8 +168,8 @@ export const DocenteUploadModal = ({ isOpen, onClose }: DocenteUploadModalProps)
                 disabled={activeTab === 'scan'}
                 className="flex items-center gap-2 px-6 py-2.5 bg-blue-600 text-white rounded-xl font-black text-xs uppercase tracking-widest shadow-lg shadow-blue-200 hover:bg-blue-700 transition-all disabled:opacity-50 disabled:shadow-none"
               >
-                {activeTab === 'ai' ? (
-                  <><Wand2 className="w-4 h-4" /> Generar Borrador</>
+                {activeTab === 'draft' ? (
+                  <><ClipboardList className="w-4 h-4" /> Guardar borrador</>
                 ) : (
                   <><CheckCircle2 className="w-4 h-4" /> Finalizar</>
                 )}

@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { Upload, Smartphone, Wand2, CheckCircle2 } from 'lucide-react';
+import { Upload, Smartphone, FileText, CheckCircle2 } from 'lucide-react';
 import {
   fadeInUp, staggerContainer, easeOut, hoverScale, hoverLift, tapScale,
 } from '../../utils/animations';
@@ -102,8 +102,8 @@ export const DocenteActivities = ({ onOpenUploadModal }: DocenteActivitiesProps)
                 onClick={onOpenUploadModal}
                 className="evidence-btn inline-flex items-center gap-2 !px-3 !py-2 bg-emerald-600 !text-white border-none hover:bg-emerald-700"
               >
-                <Wand2 className="w-4 h-4" />
-                Generar con IA
+                <FileText className="w-4 h-4" />
+                Preparar borrador
               </motion.button>
             </div>
           </motion.div>

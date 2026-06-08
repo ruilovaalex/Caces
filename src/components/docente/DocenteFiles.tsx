@@ -17,7 +17,7 @@ export const DocenteFiles = ({ onOpenUploadModal }: DocenteFilesProps) => {
     { id: '1', name: 'Syllabus_Biologia_2024.pdf', type: 'PDF', date: '01/06/2026', status: 'Validado', specialBadge: '' },
     { id: '2', name: 'Acta_Reunion_Marzo.docx', type: 'DOCX', date: '28/05/2026', status: 'Observado', observation: 'Falta firma del director', specialBadge: '' },
     { id: '3', name: 'Titutlo_Maestria.pdf', type: 'PDF', date: '20/05/2026', status: 'Pendiente', specialBadge: '' },
-    { id: '4', name: 'Informe_2025.pdf', type: 'PDF', date: '25/05/2026', status: 'Pendiente', specialBadge: 'Generado con IA' },
+    { id: '4', name: 'Informe_2025.pdf', type: 'PDF', date: '25/05/2026', status: 'Pendiente', specialBadge: 'Borrador manual' },
     { id: '5', name: 'Scan_Mayo_2025.pdf', type: 'PDF', date: '26/05/2026', status: 'Pendiente', specialBadge: 'Escaneado' }
   ];
 

@@ -26,6 +26,7 @@ import { calculateIndicatorProgress, getIndicatorCurrentStatus, getIndicatorStat
 import { getReadableAllowedFormats, isFileAllowedForRequirement } from '../utils/evidenceFormatUtils';
 import { canUserAssign } from '../utils/permissions';
 import { viewTransition } from '../utils/animations';
+import { getAcademicPeriodsForYear } from '../utils/academicPeriodUtils';
 import { Indicator, Requirement, Status } from '../types';
 
 export default function App() {
@@ -143,18 +144,23 @@ export default function App() {
       nodes.push({ id: yearId, type: 'year', data: yearPeriod });
       if (!expandedNodes.has(yearId)) return;
 
-      yearPeriod.criteria.forEach(criterion => {
-        const criterionId = `crit-${criterion.id}`;
-        nodes.push({ id: criterionId, type: 'crit', data: criterion });
-        if (!expandedNodes.has(criterionId)) return;
+      getAcademicPeriodsForYear(yearPeriod.year).forEach(period => {
+        nodes.push({ id: period.id, type: 'period', data: period });
+        if (!expandedNodes.has(period.id)) return;
 
-        criterion.subCriteria.forEach(subCriterion => {
-          const subCriterionId = `sub-${subCriterion.id}`;
-          nodes.push({ id: subCriterionId, type: 'sub', data: subCriterion });
-          if (!expandedNodes.has(subCriterionId)) return;
+        yearPeriod.criteria.forEach(criterion => {
+          const criterionId = `${period.id}-crit-${criterion.id}`;
+          nodes.push({ id: criterionId, type: 'crit', data: criterion });
+          if (!expandedNodes.has(criterionId)) return;
 
-          subCriterion.indicators.forEach(indicator => {
-            nodes.push({ id: `ind-${indicator.code}`, type: 'ind', data: indicator });
+          criterion.subCriteria.forEach(subCriterion => {
+            const subCriterionId = `${period.id}-sub-${subCriterion.id}`;
+            nodes.push({ id: subCriterionId, type: 'sub', data: subCriterion });
+            if (!expandedNodes.has(subCriterionId)) return;
+
+            subCriterion.indicators.forEach(indicator => {
+              nodes.push({ id: `${period.id}-ind-${indicator.code}`, type: 'ind', data: indicator });
+            });
           });
         });
       });

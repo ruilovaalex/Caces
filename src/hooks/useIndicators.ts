@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import { Indicator, YearPeriod } from '../types';
 import { MOCK_DATA } from '../data/cacesMockData';
+import { getAcademicPeriodsForYear } from '../utils/academicPeriodUtils';
 
 export const useIndicators = () => {
   const [selectedIndicator, setSelectedIndicator] = useState<Indicator | null>(null);
@@ -18,18 +19,19 @@ export const useIndicators = () => {
 
   const selectIndicator = useCallback((indicator: Indicator) => {
     setSelectedIndicator(indicator);
-    setFocusedNodeId(`ind-${indicator.code}`);
   }, []);
 
   const openCriterionSubCriteria = useCallback((year: number, criterionId: string) => {
     const yearId = year.toString();
-    const criterionNodeId = `crit-${criterionId}`;
+    const firstPeriodId = getAcademicPeriodsForYear(year)[0]?.id;
+    const criterionNodeId = firstPeriodId ? `${firstPeriodId}-crit-${criterionId}` : `crit-${criterionId}`;
 
     setSelectedIndicator(null);
     setFocusedNodeId(criterionNodeId);
     setExpandedNodes(prev => {
       const next = new Set(prev);
       next.add(yearId);
+      if (firstPeriodId) next.add(firstPeriodId);
       next.add(criterionNodeId);
       return next;
     });

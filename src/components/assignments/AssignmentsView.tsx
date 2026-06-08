@@ -69,11 +69,12 @@ const initialTasks: TeacherTask[] = [
 const roleDescriptions: Record<UserRole, string> = {
   ADMIN: 'Crea y mantiene roles del sistema.',
   COORDINADOR: 'Crea docentes, indicadores, evidencias y tareas.',
-  EVALUADOR: 'Revisa, observa, rechaza o valida evidencias.'
+  EVALUADOR: 'Revisa, observa, rechaza o valida evidencias.',
+  DOCENTE: 'Prepara y entrega los soportes documentales asignados.'
 };
 
 export const AssignmentsView = ({ userRole, mockData }: AssignmentsViewProps) => {
-  const [roles, setRoles] = useState<UserRole[]>(['ADMIN', 'COORDINADOR', 'EVALUADOR']);
+  const [roles, setRoles] = useState<UserRole[]>(['ADMIN', 'COORDINADOR', 'EVALUADOR', 'DOCENTE']);
   const [newRole, setNewRole] = useState('');
   const [teachers, setTeachers] = useState<Teacher[]>(initialTeachers);
   const [tasks, setTasks] = useState<TeacherTask[]>(initialTasks);

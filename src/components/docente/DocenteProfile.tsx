@@ -162,57 +162,62 @@ export const DocenteProfile = ({ onLogout }: DocenteProfileProps) => {
                 initial="initial"
                 animate="animate"
               >
-                {profileFields.map(({ key, label, Icon, type, options }, i) => (
-                  <motion.div
-                    key={key}
-                    variants={fadeInLeft}
-                    transition={{ duration: 0.35, ease: 'easeOut', delay: 0.25 + i * 0.07 }}
-                    className="space-y-2"
-                  >
-                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 flex items-center gap-1.5">
-                      <Icon className="w-3.5 h-3.5" /> {label}
-                    </label>
-                    <AnimatePresence mode="wait">
-                      {isEditing ? (
-                        <motion.div
-                          key="edit"
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          exit={{ opacity: 0 }}
-                          transition={{ duration: 0.2 }}
-                        >
-                          {type === 'select' ? (
-                            <select 
-                              value={profile[key as keyof typeof profile]} 
-                              onChange={(e) => setProfile({...profile, [key]: e.target.value})}
-                              className="w-full px-3 py-2 bg-slate-50 border border-blue-300 rounded-lg text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-blue-100"
-                            >
-                              {(options || []).map(o => <option key={o}>{o}</option>)}
-                            </select>
-                          ) : (
-                            <input 
-                              type={type} 
-                              value={profile[key as keyof typeof profile]} 
-                              onChange={(e) => setProfile({...profile, [key]: e.target.value})}
-                              className="w-full px-3 py-2 bg-slate-50 border border-blue-300 rounded-lg text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-blue-100" 
-                            />
-                          )}
-                        </motion.div>
-                      ) : (
-                        <motion.p
-                          key="view"
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          exit={{ opacity: 0 }}
-                          transition={{ duration: 0.2 }}
-                          className="text-sm font-bold text-slate-700 px-3 py-2 bg-slate-50 rounded-lg border border-transparent"
-                        >
-                          {profile[key as keyof typeof profile]}
-                        </motion.p>
-                      )}
-                    </AnimatePresence>
-                  </motion.div>
-                ))}
+                {profileFields.map((field, i) => {
+                  const { key, label, Icon, type } = field;
+                  const options = 'options' in field ? field.options : [];
+
+                  return (
+                    <motion.div
+                      key={key}
+                      variants={fadeInLeft}
+                      transition={{ duration: 0.35, ease: 'easeOut', delay: 0.25 + i * 0.07 }}
+                      className="space-y-2"
+                    >
+                      <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 flex items-center gap-1.5">
+                        <Icon className="w-3.5 h-3.5" /> {label}
+                      </label>
+                      <AnimatePresence mode="wait">
+                        {isEditing ? (
+                          <motion.div
+                            key="edit"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.2 }}
+                          >
+                            {type === 'select' ? (
+                              <select
+                                value={profile[key as keyof typeof profile]}
+                                onChange={(e) => setProfile({...profile, [key]: e.target.value})}
+                                className="w-full px-3 py-2 bg-slate-50 border border-blue-300 rounded-lg text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-blue-100"
+                              >
+                                {options.map(o => <option key={o}>{o}</option>)}
+                              </select>
+                            ) : (
+                              <input
+                                type={type}
+                                value={profile[key as keyof typeof profile]}
+                                onChange={(e) => setProfile({...profile, [key]: e.target.value})}
+                                className="w-full px-3 py-2 bg-slate-50 border border-blue-300 rounded-lg text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-blue-100"
+                              />
+                            )}
+                          </motion.div>
+                        ) : (
+                          <motion.p
+                            key="view"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.2 }}
+                            className="text-sm font-bold text-slate-700 px-3 py-2 bg-slate-50 rounded-lg border border-transparent"
+                          >
+                            {profile[key as keyof typeof profile]}
+                          </motion.p>
+                        )}
+                      </AnimatePresence>
+                    </motion.div>
+                  );
+                })}
               </motion.div>
               
               <AnimatePresence>

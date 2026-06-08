@@ -1,12 +1,14 @@
 import React from 'react';
 import {
+  CalendarRange,
   ChevronRight,
+  ClipboardList,
   FileText,
   Folder,
-  ClipboardList
 } from 'lucide-react';
-import { motion, AnimatePresence } from 'motion/react';
-import { Indicator, YearPeriod, UserRole } from '../../types';
+import { AnimatePresence, motion } from 'motion/react';
+import { Indicator, UserRole, YearPeriod } from '../../types';
+import { getAcademicPeriodsForYear } from '../../utils/academicPeriodUtils';
 import { fadeInRight, slideDown, staggerContainerFast } from '../../utils/animations';
 
 interface SidebarProps {
@@ -38,27 +40,27 @@ export const Sidebar = ({
   onKeyDown,
   onSwitchRole,
   onOpenDashboard,
-  onOpenAssignments
+  onOpenAssignments,
 }: SidebarProps) => {
   const roleNames: Record<UserRole, string> = {
     ADMIN: 'Admin Sudamericano',
     COORDINADOR: 'Coord. Academico',
     EVALUADOR: 'Evaluador Externo',
-    DOCENTE: 'Prof. Pablo Mora'
+    DOCENTE: 'Prof. Pablo Mora',
   };
 
   const roleInitials: Record<UserRole, string> = {
     ADMIN: 'AD',
     COORDINADOR: 'CO',
     EVALUADOR: 'EV',
-    DOCENTE: 'DO'
+    DOCENTE: 'DO',
   };
 
   return (
-    <motion.aside 
+    <motion.aside
       initial={{ x: -300, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
-      transition={{ duration: 0.4, ease: "easeOut" }}
+      transition={{ duration: 0.4, ease: 'easeOut' }}
       className="w-80 bg-white border-r border-[#e2e8f0] flex flex-col shadow-sm"
     >
       <div className="h-16 border-b border-white/10 flex items-center gap-3 bg-[#1e2d4a] px-6">
@@ -71,7 +73,7 @@ export const Sidebar = ({
         </div>
       </div>
 
-      <motion.div 
+      <motion.div
         variants={staggerContainerFast}
         initial="initial"
         animate="animate"
@@ -111,118 +113,185 @@ export const Sidebar = ({
       </motion.div>
 
       {userRole === 'COORDINADOR' || userRole === 'EVALUADOR' ? (
-      <nav
-        className="flex-1 overflow-y-auto p-4 space-y-1 outline-none"
-        onKeyDown={onKeyDown}
-        tabIndex={0}
-        aria-label="Explorador de indicadores"
-      >
-        <div className="text-[10px] font-bold text-[#94a3b8] uppercase tracking-widest px-2 mb-4">
-          Gestion de periodos
-        </div>
-
-        {mockData.map((yearPeriod) => (
-          <div key={yearPeriod.year} className="space-y-1">
-            <motion.button
-              whileHover={{ x: 4 }}
-              onClick={() => { onToggleNode(yearPeriod.year.toString()); onSetFocusedNode(yearPeriod.year.toString()); }}
-              className={`w-full flex items-center gap-2 px-2 py-2 hover:bg-[#f4f6f9] rounded-md transition-colors text-sm font-semibold text-[#1e293b] outline-none ${focusedNodeId === yearPeriod.year.toString() ? 'bg-[#dbeafe] ring-1 ring-blue-100' : ''}`}
-            >
-              <ChevronRight className={`w-4 h-4 text-slate-400 transition-transform ${expandedNodes.has(yearPeriod.year.toString()) ? 'rotate-90' : ''}`} />
-              <Folder className="w-4 h-4 text-amber-500/70" />
-              Año {yearPeriod.year}
-            </motion.button>
-
-            <AnimatePresence>
-              {expandedNodes.has(yearPeriod.year.toString()) && (
-                <motion.div 
-                  variants={slideDown}
-                  initial="initial"
-                  animate="animate"
-                  exit="exit"
-                  className="ml-4 space-y-1 border-l border-slate-200 pl-2 origin-top"
-                >
-                  {yearPeriod.criteria.map((crit) => (
-                    <div key={crit.id}>
-                      <motion.button
-                        whileHover={{ x: 4 }}
-                        onClick={() => { onToggleNode(`crit-${crit.id}`); onSetFocusedNode(`crit-${crit.id}`); }}
-                      className={`w-full flex items-center gap-2 px-2 py-1.5 hover:bg-[#f4f6f9] rounded-md transition-colors text-xs font-bold text-[#64748b] uppercase tracking-wide truncate text-left outline-none ${focusedNodeId === `crit-${crit.id}` ? 'bg-[#dbeafe] ring-1 ring-blue-100' : ''}`}
-                    >
-                      <ChevronRight className={`w-3 h-3 text-slate-400 transition-transform ${expandedNodes.has(`crit-${crit.id}`) ? 'rotate-90' : ''}`} />
-                        <Folder className="w-4 h-4 text-blue-600/70 shrink-0" />
-                        <span className="truncate">{crit.name}</span>
-                      </motion.button>
-
-                      <AnimatePresence>
-                        {expandedNodes.has(`crit-${crit.id}`) && (
-                          <motion.div 
-                            variants={slideDown}
-                            initial="initial"
-                            animate="animate"
-                            exit="exit"
-                            className="ml-4 mt-1 space-y-1 border-l border-slate-100 pl-2 origin-top"
-                          >
-                            {crit.subCriteria.map((sub) => (
-                              <div key={sub.id}>
-                                <motion.button
-                                  whileHover={{ x: 4 }}
-                                  onClick={() => { onToggleNode(`sub-${sub.id}`); onSetFocusedNode(`sub-${sub.id}`); }}
-                              className={`w-full flex items-center gap-2 px-2 py-1.5 hover:bg-[#f4f6f9] rounded-md transition-colors text-[11px] font-semibold text-[#64748b] text-left outline-none ${focusedNodeId === `sub-${sub.id}` ? 'bg-[#dbeafe] ring-1 ring-blue-100' : ''}`}
-                            >
-                              <ChevronRight className={`w-2.5 h-2.5 text-slate-300 transition-transform ${expandedNodes.has(`sub-${sub.id}`) ? 'rotate-90' : ''}`} />
-                                  <Folder className="w-3.5 h-3.5 text-blue-400/60 shrink-0" />
-                                  <span className="truncate">{sub.name}</span>
-                                </motion.button>
-
-                                <AnimatePresence>
-                                  {expandedNodes.has(`sub-${sub.id}`) && (
-                                    <motion.div 
-                                      variants={slideDown}
-                                      initial="initial"
-                                      animate="animate"
-                                      exit="exit"
-                                      className="ml-5 mt-1 space-y-0.5 border-l border-slate-50 pl-2 origin-top"
-                                    >
-                                      {sub.indicators.map((indicator) => (
-                                        <motion.button
-                                          whileHover={{ x: 4 }}
-                                          key={indicator.code}
-                                    onClick={() => onIndicatorSelect(indicator)}
-                                    className={`w-full flex items-center gap-2 px-3 py-1.5 rounded transition-all text-[11px] font-medium leading-tight text-left outline-none ${
-                                      selectedIndicator?.code === indicator.code
-                                        ? 'tree-item-active shadow-sm'
-                                        : (focusedNodeId === `ind-${indicator.code}` ? 'bg-[#dbeafe] ring-1 ring-blue-100' : 'text-[#64748b] hover:text-[#1e293b] hover:bg-[#f4f6f9]')
-                                    }`}
-                                  >
-                                    <FileText className="w-3 h-3 text-slate-300 shrink-0" />
-                                        <span className="flex-1 truncate">
-                                          {indicator.code} {indicator.name}
-                                        </span>
-                                      </motion.button>
-                                    ))}
-                                  </motion.div>
-                                )}
-                                </AnimatePresence>
-                            </div>
-                          ))}
-                        </motion.div>
-                      )}
-                      </AnimatePresence>
-                  </div>
-                ))}
-              </motion.div>
-            )}
-            </AnimatePresence>
+        <nav
+          className="flex-1 overflow-y-auto p-4 space-y-1 outline-none"
+          onKeyDown={onKeyDown}
+          tabIndex={0}
+          aria-label="Explorador de indicadores"
+        >
+          <div className="text-[10px] font-bold text-[#94a3b8] uppercase tracking-widest px-2 mb-4">
+            Gestion de periodos
           </div>
-        ))}
-      </nav>
+
+          {mockData.map((yearPeriod) => {
+            const yearId = yearPeriod.year.toString();
+
+            return (
+              <div key={yearId} className="space-y-1">
+                <motion.button
+                  whileHover={{ x: 4 }}
+                  onClick={() => {
+                    onToggleNode(yearId);
+                    onSetFocusedNode(yearId);
+                  }}
+                  className={`w-full flex items-center gap-2 px-2 py-2 hover:bg-[#f4f6f9] rounded-md transition-colors text-sm font-semibold text-[#1e293b] outline-none ${
+                    focusedNodeId === yearId ? 'bg-[#dbeafe] ring-1 ring-blue-100' : ''
+                  }`}
+                >
+                  <ChevronRight className={`w-4 h-4 text-slate-400 transition-transform ${expandedNodes.has(yearId) ? 'rotate-90' : ''}`} />
+                  <Folder className="w-4 h-4 text-amber-500/70" />
+                  <span>{`A\u00f1o ${yearPeriod.year}`}</span>
+                </motion.button>
+
+                <AnimatePresence>
+                  {expandedNodes.has(yearId) && (
+                    <motion.div
+                      variants={slideDown}
+                      initial="initial"
+                      animate="animate"
+                      exit="exit"
+                      className="ml-4 space-y-1 border-l border-slate-200 pl-2 origin-top"
+                    >
+                      {getAcademicPeriodsForYear(yearPeriod.year).map((period) => (
+                        <div key={period.id}>
+                          <motion.button
+                            whileHover={{ x: 4 }}
+                            onClick={() => {
+                              onToggleNode(period.id);
+                              onSetFocusedNode(period.id);
+                            }}
+                            className={`w-full flex items-center gap-2 px-2 py-1.5 hover:bg-[#f4f6f9] rounded-md transition-colors text-xs font-bold text-[#475569] text-left outline-none ${
+                              focusedNodeId === period.id ? 'bg-[#dbeafe] ring-1 ring-blue-100' : ''
+                            }`}
+                          >
+                            <ChevronRight className={`w-3 h-3 text-slate-400 transition-transform ${expandedNodes.has(period.id) ? 'rotate-90' : ''}`} />
+                            <CalendarRange className="w-4 h-4 text-emerald-600/70 shrink-0" />
+                            <span className="truncate">{period.label}</span>
+                          </motion.button>
+
+                          <AnimatePresence>
+                            {expandedNodes.has(period.id) && (
+                              <motion.div
+                                variants={slideDown}
+                                initial="initial"
+                                animate="animate"
+                                exit="exit"
+                                className="ml-4 mt-1 space-y-1 border-l border-slate-100 pl-2 origin-top"
+                              >
+                                {yearPeriod.criteria.map((crit) => {
+                                  const criterionNodeId = `${period.id}-crit-${crit.id}`;
+
+                                  return (
+                                    <div key={criterionNodeId}>
+                                      <motion.button
+                                        whileHover={{ x: 4 }}
+                                        onClick={() => {
+                                          onToggleNode(criterionNodeId);
+                                          onSetFocusedNode(criterionNodeId);
+                                        }}
+                                        className={`w-full flex items-center gap-2 px-2 py-1.5 hover:bg-[#f4f6f9] rounded-md transition-colors text-xs font-bold text-[#64748b] uppercase tracking-wide truncate text-left outline-none ${
+                                          focusedNodeId === criterionNodeId ? 'bg-[#dbeafe] ring-1 ring-blue-100' : ''
+                                        }`}
+                                      >
+                                        <ChevronRight className={`w-3 h-3 text-slate-400 transition-transform ${expandedNodes.has(criterionNodeId) ? 'rotate-90' : ''}`} />
+                                        <Folder className="w-4 h-4 text-blue-600/70 shrink-0" />
+                                        <span className="truncate">{crit.name}</span>
+                                      </motion.button>
+
+                                      <AnimatePresence>
+                                        {expandedNodes.has(criterionNodeId) && (
+                                          <motion.div
+                                            variants={slideDown}
+                                            initial="initial"
+                                            animate="animate"
+                                            exit="exit"
+                                            className="ml-4 mt-1 space-y-1 border-l border-slate-100 pl-2 origin-top"
+                                          >
+                                            {crit.subCriteria.map((sub) => {
+                                              const subCriterionNodeId = `${period.id}-sub-${sub.id}`;
+
+                                              return (
+                                                <div key={subCriterionNodeId}>
+                                                  <motion.button
+                                                    whileHover={{ x: 4 }}
+                                                    onClick={() => {
+                                                      onToggleNode(subCriterionNodeId);
+                                                      onSetFocusedNode(subCriterionNodeId);
+                                                    }}
+                                                    className={`w-full flex items-center gap-2 px-2 py-1.5 hover:bg-[#f4f6f9] rounded-md transition-colors text-[11px] font-semibold text-[#64748b] text-left outline-none ${
+                                                      focusedNodeId === subCriterionNodeId ? 'bg-[#dbeafe] ring-1 ring-blue-100' : ''
+                                                    }`}
+                                                  >
+                                                    <ChevronRight className={`w-2.5 h-2.5 text-slate-300 transition-transform ${expandedNodes.has(subCriterionNodeId) ? 'rotate-90' : ''}`} />
+                                                    <Folder className="w-3.5 h-3.5 text-blue-400/60 shrink-0" />
+                                                    <span className="truncate">{sub.name}</span>
+                                                  </motion.button>
+
+                                                  <AnimatePresence>
+                                                    {expandedNodes.has(subCriterionNodeId) && (
+                                                      <motion.div
+                                                        variants={slideDown}
+                                                        initial="initial"
+                                                        animate="animate"
+                                                        exit="exit"
+                                                        className="ml-5 mt-1 space-y-0.5 border-l border-slate-50 pl-2 origin-top"
+                                                      >
+                                                        {sub.indicators.map((indicator) => {
+                                                          const indicatorNodeId = `${period.id}-ind-${indicator.code}`;
+
+                                                          return (
+                                                            <motion.button
+                                                              whileHover={{ x: 4 }}
+                                                              key={indicatorNodeId}
+                                                              onClick={() => {
+                                                                onSetFocusedNode(indicatorNodeId);
+                                                                onIndicatorSelect(indicator);
+                                                              }}
+                                                              className={`w-full flex items-center gap-2 px-3 py-1.5 rounded transition-all text-[11px] font-medium leading-tight text-left outline-none ${
+                                                                selectedIndicator?.code === indicator.code
+                                                                  ? 'tree-item-active shadow-sm'
+                                                                  : focusedNodeId === indicatorNodeId
+                                                                    ? 'bg-[#dbeafe] ring-1 ring-blue-100'
+                                                                    : 'text-[#64748b] hover:text-[#1e293b] hover:bg-[#f4f6f9]'
+                                                              }`}
+                                                            >
+                                                              <FileText className="w-3 h-3 text-slate-300 shrink-0" />
+                                                              <span className="flex-1 truncate">
+                                                                {indicator.code} {indicator.name}
+                                                              </span>
+                                                            </motion.button>
+                                                          );
+                                                        })}
+                                                      </motion.div>
+                                                    )}
+                                                  </AnimatePresence>
+                                                </div>
+                                              );
+                                            })}
+                                          </motion.div>
+                                        )}
+                                      </AnimatePresence>
+                                    </div>
+                                  );
+                                })}
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
+                        </div>
+                      ))}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            );
+          })}
+        </nav>
       ) : userRole === 'DOCENTE' ? (
         <div className="flex-1 p-4">
           <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
             <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Docente Adjunto</p>
             <p className="mt-2 text-sm font-bold leading-relaxed text-slate-700">
-              Navega por tus actividades y archivos usando el menú superior.
+              Navega por tus actividades y archivos usando el menu superior.
             </p>
           </div>
         </div>
