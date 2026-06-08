@@ -96,6 +96,10 @@ export const AssignmentsView = ({ userRole, mockData }: AssignmentsViewProps) =>
     [mockData]
   );
 
+  if (userRole !== 'ADMIN' && userRole !== 'COORDINADOR') {
+    return null;
+  }
+
   const handleAddRole = () => {
     const normalized = newRole.trim().toUpperCase().replace(/\s+/g, '_') as UserRole;
     if (!normalized || roles.includes(normalized)) return;

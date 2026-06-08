@@ -1,5 +1,6 @@
 import { Status, UploadedFile, GeneratedDoc, UploadPayload } from '../types';
 import { StorageService } from './storageService';
+import { FileContentService } from './fileContentService';
 import { getDisplayFileType } from '../utils/evidenceFormatUtils';
 
 const STORAGE_KEY = 'edusudamericano_advanced_evidences_v2';
@@ -43,8 +44,9 @@ export const EvidenceService = {
 
     const newVersion = EvidenceService.getByRequirement(payload.indicatorCode, payload.requirementId).length + 1;
 
+    const fileId = crypto.randomUUID();
     const newFile: UploadedFile = {
-      id: Math.random().toString(36).substr(2, 9),
+      id: fileId,
       indicatorCode: payload.indicatorCode,
       requirementId: payload.requirementId,
       requirementLabel: payload.requirementLabel,
@@ -59,6 +61,7 @@ export const EvidenceService = {
       isCurrentVersion: true
     };
 
+    await FileContentService.save(fileId, file);
     updated.push(newFile);
     StorageService.set(STORAGE_KEY, updated);
     return newFile;
@@ -113,6 +116,11 @@ export const EvidenceService = {
     });
 
     StorageService.set(STORAGE_KEY, updated);
+    void FileContentService.remove(evidenceId);
+  },
+
+  getFileContent: (evidenceId: string): Promise<Blob | null> => {
+    return FileContentService.get(evidenceId);
   },
 
   getVersionHistory: (indicatorCode: string, requirementId: string): UploadedFile[] => {

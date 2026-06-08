@@ -6,7 +6,6 @@ import { Dashboard } from '../components/layout/Dashboard';
 import { ChecklistView } from '../components/layout/ChecklistView';
 import { LoginScreen } from '../components/auth/LoginScreen';
 import { IndicatorHeader } from '../components/indicators/IndicatorHeader';
-import { IndicatorStatsCards } from '../components/indicators/IndicatorStatsCards';
 import { IndicatorContent } from '../components/indicators/IndicatorContent';
 import { EvidenceTable } from '../components/evidences/EvidenceTable';
 import { EvidenceUploadModal } from '../components/evidences/EvidenceUploadModal';
@@ -22,9 +21,9 @@ import { useNotifications } from '../hooks/useNotifications';
 import { useFileUpload } from '../hooks/useFileUpload';
 import { useAssignments } from '../hooks/useAssignments';
 
-import { calculateIndicatorProgress, getIndicatorCurrentStatus, getIndicatorStats } from '../utils/progressUtils';
+import { getIndicatorCurrentStatus } from '../utils/progressUtils';
 import { getReadableAllowedFormats, isFileAllowedForRequirement } from '../utils/evidenceFormatUtils';
-import { canUserAssign } from '../utils/permissions';
+import { canUserAssign, canUserDelete, canUserUpload } from '../utils/permissions';
 import { viewTransition } from '../utils/animations';
 import { getAcademicPeriodsForYear } from '../utils/academicPeriodUtils';
 import { Indicator, Requirement, Status } from '../types';
@@ -78,14 +77,25 @@ export default function App() {
   useAssignments();
 
   useEffect(() => {
-    if (userRole !== 'ADMIN') return;
-    setIsEditorOpen(false);
-    setIsUploadOpen(false);
-    setIsHistoryOpen(false);
-    setIsChecklistOpen(false);
-    setActiveRequirement(null);
-    setSelectedIndicator(null);
-    setIsAssignmentsOpen(true);
+    if (userRole === 'ADMIN') {
+      setIsEditorOpen(false);
+      setIsUploadOpen(false);
+      setIsHistoryOpen(false);
+      setIsChecklistOpen(false);
+      setActiveRequirement(null);
+      setSelectedIndicator(null);
+      setIsAssignmentsOpen(true);
+      return;
+    }
+
+    if (userRole === 'EVALUADOR') {
+      setIsEditorOpen(false);
+      setIsUploadOpen(false);
+      setIsHistoryOpen(false);
+      setIsChecklistOpen(false);
+      setActiveRequirement(null);
+      setIsAssignmentsOpen(false);
+    }
   }, [setSelectedIndicator, userRole]);
 
   const handleIndicatorSelect = useCallback((indicator: Indicator) => {
@@ -105,6 +115,7 @@ export default function App() {
   }, [setSelectedIndicator]);
 
   const handleOpenAssignments = useCallback(() => {
+    if (userRole !== 'ADMIN' && !canUserAssign(userRole)) return;
     setIsEditorOpen(false);
     setIsUploadOpen(false);
     setIsHistoryOpen(false);
@@ -112,9 +123,10 @@ export default function App() {
     setActiveRequirement(null);
     setSelectedIndicator(null);
     setIsAssignmentsOpen(true);
-  }, [setSelectedIndicator]);
+  }, [setSelectedIndicator, userRole]);
 
   const handleSaveUpload = async () => {
+    if (!canUserUpload(userRole)) return;
     if (!activeRequirement || !selectedIndicator || !uploadFileContent || !user) return;
     if (!isFileAllowedForRequirement(uploadFileContent, activeRequirement)) {
       window.alert(`Formato no permitido. Para esta evidencia solo se acepta: ${getReadableAllowedFormats(activeRequirement.format)}.`);
@@ -206,7 +218,14 @@ export default function App() {
     }
   };
 
-  const activeView = selectedIndicator ? 'indicator' : isAssignmentsOpen ? 'assignments' : isChecklistOpen ? 'checklist' : 'dashboard';
+  const canAccessAssignments = userRole === 'ADMIN' || canUserAssign(userRole);
+  const activeView = selectedIndicator
+    ? 'indicator'
+    : isAssignmentsOpen && canAccessAssignments
+      ? 'assignments'
+      : isChecklistOpen
+        ? 'checklist'
+        : 'dashboard';
   const selectedIndicatorContext = useMemo(() => {
     if (!selectedIndicator) return null;
 
@@ -265,7 +284,7 @@ export default function App() {
         ) : (
           <div className="flex-1 overflow-y-auto p-8 bg-[#f4f6f9]">
             <AnimatePresence mode="wait">
-              {!selectedIndicator && !isChecklistOpen && !isAssignmentsOpen && (
+              {!selectedIndicator && !isChecklistOpen && (!isAssignmentsOpen || !canAccessAssignments) && (
                 <motion.div key="dashboard" variants={viewTransition} initial="initial" animate="animate" exit="exit">
                   <Dashboard
                     mockData={mockData}
@@ -289,7 +308,7 @@ export default function App() {
                 </motion.div>
               )}
 
-              {!selectedIndicator && isAssignmentsOpen && (
+              {!selectedIndicator && isAssignmentsOpen && canAccessAssignments && (
                 <motion.div key="assignments" variants={viewTransition} initial="initial" animate="animate" exit="exit">
                   <AssignmentsView userRole={userRole} mockData={mockData} />
                 </motion.div>
@@ -308,17 +327,15 @@ export default function App() {
                 <IndicatorHeader
                   indicator={selectedIndicator}
                   status={getIndicatorCurrentStatus(selectedIndicator, allFiles)}
-                  progress={calculateIndicatorProgress(selectedIndicator, allFiles)}
                   onBackToDashboard={handleGoToStart}
                 />
-
-                <IndicatorStatsCards stats={getIndicatorStats(selectedIndicator, allFiles)} />
 
                 <EvidenceTable
                   indicator={selectedIndicator}
                   userRole={userRole}
                   getRequirementFiles={requirementId => getRequirementFiles(requirementId, selectedIndicator.code)}
                   onOpenUpload={requirement => {
+                    if (!canUserUpload(userRole)) return;
                     setActiveRequirement(requirement);
                     setIsUploadOpen(true);
                     resetUpload();
@@ -331,6 +348,7 @@ export default function App() {
                     setActiveRequirement(requirement);
                     setIsHistoryOpen(true);
                   }}
+                  onReviewStatus={handleReviewUpdate}
                 />
               </IndicatorContent>
                 </motion.div>
@@ -341,7 +359,7 @@ export default function App() {
       </main>
 
       <EvidenceUploadModal
-        isOpen={isUploadOpen}
+        isOpen={isUploadOpen && canUserUpload(userRole)}
         onClose={() => setIsUploadOpen(false)}
         activeRequirement={activeRequirement}
         uploadForm={{ file: uploadFileContent, obs: uploadObs }}
@@ -356,7 +374,7 @@ export default function App() {
         onClose={() => setIsHistoryOpen(false)}
         activeRequirement={activeRequirement}
         files={selectedIndicator && activeRequirement ? getRequirementFiles(activeRequirement.id, selectedIndicator.code) : []}
-        onDeleteFile={deleteEvidence}
+        onDeleteFile={canUserDelete(userRole) ? deleteEvidence : undefined}
       />
 
       {isEditorOpen && selectedIndicator && activeRequirement && (

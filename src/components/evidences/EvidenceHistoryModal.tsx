@@ -10,7 +10,7 @@ interface EvidenceHistoryModalProps {
   onClose: () => void;
   activeRequirement: Requirement | null;
   files: UploadedFile[];
-  onDeleteFile: (fileId: string) => void;
+  onDeleteFile?: (fileId: string) => void;
 }
 
 export const EvidenceHistoryModal = ({
@@ -42,6 +42,7 @@ export const EvidenceHistoryModal = ({
   }, [files, statusFilter, typeFilter]);
 
   const handleDeleteFile = (file: UploadedFile) => {
+    if (!onDeleteFile) return;
     const confirmed = window.confirm(`Eliminar ${file.fileName}? Esta accion quitara la version v${file.version} del historial.`);
     if (!confirmed) return;
 
@@ -115,7 +116,10 @@ export const EvidenceHistoryModal = ({
         )}
 
         {filteredFiles.length > 0 ? (
-          <EvidenceVersionHistory files={filteredFiles} onDeleteFile={handleDeleteFile} />
+          <EvidenceVersionHistory
+            files={filteredFiles}
+            onDeleteFile={onDeleteFile ? handleDeleteFile : undefined}
+          />
         ) : (
           <div className="rounded-3xl border-2 border-dashed border-slate-200 p-10 text-center">
             <FileText className="mx-auto mb-3 h-10 w-10 text-slate-300" />

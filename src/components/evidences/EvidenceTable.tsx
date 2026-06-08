@@ -1,10 +1,29 @@
-import React from 'react';
-import { Indicator, Requirement, UploadedFile, UserRole } from '../../types';
-import { EvidenceRow } from './EvidenceRow';
-import { Folder, Info, PenSquare, ClipboardCheck, Upload, History } from 'lucide-react';
+import React, { useEffect, useMemo, useState } from 'react';
+import {
+  BookOpen,
+  CheckCircle2,
+  ChevronRight,
+  ClipboardCheck,
+  Eye,
+  FileClock,
+  FileText,
+  Folder,
+  FolderOpen,
+  FolderPlus,
+  History,
+  LayoutTemplate,
+  Plus,
+  Upload,
+  X,
+  XCircle,
+} from 'lucide-react';
 import { motion } from 'motion/react';
-import { staggerContainerFast, scaleIn } from '../../utils/animations';
-import { WorkflowGuide } from '../layout/WorkflowGuide';
+import { Indicator, Requirement, Status, UploadedFile, UserRole } from '../../types';
+import { canUserUpload } from '../../utils/permissions';
+import { EvidenceStatusBadge } from './EvidenceStatusBadge';
+import { EvidenceFilePreviewModal } from './EvidenceFilePreviewModal';
+import { EvidenceGuideModal } from './EvidenceGuideModal';
+import { TemplateLibraryModal } from './TemplateLibraryModal';
 
 interface EvidenceTableProps {
   indicator: Indicator;
@@ -13,7 +32,21 @@ interface EvidenceTableProps {
   onOpenUpload: (req: Requirement) => void;
   onOpenEditor: (req: Requirement) => void;
   onOpenHistory: (req: Requirement) => void;
+  onReviewStatus: (fileId: string, status: Status, observation?: string) => void;
 }
+
+type FolderMap = Record<string, string[]>;
+
+const getFolderStorageKey = (indicatorCode: string) => `caces_repository_folders_${indicatorCode}`;
+
+const readFolders = (indicatorCode: string): FolderMap => {
+  try {
+    const saved = localStorage.getItem(getFolderStorageKey(indicatorCode));
+    return saved ? JSON.parse(saved) as FolderMap : {};
+  } catch {
+    return {};
+  }
+};
 
 export const EvidenceTable = ({
   indicator,
@@ -21,111 +54,431 @@ export const EvidenceTable = ({
   getRequirementFiles,
   onOpenUpload,
   onOpenEditor,
-  onOpenHistory
+  onOpenHistory,
+  onReviewStatus,
 }: EvidenceTableProps) => {
+  const [expandedRequirements, setExpandedRequirements] = useState<Set<string>>(new Set());
+  const [folders, setFolders] = useState<FolderMap>(() => readFolders(indicator.code));
+  const [guideRequirement, setGuideRequirement] = useState<Requirement | null>(null);
+  const [previewFile, setPreviewFile] = useState<UploadedFile | null>(null);
+  const [isTemplateLibraryOpen, setIsTemplateLibraryOpen] = useState(false);
+  const canUpload = canUserUpload(userRole);
   const isEvaluator = userRole === 'EVALUADOR';
 
+  useEffect(() => {
+    setFolders(readFolders(indicator.code));
+    setExpandedRequirements(new Set());
+  }, [indicator.code]);
+
+  const fileCount = useMemo(
+    () => indicator.requirements.reduce((total, requirement) => total + getRequirementFiles(requirement.id).length, 0),
+    [getRequirementFiles, indicator.requirements],
+  );
+  const visibleRequirements = useMemo(
+    () => isEvaluator
+      ? indicator.requirements.filter(requirement => getRequirementFiles(requirement.id).length > 0)
+      : indicator.requirements,
+    [getRequirementFiles, indicator.requirements, isEvaluator],
+  );
+
+  const saveFolders = (nextFolders: FolderMap) => {
+    setFolders(nextFolders);
+    localStorage.setItem(getFolderStorageKey(indicator.code), JSON.stringify(nextFolders));
+  };
+
+  const toggleRequirement = (requirementId: string) => {
+    setExpandedRequirements(current => {
+      const next = new Set(current);
+      if (next.has(requirementId)) next.delete(requirementId);
+      else next.add(requirementId);
+      return next;
+    });
+  };
+
+  const createFolder = (requirement: Requirement) => {
+    const name = window.prompt('Nombre de la nueva carpeta');
+    const normalizedName = name?.trim();
+    if (!normalizedName) return;
+
+    const existing = folders[requirement.id] || [];
+    if (existing.some(folder => folder.toLowerCase() === normalizedName.toLowerCase())) {
+      window.alert('Ya existe una carpeta con ese nombre.');
+      return;
+    }
+
+    saveFolders({
+      ...folders,
+      [requirement.id]: [...existing, normalizedName],
+    });
+  };
+
+  const removeFolder = (requirementId: string, folderName: string) => {
+    const confirmed = window.confirm(`Eliminar la carpeta "${folderName}"?`);
+    if (!confirmed) return;
+
+    saveFolders({
+      ...folders,
+      [requirementId]: (folders[requirementId] || []).filter(folder => folder !== folderName),
+    });
+  };
+
+  const confirmFile = (file: UploadedFile) => {
+    const confirmed = window.confirm(`Confirmar y validar el archivo "${file.fileName}"?`);
+    if (!confirmed) return;
+    onReviewStatus(file.id, 'Validado');
+  };
+
+  const denyFile = (file: UploadedFile) => {
+    const observation = window.prompt('Indica el motivo por el que se deniega este archivo:');
+    if (!observation?.trim()) return;
+    onReviewStatus(file.id, 'Rechazado', observation.trim());
+  };
+
   return (
-    <div className="flex-1 flex flex-col min-h-0">
-      <div className="m-8 mb-0">
-        <WorkflowGuide activeStep={isEvaluator ? 'review' : 'evidence'} />
-      </div>
-
-      <div className="px-8 py-4 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
-        <h3 className="text-[11px] font-black text-slate-500 uppercase tracking-[0.2em] flex items-center gap-2">
-          <Folder className="w-4 h-4 text-blue-600" />
-          Evidencias Requeridas por el CACES
-        </h3>
-        <span className="text-[10px] font-bold text-blue-600/60 uppercase tracking-widest">Modelo de Evaluacion v.2024</span>
-      </div>
-
-      <motion.div 
-        variants={scaleIn}
-        initial="initial"
-        animate="animate"
-        className="mx-8 mt-5 rounded-lg border border-blue-100 bg-white p-4"
-      >
-        <div className="flex items-start gap-3">
-          <div className="mt-0.5 rounded-xl bg-white p-2 text-blue-600 shadow-sm border border-blue-100">
-            <Info className="w-4 h-4" />
+    <section className="bg-white">
+      <div className="flex flex-col gap-4 border-b border-slate-200 px-6 py-5 md:flex-row md:items-center md:justify-between">
+        <div>
+          <div className="flex items-center gap-2">
+            {isEvaluator
+              ? <ClipboardCheck className="h-5 w-5 text-amber-600" />
+              : <FolderOpen className="h-5 w-5 text-blue-600" />}
+            <h3 className="text-base font-black text-slate-900">
+              {isEvaluator ? 'Bandeja de revision' : 'Repositorio de evidencias'}
+            </h3>
           </div>
-          <div className="flex-1">
-            <p className="text-sm font-black text-slate-800">Como usar esta seccion</p>
-            {isEvaluator ? (
-              <>
-                <p className="mt-1 text-xs text-slate-500 leading-relaxed">
-                  Entra a revisar cada evidencia para evaluar lo cargado por el coordinador, dejar observaciones y decidir si se valida, se observa o se rechaza.
-                </p>
-                <div className="mt-3 flex flex-wrap gap-2">
-                  <span className="inline-flex items-center gap-2 rounded-lg bg-white px-3 py-2 text-[10px] font-black uppercase tracking-wider text-amber-700 border border-amber-100">
-                    <ClipboardCheck className="w-3.5 h-3.5" />
-                    1. Revisar evidencia
-                  </span>
-                  <span className="inline-flex items-center gap-2 rounded-lg bg-white px-3 py-2 text-[10px] font-black uppercase tracking-wider text-slate-700 border border-slate-200">
-                    <Info className="w-3.5 h-3.5" />
-                    2. Analizar version actual
-                  </span>
-                  <span className="inline-flex items-center gap-2 rounded-lg bg-white px-3 py-2 text-[10px] font-black uppercase tracking-wider text-rose-700 border border-rose-100">
-                    <ClipboardCheck className="w-3.5 h-3.5" />
-                    3. Validar, observar o rechazar
-                  </span>
-                </div>
-              </>
-            ) : (
-              <>
-                <p className="mt-1 text-xs text-slate-500 leading-relaxed">
-                  Para cada evidencia, prepara el contenido con plantilla manual, genera el documento institucional y revisa el historial de archivos subidos desde su boton independiente. La carga final sigue en el boton azul de la tabla.
-                </p>
-                <div className="mt-3 flex flex-wrap gap-2">
-                  <span className="inline-flex items-center gap-2 rounded-lg bg-white px-3 py-2 text-[10px] font-black uppercase tracking-wider text-emerald-700 border border-emerald-100">
-                    <PenSquare className="w-3.5 h-3.5" />
-                    1. Preparar evidencia
-                  </span>
-                  <span className="inline-flex items-center gap-2 rounded-lg bg-white px-3 py-2 text-[10px] font-black uppercase tracking-wider text-slate-700 border border-slate-200">
-                    <History className="w-3.5 h-3.5" />
-                    2. Revisar historial
-                  </span>
-                  <span className="inline-flex items-center gap-2 rounded-lg bg-white px-3 py-2 text-[10px] font-black uppercase tracking-wider text-blue-700 border border-blue-100">
-                    <Upload className="w-3.5 h-3.5" />
-                    3. Subir version final
-                  </span>
-                </div>
-              </>
-            )}
-          </div>
+          <p className="mt-1 text-sm text-slate-500">
+            {isEvaluator
+              ? `${fileCount} archivos cargados por coordinadores o docentes disponibles para revisar.`
+              : `${indicator.requirements.length} carpetas de evidencia y ${fileCount} archivos cargados.`}
+          </p>
         </div>
-      </motion.div>
 
-      <div className="flex-1 overflow-y-auto">
-        <table className="w-full text-left border-collapse">
-          <thead>
-            <tr className="bg-white/50 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-50">
-              <th className="px-8 py-4">Evidencia Requerida</th>
-              <th className="px-8 py-4 text-center">Formato</th>
-              <th className="px-8 py-4 text-center">Estado</th>
-              <th className="px-8 py-4 text-right">Acciones de Gestion</th>
-            </tr>
-          </thead>
-          <motion.tbody 
-            variants={staggerContainerFast}
-            initial="initial"
-            animate="animate"
-            className="divide-y divide-slate-50"
+        {!isEvaluator && (
+          <button
+            onClick={() => setIsTemplateLibraryOpen(true)}
+            className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-4 text-xs font-black uppercase tracking-widest text-slate-600 transition-colors hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700"
           >
-            {indicator.requirements.map(requirement => (
-              <EvidenceRow
-                key={requirement.id}
-                requirement={requirement}
-                userRole={userRole}
-                files={getRequirementFiles(requirement.id)}
-                onOpenUpload={onOpenUpload}
-                onOpenEditor={onOpenEditor}
-                onOpenHistory={onOpenHistory}
-              />
-            ))}
-          </motion.tbody>
-        </table>
+            <LayoutTemplate className="h-4 w-4" />
+            Ver plantillas
+          </button>
+        )}
       </div>
-    </div>
+
+      <div className="divide-y divide-slate-200">
+        {visibleRequirements.map((requirement, index) => {
+          const files = [...getRequirementFiles(requirement.id)].sort((a, b) => b.version - a.version);
+          const currentFile = files.find(file => file.isCurrentVersion);
+          const status = currentFile?.status || 'Pendiente';
+          const isExpanded = expandedRequirements.has(requirement.id);
+          const customFolders = folders[requirement.id] || [];
+
+          return (
+            <article key={requirement.id} className="bg-white">
+              <div className="flex items-center gap-3 px-6 py-4 transition-colors hover:bg-slate-50">
+                <button
+                  onClick={() => toggleRequirement(requirement.id)}
+                  className="flex min-w-0 flex-1 items-center gap-3 text-left"
+                  aria-expanded={isExpanded}
+                >
+                  <ChevronRight className={`h-4 w-4 shrink-0 text-slate-400 transition-transform ${isExpanded ? 'rotate-90' : ''}`} />
+                  <div className={`relative flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${
+                    files.length > 0
+                      ? 'bg-emerald-100 text-emerald-700'
+                      : isExpanded
+                        ? 'bg-blue-100 text-blue-700'
+                        : 'bg-amber-50 text-amber-600'
+                  }`}>
+                    {isExpanded ? <FolderOpen className="h-5 w-5" /> : <Folder className="h-5 w-5" />}
+                    {files.length > 0 && (
+                      <span className="absolute -bottom-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-emerald-600 text-white ring-2 ring-white">
+                        <CheckCircle2 className="h-3 w-3" />
+                      </span>
+                    )}
+                  </div>
+                  <div className="min-w-0">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+                        Evidencia {index + 1}
+                      </span>
+                      <EvidenceStatusBadge status={status} />
+                    </div>
+                    <p className="mt-1 truncate text-sm font-black text-slate-800">{requirement.label}</p>
+                    <p className="mt-1 text-xs text-slate-400">
+                      {files.length} archivo{files.length === 1 ? '' : 's'} · Formato {requirement.format}
+                    </p>
+                  </div>
+                </button>
+
+                <div className="hidden items-center gap-1 sm:flex">
+                  {!isEvaluator && (
+                    <button
+                      onClick={() => setGuideRequirement(requirement)}
+                      className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-emerald-50 hover:text-emerald-700"
+                      title="Ver guia de carga"
+                      aria-label="Ver guia de carga"
+                    >
+                      <BookOpen className="h-4 w-4" />
+                    </button>
+                  )}
+                  <button
+                    onClick={() => onOpenHistory(requirement)}
+                    className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-slate-200 hover:text-slate-800"
+                    title="Ver historial"
+                    aria-label="Ver historial"
+                  >
+                    <History className="h-4 w-4" />
+                  </button>
+                  {isEvaluator && currentFile && (
+                    <>
+                      <button
+                        onClick={() => setPreviewFile(currentFile)}
+                        className="inline-flex h-9 items-center justify-center gap-2 rounded-lg border border-blue-200 bg-blue-50 px-3 text-[10px] font-black uppercase tracking-widest text-blue-700 hover:bg-blue-600 hover:text-white"
+                        title="Visualizar archivo subido"
+                      >
+                        <Eye className="h-3.5 w-3.5" />
+                        Visualizar
+                      </button>
+                      <button
+                        onClick={() => confirmFile(currentFile)}
+                        disabled={currentFile.status === 'Validado'}
+                        className="inline-flex h-9 items-center justify-center gap-2 rounded-lg bg-emerald-600 px-3 text-[10px] font-black uppercase tracking-widest text-white hover:bg-emerald-700 disabled:cursor-not-allowed disabled:bg-emerald-200"
+                        title="Confirmar evidencia"
+                      >
+                        <CheckCircle2 className="h-3.5 w-3.5" />
+                        Confirmar
+                      </button>
+                      <button
+                        onClick={() => denyFile(currentFile)}
+                        disabled={currentFile.status === 'Rechazado'}
+                        className="inline-flex h-9 items-center justify-center gap-2 rounded-lg bg-rose-600 px-3 text-[10px] font-black uppercase tracking-widest text-white hover:bg-rose-700 disabled:cursor-not-allowed disabled:bg-rose-200"
+                        title="Denegar evidencia"
+                      >
+                        <XCircle className="h-3.5 w-3.5" />
+                        Denegar
+                      </button>
+                      <button
+                        onClick={() => onOpenEditor(requirement)}
+                        className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-amber-600 transition-colors hover:bg-amber-50"
+                        title="Revision detallada y observaciones"
+                        aria-label="Revision detallada y observaciones"
+                      >
+                        <ClipboardCheck className="h-4 w-4" />
+                      </button>
+                    </>
+                  )}
+                  {canUpload && (
+                    <button
+                      onClick={() => onOpenUpload(requirement)}
+                      className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-blue-600 text-white transition-colors hover:bg-blue-700"
+                      title="Subir archivo"
+                      aria-label="Subir archivo"
+                    >
+                      <Upload className="h-4 w-4" />
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {isExpanded && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  className="border-t border-slate-100 bg-slate-50 px-6 py-5"
+                >
+                  <div className="mb-4 flex flex-wrap gap-2 sm:hidden">
+                    {!isEvaluator && <RepositoryAction icon={BookOpen} label="Guia" onClick={() => setGuideRequirement(requirement)} />}
+                    <RepositoryAction icon={History} label="Historial" onClick={() => onOpenHistory(requirement)} />
+                    {isEvaluator && <RepositoryAction icon={ClipboardCheck} label="Revisar" onClick={() => onOpenEditor(requirement)} />}
+                    {canUpload && <RepositoryAction icon={Upload} label="Subir" onClick={() => onOpenUpload(requirement)} primary />}
+                  </div>
+
+                  <div className="ml-5 border-l border-slate-300 pl-5">
+                    <div className="mb-3 flex items-center justify-between gap-3">
+                      <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Contenido de la carpeta</p>
+                      {canUpload && (
+                        <button
+                          onClick={() => createFolder(requirement)}
+                          className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-[10px] font-black uppercase tracking-widest text-slate-600 hover:border-blue-300 hover:text-blue-600"
+                        >
+                          <FolderPlus className="h-3.5 w-3.5" />
+                          Crear carpeta
+                        </button>
+                      )}
+                    </div>
+
+                    <div className="space-y-2">
+                      <div className="rounded-lg border border-slate-200 bg-white">
+                        <div className="flex items-center gap-3 border-b border-slate-100 px-4 py-3">
+                          <FolderOpen className={`h-4 w-4 ${files.length > 0 ? 'text-emerald-600' : 'text-blue-600'}`} />
+                          <p className="text-sm font-black text-slate-700">Archivos cargados</p>
+                          <span className="ml-auto text-xs font-bold text-slate-400">{files.length}</span>
+                        </div>
+
+                        {files.length > 0 ? (
+                          <div className="divide-y divide-slate-100">
+                            {files.map(file => (
+                              <div
+                                key={file.id}
+                                className="flex items-center gap-3 px-4 py-3 transition-colors hover:bg-blue-50"
+                              >
+                                <button
+                                  onClick={() => setPreviewFile(file)}
+                                  className="flex min-w-0 flex-1 items-center gap-3 text-left"
+                                  title="Visualizar archivo"
+                                >
+                                  <span className="relative shrink-0">
+                                    <FileText className="h-4 w-4 text-emerald-600" />
+                                    <CheckCircle2 className="absolute -bottom-1 -right-1 h-2.5 w-2.5 rounded-full bg-white text-emerald-600" />
+                                  </span>
+                                  <div className="min-w-0 flex-1">
+                                    <p className="truncate text-sm font-bold text-slate-700">{file.fileName}</p>
+                                    <p className="mt-0.5 text-[10px] text-slate-400">
+                                      v{file.version} · {file.uploadDate} · {file.uploadedBy}
+                                    </p>
+                                  </div>
+                                </button>
+
+                                <EvidenceStatusBadge status={file.status} />
+
+                                {isEvaluator && (
+                                  <div className="flex shrink-0 items-center gap-2">
+                                    <button
+                                      onClick={() => setPreviewFile(file)}
+                                      className="inline-flex items-center gap-2 rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-[10px] font-black uppercase tracking-widest text-blue-700 hover:bg-blue-600 hover:text-white"
+                                      title="Visualizar archivo subido"
+                                    >
+                                      <Eye className="h-3.5 w-3.5" />
+                                      Visualizar
+                                    </button>
+                                    <button
+                                      onClick={() => confirmFile(file)}
+                                      disabled={file.status === 'Validado'}
+                                      className="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-3 py-2 text-[10px] font-black uppercase tracking-widest text-white hover:bg-emerald-700 disabled:cursor-not-allowed disabled:bg-emerald-200"
+                                      title="Confirmar evidencia"
+                                    >
+                                      <CheckCircle2 className="h-3.5 w-3.5" />
+                                      Confirmar
+                                    </button>
+                                    <button
+                                      onClick={() => denyFile(file)}
+                                      disabled={file.status === 'Rechazado'}
+                                      className="inline-flex items-center gap-2 rounded-lg bg-rose-600 px-3 py-2 text-[10px] font-black uppercase tracking-widest text-white hover:bg-rose-700 disabled:cursor-not-allowed disabled:bg-rose-200"
+                                      title="Denegar evidencia"
+                                    >
+                                      <XCircle className="h-3.5 w-3.5" />
+                                      Denegar
+                                    </button>
+                                  </div>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <div className="flex items-center gap-3 px-4 py-5 text-sm text-slate-400">
+                            <FileClock className="h-4 w-4" />
+                            Todavia no hay archivos en esta evidencia.
+                          </div>
+                        )}
+                      </div>
+
+                      {!isEvaluator && (
+                        <>
+                          <div className="flex items-center gap-3 rounded-lg border border-slate-200 bg-white px-4 py-3">
+                            <Folder className="h-4 w-4 text-amber-500" />
+                            <p className="text-sm font-bold text-slate-700">Anexos y respaldos</p>
+                            <span className="ml-auto text-xs font-bold text-slate-400">0</span>
+                          </div>
+
+                          {customFolders.map(folder => (
+                            <div key={folder} className="flex items-center gap-3 rounded-lg border border-slate-200 bg-white px-4 py-3">
+                              <Folder className="h-4 w-4 text-amber-500" />
+                              <p className="min-w-0 flex-1 truncate text-sm font-bold text-slate-700">{folder}</p>
+                              <span className="text-xs font-bold text-slate-400">0</span>
+                              <button
+                                onClick={() => removeFolder(requirement.id, folder)}
+                                className="inline-flex h-7 w-7 items-center justify-center rounded-md text-slate-400 hover:bg-rose-50 hover:text-rose-600"
+                                title="Eliminar carpeta"
+                                aria-label={`Eliminar carpeta ${folder}`}
+                              >
+                                <X className="h-3.5 w-3.5" />
+                              </button>
+                            </div>
+                          ))}
+                        </>
+                      )}
+
+                      {canUpload && (
+                        <button
+                          onClick={() => onOpenUpload(requirement)}
+                          className="flex w-full items-center justify-center gap-2 rounded-lg border-2 border-dashed border-slate-300 bg-white px-4 py-4 text-xs font-black uppercase tracking-widest text-slate-500 transition-colors hover:border-blue-400 hover:bg-blue-50 hover:text-blue-700"
+                        >
+                          <Plus className="h-4 w-4" />
+                          Subir archivo a esta evidencia
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </article>
+          );
+        })}
+        {isEvaluator && visibleRequirements.length === 0 && (
+          <div className="px-8 py-14 text-center">
+            <FileClock className="mx-auto h-10 w-10 text-slate-300" />
+            <p className="mt-3 text-sm font-black text-slate-600">No hay archivos para revisar en este indicador.</p>
+            <p className="mt-1 text-xs text-slate-400">
+              Las evidencias apareceran aqui cuando un coordinador o docente cargue documentos.
+            </p>
+          </div>
+        )}
+      </div>
+
+      {!isEvaluator && (
+        <>
+          <EvidenceGuideModal
+            isOpen={Boolean(guideRequirement)}
+            indicator={indicator}
+            requirement={guideRequirement}
+            onClose={() => setGuideRequirement(null)}
+          />
+          <TemplateLibraryModal
+            isOpen={isTemplateLibraryOpen}
+            onClose={() => setIsTemplateLibraryOpen(false)}
+          />
+        </>
+      )}
+      <EvidenceFilePreviewModal
+        isOpen={Boolean(previewFile)}
+        file={previewFile}
+        onClose={() => setPreviewFile(null)}
+      />
+    </section>
   );
 };
+
+interface RepositoryActionProps {
+  icon: React.ComponentType<{ className?: string }>;
+  label: string;
+  onClick: () => void;
+  primary?: boolean;
+}
+
+const RepositoryAction = ({
+  icon: Icon,
+  label,
+  onClick,
+  primary = false,
+}: RepositoryActionProps) => (
+  <button
+    onClick={onClick}
+    className={`inline-flex items-center gap-2 rounded-lg px-3 py-2 text-[10px] font-black uppercase tracking-widest ${
+      primary
+        ? 'bg-blue-600 text-white'
+        : 'border border-slate-200 bg-white text-slate-600'
+    }`}
+  >
+    <Icon className="h-3.5 w-3.5" />
+    {label}
+  </button>
+);

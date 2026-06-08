@@ -45,10 +45,11 @@ export const EvidenceVersionHistory = ({ files, onDeleteFile }: EvidenceVersionH
                 <td className="px-4 py-5 text-right">
                   <button
                     onClick={() => onDeleteFile(file)}
-                    className="p-2 rounded-lg bg-rose-50 text-rose-500 transition-colors hover:bg-rose-600 hover:text-white"
-                    title="Eliminar archivo subido"
+                    className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-rose-200 bg-rose-50 text-rose-600 transition-colors hover:border-rose-600 hover:bg-rose-600 hover:text-white focus:outline-none focus:ring-2 focus:ring-rose-300"
+                    title={`Eliminar ${file.fileName}`}
+                    aria-label={`Eliminar ${file.fileName}`}
                   >
-                    <Trash2 className="w-4 h-4" />
+                    <Trash2 className="h-4 w-4" />
                   </button>
                 </td>
               )}

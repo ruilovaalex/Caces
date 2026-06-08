@@ -7,7 +7,7 @@ interface IndicatorContentProps {
 
 export const IndicatorContent = ({ children, className = '' }: IndicatorContentProps) => {
   return (
-    <div className={`space-y-6 pb-12 ${className}`}>
+    <div className={`overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm ${className}`}>
       {children}
     </div>
   );
