@@ -3,6 +3,7 @@ import {
   CalendarRange,
   ChevronRight,
   ClipboardList,
+  FilePlus2,
   FileText,
   Folder,
 } from 'lucide-react';
@@ -17,13 +18,14 @@ interface SidebarProps {
   expandedNodes: Set<string>;
   focusedNodeId: string | null;
   userRole: UserRole;
-  activeView: 'dashboard' | 'checklist' | 'assignments' | 'indicator';
+  activeView: 'dashboard' | 'checklist' | 'assignments' | 'templates' | 'indicator';
   onIndicatorSelect: (ind: Indicator) => void;
   onToggleNode: (id: string) => void;
   onSetFocusedNode: (id: string) => void;
   onKeyDown: (e: React.KeyboardEvent) => void;
   onSwitchRole: (role: UserRole) => void;
   onOpenDashboard: () => void;
+  onOpenTemplates: () => void;
   onOpenAssignments: () => void;
 }
 
@@ -40,8 +42,14 @@ export const Sidebar = ({
   onKeyDown,
   onSwitchRole,
   onOpenDashboard,
+  onOpenTemplates,
   onOpenAssignments,
 }: SidebarProps) => {
+  const isRepositoryActive =
+    activeView === 'dashboard' || activeView === 'indicator' || activeView === 'checklist';
+  const isTemplatesActive = activeView === 'templates';
+  const isAssignmentsActive = activeView === 'assignments';
+
   const roleNames: Record<UserRole, string> = {
     ADMIN: 'Admin Sudamericano',
     COORDINADOR: 'Coord. Academico',
@@ -55,6 +63,11 @@ export const Sidebar = ({
     EVALUADOR: 'EV',
     DOCENTE: 'DO',
   };
+
+  const activeButtonStyles =
+    'relative bg-[#eff6ff] text-[#1d4ed8] border-[#2563eb] shadow-lg shadow-blue-600/10 ring-2 ring-blue-200/70';
+  const inactiveButtonStyles =
+    'text-[#475569] border-transparent hover:bg-[#f4f6f9]';
 
   return (
     <motion.aside
@@ -82,32 +95,99 @@ export const Sidebar = ({
         {(userRole === 'COORDINADOR' || userRole === 'EVALUADOR') && (
           <motion.button
             variants={fadeInRight}
-            whileHover={{ x: 4, backgroundColor: 'rgba(244, 246, 249, 1)' }}
+            whileHover={
+              isRepositoryActive
+                ? { x: 4, boxShadow: '0 10px 24px rgba(37, 99, 235, 0.22)' }
+                : { x: 4, backgroundColor: 'rgba(244, 246, 249, 1)' }
+            }
             onClick={onOpenDashboard}
-            className={`w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-colors ${
-              activeView === 'dashboard' || activeView === 'indicator' || activeView === 'checklist'
-                ? 'bg-[#2563eb] text-white'
-                : 'text-[#64748b] hover:bg-[#f4f6f9]'
+            aria-current={isRepositoryActive ? 'page' : undefined}
+            className={`w-full flex items-center gap-3 px-3 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all border ${
+              isRepositoryActive
+                ? activeButtonStyles
+                : inactiveButtonStyles
             }`}
           >
-            <Folder className="w-4 h-4" />
-            1. Repositorio
+            {isRepositoryActive && (
+              <span className="absolute left-0 top-2 bottom-2 w-1.5 rounded-r-full bg-[#2563eb]" />
+            )}
+            <span className={`flex h-8 w-8 items-center justify-center rounded-xl transition-colors ${
+              isRepositoryActive ? 'bg-[#2563eb] text-white shadow-sm shadow-blue-600/20' : 'bg-slate-100 text-slate-500'
+            }`}>
+              <Folder className="w-4 h-4" />
+            </span>
+            <span className="flex-1 text-left">1. Repositorio</span>
+            {isRepositoryActive && (
+              <span className="rounded-full bg-[#2563eb] px-2.5 py-1 text-[9px] font-black uppercase tracking-[0.2em] text-white">
+                Actual
+              </span>
+            )}
           </motion.button>
         )}
 
         {(userRole === 'ADMIN' || userRole === 'COORDINADOR') && (
           <motion.button
             variants={fadeInRight}
-            whileHover={{ x: 4, backgroundColor: 'rgba(244, 246, 249, 1)' }}
-            onClick={onOpenAssignments}
-            className={`w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-colors ${
-              activeView === 'assignments'
-                ? 'bg-[#2563eb] text-white'
-                : 'text-[#64748b] hover:bg-[#f4f6f9]'
+            whileHover={
+              isTemplatesActive
+                ? { x: 4, boxShadow: '0 10px 24px rgba(37, 99, 235, 0.22)' }
+                : { x: 4, backgroundColor: 'rgba(244, 246, 249, 1)' }
+            }
+            onClick={onOpenTemplates}
+            aria-current={isTemplatesActive ? 'page' : undefined}
+            className={`w-full flex items-center gap-3 px-3 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all border ${
+              isTemplatesActive
+                ? activeButtonStyles
+                : inactiveButtonStyles
             }`}
           >
-            <ClipboardList className="w-4 h-4" />
-            {userRole === 'ADMIN' ? '1. Roles' : '2. Docentes y tareas'}
+            {isTemplatesActive && (
+              <span className="absolute left-0 top-2 bottom-2 w-1.5 rounded-r-full bg-[#2563eb]" />
+            )}
+            <span className={`flex h-8 w-8 items-center justify-center rounded-xl transition-colors ${
+              isTemplatesActive ? 'bg-[#2563eb] text-white shadow-sm shadow-blue-600/20' : 'bg-slate-100 text-slate-500'
+            }`}>
+              <FilePlus2 className="w-4 h-4" />
+            </span>
+            <span className="flex-1 text-left">2. Crear</span>
+            {isTemplatesActive && (
+              <span className="rounded-full bg-[#2563eb] px-2.5 py-1 text-[9px] font-black uppercase tracking-[0.2em] text-white">
+                Actual
+              </span>
+            )}
+          </motion.button>
+        )}
+
+        {(userRole === 'ADMIN' || userRole === 'COORDINADOR') && (
+          <motion.button
+            variants={fadeInRight}
+            whileHover={
+              isAssignmentsActive
+                ? { x: 4, boxShadow: '0 10px 24px rgba(37, 99, 235, 0.22)' }
+                : { x: 4, backgroundColor: 'rgba(244, 246, 249, 1)' }
+            }
+            onClick={onOpenAssignments}
+            aria-current={isAssignmentsActive ? 'page' : undefined}
+            className={`w-full flex items-center gap-3 px-3 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all border ${
+              isAssignmentsActive
+                ? activeButtonStyles
+                : inactiveButtonStyles
+            }`}
+          >
+            {isAssignmentsActive && (
+              <span className="absolute left-0 top-2 bottom-2 w-1.5 rounded-r-full bg-[#2563eb]" />
+            )}
+            <span className={`flex h-8 w-8 items-center justify-center rounded-xl transition-colors ${
+              isAssignmentsActive ? 'bg-[#2563eb] text-white shadow-sm shadow-blue-600/20' : 'bg-slate-100 text-slate-500'
+            }`}>
+              <ClipboardList className="w-4 h-4" />
+            </span>
+            <span className="flex-1 text-left">{userRole === 'ADMIN' ? '3. Roles' : '3. Docentes y tareas'}</span>
+            {isAssignmentsActive && (
+              <span className="rounded-full bg-[#2563eb] px-2.5 py-1 text-[9px] font-black uppercase tracking-[0.2em] text-white">
+                Actual
+              </span>
+            )}
           </motion.button>
         )}
       </motion.div>
