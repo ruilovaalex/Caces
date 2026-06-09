@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { Download, FileSpreadsheet, FileText, Search, Sparkles, Star } from 'lucide-react';
+import { MOCK_DATA } from '../../data/cacesMockData';
 import { TEMPLATES } from '../../data/templates';
 import { Modal } from '../common/Modal';
 
@@ -11,43 +12,43 @@ interface TemplateLibraryModalProps {
 const categories = [
   {
     id: 'criterio-1',
-    label: 'Criterio 1: Organizacion',
-    shortLabel: 'C1 Organizacion',
+    label: MOCK_DATA[0].criteria[0].name,
+    shortLabel: 'C1 ORGANIZACIÓN',
     description: 'Plantillas para planificacion, seguimiento institucional, actas, informes y soporte de gestion.',
     templateIds: ['acta', 'informe', 'registro', 'oficio', 'documento'],
   },
   {
     id: 'criterio-2',
-    label: 'Criterio 2: Infraestructura',
-    shortLabel: 'C2 Infraestructura',
+    label: MOCK_DATA[0].criteria[1].name,
+    shortLabel: 'C2 INFRAESTRUCTURA',
     description: 'Modelos para constataciones, reportes, matrices y evidencias de recursos fisicos y tecnologicos.',
     templateIds: ['informe', 'registro', 'matriz', 'evidencia', 'oficio'],
   },
   {
     id: 'criterio-3',
-    label: 'Criterio 3: Profesores',
-    shortLabel: 'C3 Profesores',
+    label: MOCK_DATA[0].criteria[2].name,
+    shortLabel: 'C3 PROFESORES',
     description: 'Formatos para seguimiento docente, certificaciones, planes, registros y control de actividades.',
     templateIds: ['informe', 'registro', 'evidencia', 'certificado', 'matriz'],
   },
   {
     id: 'criterio-4',
-    label: 'Criterio 4: Docencia',
-    shortLabel: 'C4 Docencia',
+    label: MOCK_DATA[0].criteria[3].name,
+    shortLabel: 'C4 DOCENCIA',
     description: 'Plantillas para programas, actas, evidencias de clase, cronogramas y seguimiento academico.',
     templateIds: ['plan', 'acta', 'registro', 'evidencia', 'cronograma'],
   },
   {
     id: 'criterio-5',
-    label: 'Criterio 5: Investigacion + Desarrollo e Innovacion',
-    shortLabel: 'C5 Investigacion',
+    label: MOCK_DATA[0].criteria[4].name,
+    shortLabel: 'C5 INVESTIGACIÓN',
     description: 'Apoyos para proyectos, productos, seguimiento y respaldo de resultados.',
     templateIds: ['plan', 'informe', 'evidencia', 'matriz', 'certificado'],
   },
   {
     id: 'criterio-6',
-    label: 'Criterio 6: Vinculacion con la Sociedad',
-    shortLabel: 'C6 Vinculacion',
+    label: MOCK_DATA[0].criteria[5].name,
+    shortLabel: 'C6 VINCULACIÓN',
     description: 'Modelos para convenios, actas, informes, evidencias y relacion con actores externos.',
     templateIds: ['convenio', 'acta', 'informe', 'evidencia', 'oficio'],
   },
