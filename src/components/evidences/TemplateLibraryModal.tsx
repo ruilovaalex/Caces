@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { Download, FileSpreadsheet, FileText, Search, Star } from 'lucide-react';
+import { Download, FileSpreadsheet, FileText, Search, Sparkles, Star } from 'lucide-react';
 import { TEMPLATES } from '../../data/templates';
 import { Modal } from '../common/Modal';
 
@@ -9,11 +9,48 @@ interface TemplateLibraryModalProps {
 }
 
 const categories = [
-  { id: 'gestion', label: 'Gestion institucional', templateIds: ['acta', 'informe', 'registro'] },
-  { id: 'planificacion', label: 'Planificacion y seguimiento', templateIds: ['plan', 'informe', 'registro'] },
-  { id: 'docencia', label: 'Docencia', templateIds: ['informe', 'registro', 'evidencia'] },
-  { id: 'vinculacion', label: 'Vinculacion', templateIds: ['acta', 'informe', 'evidencia'] },
-  { id: 'investigacion', label: 'Investigacion e innovacion', templateIds: ['plan', 'informe', 'evidencia'] },
+  {
+    id: 'criterio-1',
+    label: 'Criterio 1: Organizacion',
+    shortLabel: 'C1 Organizacion',
+    description: 'Plantillas para planificacion, seguimiento institucional, actas, informes y soporte de gestion.',
+    templateIds: ['acta', 'informe', 'registro', 'oficio', 'documento'],
+  },
+  {
+    id: 'criterio-2',
+    label: 'Criterio 2: Infraestructura',
+    shortLabel: 'C2 Infraestructura',
+    description: 'Modelos para constataciones, reportes, matrices y evidencias de recursos fisicos y tecnologicos.',
+    templateIds: ['informe', 'registro', 'matriz', 'evidencia', 'oficio'],
+  },
+  {
+    id: 'criterio-3',
+    label: 'Criterio 3: Profesores',
+    shortLabel: 'C3 Profesores',
+    description: 'Formatos para seguimiento docente, certificaciones, planes, registros y control de actividades.',
+    templateIds: ['informe', 'registro', 'evidencia', 'certificado', 'matriz'],
+  },
+  {
+    id: 'criterio-4',
+    label: 'Criterio 4: Docencia',
+    shortLabel: 'C4 Docencia',
+    description: 'Plantillas para programas, actas, evidencias de clase, cronogramas y seguimiento academico.',
+    templateIds: ['plan', 'acta', 'registro', 'evidencia', 'cronograma'],
+  },
+  {
+    id: 'criterio-5',
+    label: 'Criterio 5: Investigacion + Desarrollo e Innovacion',
+    shortLabel: 'C5 Investigacion',
+    description: 'Apoyos para proyectos, productos, seguimiento y respaldo de resultados.',
+    templateIds: ['plan', 'informe', 'evidencia', 'matriz', 'certificado'],
+  },
+  {
+    id: 'criterio-6',
+    label: 'Criterio 6: Vinculacion con la Sociedad',
+    shortLabel: 'C6 Vinculacion',
+    description: 'Modelos para convenios, actas, informes, evidencias y relacion con actores externos.',
+    templateIds: ['convenio', 'acta', 'informe', 'evidencia', 'oficio'],
+  },
 ] as const;
 
 const featuredIds = ['acta', 'informe', 'registro', 'plan'];
@@ -23,20 +60,22 @@ export const TemplateLibraryModal = ({
   onClose,
 }: TemplateLibraryModalProps) => {
   const [query, setQuery] = useState('');
-  const [activeCategory, setActiveCategory] = useState('todas');
+  const [activeCategory, setActiveCategory] = useState('');
+
+  const activeCategoryData = categories.find(category => category.id === activeCategory);
 
   const filteredTemplates = useMemo(() => {
-    const category = categories.find(item => item.id === activeCategory);
     const normalizedQuery = query.trim().toLowerCase();
 
     return TEMPLATES.filter(template => {
-      const matchesCategory = !category || category.templateIds.includes(template.id as never);
-      const matchesQuery = !normalizedQuery
-        || template.label.toLowerCase().includes(normalizedQuery)
-        || template.description.toLowerCase().includes(normalizedQuery);
+      const matchesCategory = !activeCategoryData || activeCategoryData.templateIds.includes(template.id as never);
+      const matchesQuery =
+        !normalizedQuery ||
+        template.label.toLowerCase().includes(normalizedQuery) ||
+        template.description.toLowerCase().includes(normalizedQuery);
       return matchesCategory && matchesQuery;
     });
-  }, [activeCategory, query]);
+  }, [activeCategoryData, query]);
 
   const handleDownload = (templateId: string) => {
     const template = TEMPLATES.find(item => item.id === templateId);
@@ -67,8 +106,8 @@ export const TemplateLibraryModal = ({
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Biblioteca de plantillas" maxWidth="max-w-6xl">
       <div className="space-y-7 border-t border-slate-100 bg-slate-50 p-7">
-        <div className="flex flex-col gap-3 md:flex-row">
-          <label className="relative flex-1">
+        <div className="flex flex-col gap-3">
+          <label className="relative">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
             <input
               value={query}
@@ -77,19 +116,20 @@ export const TemplateLibraryModal = ({
               className="h-11 w-full rounded-lg border border-slate-200 bg-white pl-10 pr-4 text-sm outline-none focus:border-blue-400"
             />
           </label>
-          <select
-            value={activeCategory}
-            onChange={event => setActiveCategory(event.target.value)}
-            className="h-11 rounded-lg border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-600 outline-none focus:border-blue-400"
-          >
-            <option value="todas">Todas las categorias</option>
+          <div className="flex flex-wrap gap-2">
+            <FilterChip label="Todas" active={activeCategory === ''} onClick={() => setActiveCategory('')} />
             {categories.map(category => (
-              <option key={category.id} value={category.id}>{category.label}</option>
+              <FilterChip
+                key={category.id}
+                label={category.shortLabel}
+                active={activeCategory === category.id}
+                onClick={() => setActiveCategory(category.id)}
+              />
             ))}
-          </select>
+          </div>
         </div>
 
-        {!query && activeCategory === 'todas' && (
+        {!query && activeCategory === '' && (
           <section>
             <div className="mb-3 flex items-center gap-2">
               <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
@@ -104,42 +144,87 @@ export const TemplateLibraryModal = ({
         )}
 
         <section>
-          <h3 className="mb-3 text-xs font-black uppercase tracking-widest text-slate-700">
-            {activeCategory === 'todas' ? 'Todas las plantillas' : categories.find(item => item.id === activeCategory)?.label}
-          </h3>
-          {filteredTemplates.length > 0 ? (
-            <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-              {filteredTemplates.map(template => (
-                <TemplateCard key={template.id} template={template} onDownload={handleDownload} />
-              ))}
-            </div>
-          ) : (
-            <div className="rounded-lg border-2 border-dashed border-slate-200 bg-white p-10 text-center text-sm font-semibold text-slate-400">
-              No se encontraron plantillas con esos filtros.
-            </div>
-          )}
-        </section>
-
-        <section>
-          <h3 className="mb-3 text-xs font-black uppercase tracking-widest text-slate-700">Explorar por bloques</h3>
-          <div className="grid gap-2 md:grid-cols-3 xl:grid-cols-5">
+          <h3 className="mb-3 text-xs font-black uppercase tracking-widest text-slate-700">Plantillas por criterio</h3>
+          <div className="grid gap-2 md:grid-cols-2 xl:grid-cols-3">
             {categories.map(category => (
               <button
                 key={category.id}
                 onClick={() => setActiveCategory(category.id)}
-                className="rounded-lg border border-slate-200 bg-white p-4 text-left transition-colors hover:border-blue-300 hover:bg-blue-50"
+                className={`rounded-xl border p-4 text-left transition-colors ${
+                  activeCategory === category.id
+                    ? 'border-blue-300 bg-blue-50'
+                    : 'border-slate-200 bg-white hover:border-blue-300 hover:bg-blue-50'
+                }`}
               >
-                <FileSpreadsheet className="h-5 w-5 text-blue-600" />
+                <FileSpreadsheet className={`h-5 w-5 ${
+                  activeCategory === category.id ? 'text-blue-700' : 'text-blue-600'
+                }`} />
                 <p className="mt-3 text-sm font-black text-slate-700">{category.label}</p>
-                <p className="mt-1 text-xs text-slate-400">{category.templateIds.length} tipos disponibles</p>
+                <p className="mt-2 text-xs leading-relaxed text-slate-500">{category.description}</p>
+                <p className="mt-4 text-[10px] font-black uppercase tracking-widest text-blue-600">
+                  {category.templateIds.length} plantillas sugeridas
+                </p>
               </button>
             ))}
           </div>
         </section>
+
+        {activeCategoryData ? (
+          <section className="rounded-2xl border border-slate-200 bg-white p-5">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <h3 className="text-lg font-black tracking-tight text-slate-900">{activeCategoryData.label}</h3>
+                <p className="mt-1 text-sm text-slate-500">{activeCategoryData.description}</p>
+              </div>
+              <div className="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-2 text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">
+                <Sparkles className="h-3.5 w-3.5 text-blue-600" />
+                {filteredTemplates.length} plantillas visibles
+              </div>
+            </div>
+
+            {filteredTemplates.length > 0 ? (
+              <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+                {filteredTemplates.map(template => (
+                  <TemplateCard key={template.id} template={template} onDownload={handleDownload} />
+                ))}
+              </div>
+            ) : (
+              <div className="mt-5 rounded-lg border-2 border-dashed border-slate-200 bg-slate-50 p-10 text-center text-sm font-semibold text-slate-400">
+                No se encontraron plantillas con esos filtros.
+              </div>
+            )}
+          </section>
+        ) : (
+          <section className="rounded-2xl border border-dashed border-slate-200 bg-white p-10 text-center">
+            <p className="text-sm font-bold text-slate-600">Selecciona un criterio para ver sus plantillas.</p>
+            <p className="mt-2 text-xs text-slate-400">La parte inferior se abre solo cuando eliges un criterio.</p>
+          </section>
+        )}
       </div>
     </Modal>
   );
 };
+
+const FilterChip = ({
+  label,
+  active,
+  onClick,
+}: {
+  label: string;
+  active: boolean;
+  onClick: () => void;
+}) => (
+  <button
+    onClick={onClick}
+    className={`rounded-full px-4 py-2 text-[10px] font-black uppercase tracking-[0.18em] transition-all ${
+      active
+        ? 'bg-[#2563eb] text-white shadow-md shadow-blue-600/20'
+        : 'bg-white text-slate-500 ring-1 ring-slate-200 hover:bg-slate-50'
+    }`}
+  >
+    {label}
+  </button>
+);
 
 interface TemplateCardProps {
   template: (typeof TEMPLATES)[number];

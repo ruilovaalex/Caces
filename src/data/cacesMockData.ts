@@ -46,7 +46,7 @@ export const MOCK_DATA: YearPeriod[] = [
                 name: 'Relaciones interinstitucionales',
                 status: 'Pendiente',
                 description:
-                  'Valora la planificación, ejecución, resultados y pertinencia de convenios, redes y relaciones externas para fortalecer las funciones sustantivas.',
+                  'Valora la planificacion, ejecución, resultados y pertinencia de convenios, redes y relaciones externas para fortalecer las funciones sustantivas.',
                 requirements: [
                   evidence('1', 'Normativa o lineamientos de relaciones interinstitucionales', 'Documento aprobado que define responsables, procedimientos, seguimiento y evaluación de convenios y redes.'),
                   evidence('2', 'Plan o matriz de relaciones interinstitucionales', 'Planificación de convenios, redes y alianzas vinculadas con docencia, investigación, vinculación o gestión institucional.', 'PDF / XLSX'),

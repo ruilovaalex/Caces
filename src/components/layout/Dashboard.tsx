@@ -120,7 +120,7 @@ export const Dashboard = ({
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <h3 className="text-sm font-black text-slate-800 uppercase tracking-tight leading-none">
-            Estructura Institucional de Calidad
+            CRITERIOS
           </h3>
         </div>
         <motion.div 

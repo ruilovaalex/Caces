@@ -13,6 +13,7 @@ import { EvidenceHistoryModal } from '../components/evidences/EvidenceHistoryMod
 import { CoordinatorEvidenceEditor } from '../components/coordinator/CoordinatorEvidenceEditor';
 import { AssignmentsView } from '../components/assignments/AssignmentsView';
 import { DocenteView } from '../components/docente/DocenteView';
+import { TemplatesView } from '../components/templates/TemplatesView';
 
 import { useAuth } from '../hooks/useAuth';
 import { useIndicators } from '../hooks/useIndicators';
@@ -48,6 +49,7 @@ export default function App() {
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const [isChecklistOpen, setIsChecklistOpen] = useState(false);
   const [isAssignmentsOpen, setIsAssignmentsOpen] = useState(false);
+  const [isTemplatesOpen, setIsTemplatesOpen] = useState(false);
 
   const {
     allFiles,
@@ -82,6 +84,7 @@ export default function App() {
       setIsUploadOpen(false);
       setIsHistoryOpen(false);
       setIsChecklistOpen(false);
+      setIsTemplatesOpen(false);
       setActiveRequirement(null);
       setSelectedIndicator(null);
       setIsAssignmentsOpen(true);
@@ -93,6 +96,7 @@ export default function App() {
       setIsUploadOpen(false);
       setIsHistoryOpen(false);
       setIsChecklistOpen(false);
+      setIsTemplatesOpen(false);
       setActiveRequirement(null);
       setIsAssignmentsOpen(false);
     }
@@ -101,6 +105,7 @@ export default function App() {
   const handleIndicatorSelect = useCallback((indicator: Indicator) => {
     setIsChecklistOpen(false);
     setIsAssignmentsOpen(false);
+    setIsTemplatesOpen(false);
     selectIndicator(indicator);
   }, [selectIndicator]);
 
@@ -110,9 +115,22 @@ export default function App() {
     setIsHistoryOpen(false);
     setIsChecklistOpen(false);
     setIsAssignmentsOpen(false);
+    setIsTemplatesOpen(false);
     setActiveRequirement(null);
     setSelectedIndicator(null);
   }, [setSelectedIndicator]);
+
+  const handleOpenTemplates = useCallback(() => {
+    if (userRole !== 'ADMIN' && userRole !== 'COORDINADOR') return;
+    setIsEditorOpen(false);
+    setIsUploadOpen(false);
+    setIsHistoryOpen(false);
+    setIsChecklistOpen(false);
+    setIsAssignmentsOpen(false);
+    setActiveRequirement(null);
+    setSelectedIndicator(null);
+    setIsTemplatesOpen(true);
+  }, [setSelectedIndicator, userRole]);
 
   const handleOpenAssignments = useCallback(() => {
     if (userRole !== 'ADMIN' && !canUserAssign(userRole)) return;
@@ -120,6 +138,7 @@ export default function App() {
     setIsUploadOpen(false);
     setIsHistoryOpen(false);
     setIsChecklistOpen(false);
+    setIsTemplatesOpen(false);
     setActiveRequirement(null);
     setSelectedIndicator(null);
     setIsAssignmentsOpen(true);
@@ -221,6 +240,8 @@ export default function App() {
   const canAccessAssignments = userRole === 'ADMIN' || canUserAssign(userRole);
   const activeView = selectedIndicator
     ? 'indicator'
+    : isTemplatesOpen
+      ? 'templates'
     : isAssignmentsOpen && canAccessAssignments
       ? 'assignments'
       : isChecklistOpen
@@ -264,6 +285,7 @@ export default function App() {
         onSwitchRole={switchRole}
         activeView={activeView}
         onOpenDashboard={handleGoToStart}
+        onOpenTemplates={handleOpenTemplates}
         onOpenAssignments={handleOpenAssignments}
       />
 
@@ -284,7 +306,7 @@ export default function App() {
         ) : (
           <div className="flex-1 overflow-y-auto p-8 bg-[#f4f6f9]">
             <AnimatePresence mode="wait">
-              {!selectedIndicator && !isChecklistOpen && (!isAssignmentsOpen || !canAccessAssignments) && (
+              {!selectedIndicator && !isChecklistOpen && !isTemplatesOpen && (!isAssignmentsOpen || !canAccessAssignments) && (
                 <motion.div key="dashboard" variants={viewTransition} initial="initial" animate="animate" exit="exit">
                   <Dashboard
                     mockData={mockData}
@@ -298,7 +320,7 @@ export default function App() {
                 </motion.div>
               )}
 
-              {!selectedIndicator && isChecklistOpen && !isAssignmentsOpen && (
+              {!selectedIndicator && isChecklistOpen && !isAssignmentsOpen && !isTemplatesOpen && (
                 <motion.div key="checklist" variants={viewTransition} initial="initial" animate="animate" exit="exit">
                   <ChecklistView
                     mockData={mockData}
@@ -308,7 +330,13 @@ export default function App() {
                 </motion.div>
               )}
 
-              {!selectedIndicator && isAssignmentsOpen && canAccessAssignments && (
+              {!selectedIndicator && isTemplatesOpen && (
+                <motion.div key="templates" variants={viewTransition} initial="initial" animate="animate" exit="exit">
+                  <TemplatesView />
+                </motion.div>
+              )}
+
+              {!selectedIndicator && isAssignmentsOpen && canAccessAssignments && !isTemplatesOpen && (
                 <motion.div key="assignments" variants={viewTransition} initial="initial" animate="animate" exit="exit">
                   <AssignmentsView userRole={userRole} mockData={mockData} />
                 </motion.div>
