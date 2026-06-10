@@ -9,7 +9,6 @@ import {
   UserPlus,
   Users
 } from 'lucide-react';
-import { WorkflowGuide } from '../layout/WorkflowGuide';
 import { UserRole, YearPeriod } from '../../types';
 
 interface AssignmentsViewProps {
@@ -149,8 +148,6 @@ export const AssignmentsView = ({ userRole, mockData }: AssignmentsViewProps) =>
   if (userRole === 'ADMIN') {
     return (
       <div className="max-w-6xl mx-auto space-y-6">
-        <WorkflowGuide activeStep="assignments" />
-
         <section className="rounded-lg border border-slate-200 bg-white p-6">
           <div className="flex items-center gap-3">
             <div className="rounded-lg bg-slate-900 p-3 text-white">
@@ -195,8 +192,6 @@ export const AssignmentsView = ({ userRole, mockData }: AssignmentsViewProps) =>
 
   return (
     <div className="max-w-6xl mx-auto space-y-6">
-      <WorkflowGuide activeStep="assignments" />
-
       <div className="flex items-center gap-3">
         <div className="rounded-lg bg-emerald-50 p-3 text-emerald-700 border border-emerald-100">
           <ClipboardList className="h-5 w-5" />

@@ -3,7 +3,6 @@ import { Folder, ChevronRight, AlertCircle } from 'lucide-react';
 import { motion } from 'motion/react';
 import { YearPeriod, UploadedFile, Indicator } from '../../types';
 import { calculateIndicatorProgress } from '../../utils/progressUtils';
-import { WorkflowGuide } from './WorkflowGuide';
 import { staggerContainer, fadeInUp, hoverScale, tapScale, hoverCardLift, useCountUp } from '../../utils/animations';
 
 
@@ -24,8 +23,8 @@ export const Dashboard = ({
   onIndicatorSelect,
   onViewChecklist,
   onOpenCriterionSubCriteria,
-  onOpenAssignments,
-  canManageAssignments
+  onOpenAssignments: _onOpenAssignments,
+  canManageAssignments: _canManageAssignments
 }: DashboardProps) => {
   const dashboardStats = useMemo(() => {
     const totalEvidences = mockData[0].criteria.reduce(
@@ -78,12 +77,6 @@ export const Dashboard = ({
 
   return (
     <div className="max-w-6xl mx-auto space-y-8">
-      <WorkflowGuide
-        activeStep="repository"
-        canManageAssignments={canManageAssignments}
-        onOpenAssignments={onOpenAssignments}
-      />
-
       <motion.div 
         variants={staggerContainer}
         initial="initial"
