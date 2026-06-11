@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   BookOpen,
   ClipboardList,
@@ -10,7 +10,8 @@ import {
   Users
 } from 'lucide-react';
 import { WorkflowGuide } from '../layout/WorkflowGuide';
-import { UserRole, YearPeriod } from '../../types';
+import { Assignment, AssignmentMode, UserRole, YearPeriod } from '../../types';
+import { useAssignments } from '../../hooks/useAssignments';
 
 interface AssignmentsViewProps {
   userRole: UserRole;
@@ -23,17 +24,6 @@ interface Teacher {
   email: string;
   area: string;
   mobileStatus: 'Conectado' | 'Pendiente';
-}
-
-interface TeacherTask {
-  id: string;
-  teacherId: string;
-  teacherName: string;
-  title: string;
-  indicatorCode: string;
-  evidenceLabel: string;
-  dueDate: string;
-  status: 'Nueva' | 'En progreso' | 'Entregada';
 }
 
 const initialTeachers: Teacher[] = [
@@ -53,19 +43,6 @@ const initialTeachers: Teacher[] = [
   }
 ];
 
-const initialTasks: TeacherTask[] = [
-  {
-    id: 'task-1',
-    teacherId: 'doc-1',
-    teacherName: 'Carlos Mendoza',
-    title: 'Preparar respaldo documental del PEDI',
-    indicatorCode: '1.1.1',
-    evidenceLabel: 'PEDI aprobado y vigente',
-    dueDate: '2026-06-05',
-    status: 'Nueva'
-  }
-];
-
 const roleDescriptions: Record<UserRole, string> = {
   ADMIN: 'Supervisa el sistema y mantiene la base local de roles en esta fase.',
   COORDINADOR: 'Crea docentes, indicadores, evidencias y tareas.',
@@ -74,17 +51,21 @@ const roleDescriptions: Record<UserRole, string> = {
 };
 
 export const AssignmentsView = ({ userRole, mockData }: AssignmentsViewProps) => {
+  const { assignments, createAssignment } = useAssignments();
   const [roles, setRoles] = useState<UserRole[]>(['ADMIN', 'COORDINADOR', 'EVALUADOR', 'DOCENTE']);
   const [newRole, setNewRole] = useState('');
   const [teachers, setTeachers] = useState<Teacher[]>(initialTeachers);
-  const [tasks, setTasks] = useState<TeacherTask[]>(initialTasks);
   const [teacherName, setTeacherName] = useState('');
   const [teacherEmail, setTeacherEmail] = useState('');
   const [teacherArea, setTeacherArea] = useState('');
   const [selectedTeacherId, setSelectedTeacherId] = useState(initialTeachers[0]?.id || '');
+  const [selectedTeacherIds, setSelectedTeacherIds] = useState<string[]>(initialTeachers[0] ? [initialTeachers[0].id] : []);
+  const [assignmentMode, setAssignmentMode] = useState<AssignmentMode>('SINGLE');
   const [selectedIndicatorCode, setSelectedIndicatorCode] = useState('1.1.1');
+  const [selectedRequirementId, setSelectedRequirementId] = useState('');
+  const [selectedPeriodId, setSelectedPeriodId] = useState('');
   const [taskTitle, setTaskTitle] = useState('');
-  const [taskEvidence, setTaskEvidence] = useState('');
+  const [taskNote, setTaskNote] = useState('');
   const [dueDate, setDueDate] = useState('');
 
   const indicators = useMemo(
@@ -95,6 +76,48 @@ export const AssignmentsView = ({ userRole, mockData }: AssignmentsViewProps) =>
     ),
     [mockData]
   );
+
+  const periodOptions = useMemo(() => {
+    const years = Array.from(new Set(mockData.map(period => period.year)));
+    const visibleYears = years.length ? years : [new Date().getFullYear()];
+
+    return visibleYears.flatMap(year => [
+      { id: `${year}-periodo-1`, label: `${year} - Periodo 1` },
+      { id: `${year}-periodo-2`, label: `${year} - Periodo 2` }
+    ]);
+  }, [mockData]);
+
+  const selectedIndicator = useMemo(
+    () => indicators.find(indicator => indicator.code === selectedIndicatorCode) || indicators[0],
+    [indicators, selectedIndicatorCode]
+  );
+
+  const selectedRequirement = useMemo(
+    () => selectedIndicator?.requirements.find(requirement => requirement.id === selectedRequirementId) || selectedIndicator?.requirements[0],
+    [selectedIndicator, selectedRequirementId]
+  );
+
+  const selectedPeriod = useMemo(
+    () => periodOptions.find(period => period.id === selectedPeriodId) || periodOptions[0],
+    [periodOptions, selectedPeriodId]
+  );
+
+  useEffect(() => {
+    if (!selectedIndicator && indicators[0]) {
+      setSelectedIndicatorCode(indicators[0].code);
+    }
+  }, [indicators, selectedIndicator]);
+
+  useEffect(() => {
+    if (!selectedIndicator) return;
+    if (selectedIndicator.requirements.some(requirement => requirement.id === selectedRequirementId)) return;
+    setSelectedRequirementId(selectedIndicator.requirements[0]?.id || '');
+  }, [selectedIndicator, selectedRequirementId]);
+
+  useEffect(() => {
+    if (selectedPeriodId || !periodOptions[0]) return;
+    setSelectedPeriodId(periodOptions[0].id);
+  }, [periodOptions, selectedPeriodId]);
 
   if (userRole !== 'ADMIN' && userRole !== 'COORDINADOR') {
     return null;
@@ -120,29 +143,51 @@ export const AssignmentsView = ({ userRole, mockData }: AssignmentsViewProps) =>
 
     setTeachers([teacher, ...teachers]);
     setSelectedTeacherId(teacher.id);
+    setSelectedTeacherIds(previous => [teacher.id, ...previous]);
     setTeacherName('');
     setTeacherEmail('');
     setTeacherArea('');
   };
 
-  const handleCreateTask = () => {
-    const teacher = teachers.find(item => item.id === selectedTeacherId);
-    if (!teacher || !taskTitle.trim() || !taskEvidence.trim() || !dueDate) return;
+  const toggleTeacherSelection = (teacherId: string) => {
+    setSelectedTeacherIds(previous =>
+      previous.includes(teacherId)
+        ? previous.filter(id => id !== teacherId)
+        : [...previous, teacherId]
+    );
+  };
 
-    const task: TeacherTask = {
+  const getAssignedTeachers = () => {
+    if (assignmentMode === 'ALL') return teachers;
+    if (assignmentMode === 'MULTIPLE') {
+      return teachers.filter(teacher => selectedTeacherIds.includes(teacher.id));
+    }
+    return teachers.filter(teacher => teacher.id === selectedTeacherId);
+  };
+
+  const handleCreateTask = () => {
+    const assignedTeachers = getAssignedTeachers();
+    if (!assignedTeachers.length || !taskTitle.trim() || !selectedIndicator || !selectedRequirement || !selectedPeriod || !dueDate) return;
+
+    const task: Assignment = {
       id: crypto.randomUUID(),
-      teacherId: teacher.id,
-      teacherName: teacher.name,
       title: taskTitle.trim(),
-      indicatorCode: selectedIndicatorCode,
-      evidenceLabel: taskEvidence.trim(),
+      periodId: selectedPeriod.id,
+      periodLabel: selectedPeriod.label,
+      indicatorCode: selectedIndicator.code,
+      requirementId: selectedRequirement.id,
+      requirementLabel: selectedRequirement.label,
+      assignedTeacherIds: assignedTeachers.map(teacher => teacher.id),
+      assignedTeacherNames: assignedTeachers.map(teacher => teacher.name),
+      assignmentMode,
       dueDate,
-      status: 'Nueva'
+      state: 'CREAR',
+      note: taskNote.trim() || undefined
     };
 
-    setTasks([task, ...tasks]);
+    createAssignment(task);
     setTaskTitle('');
-    setTaskEvidence('');
+    setTaskNote('');
     setDueDate('');
   };
 
@@ -204,7 +249,7 @@ export const AssignmentsView = ({ userRole, mockData }: AssignmentsViewProps) =>
         <div>
           <h2 className="text-2xl font-black text-slate-800 tracking-tight leading-tight">Docentes y tareas</h2>
           <p className="text-xs font-bold uppercase tracking-widest text-slate-400 mt-1">
-            El coordinador crea docentes, indicadores, evidencias y tareas.
+            El coordinador crea docentes y tareas locales de apoyo.
           </p>
         </div>
       </div>
@@ -234,18 +279,69 @@ export const AssignmentsView = ({ userRole, mockData }: AssignmentsViewProps) =>
           </div>
 
           <div className="mt-5 space-y-3">
-            <select value={selectedTeacherId} onChange={event => setSelectedTeacherId(event.target.value)} className="w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold outline-none focus:border-blue-300 focus:bg-white">
-              {teachers.map(teacher => <option key={teacher.id} value={teacher.id}>{teacher.name}</option>)}
+            <div className="grid grid-cols-3 gap-2">
+              {[
+                { value: 'SINGLE', label: 'Un docente' },
+                { value: 'MULTIPLE', label: 'Varios' },
+                { value: 'ALL', label: 'Todos' }
+              ].map(option => (
+                <button
+                  key={option.value}
+                  type="button"
+                  onClick={() => setAssignmentMode(option.value as AssignmentMode)}
+                  className={`rounded-lg border px-3 py-2 text-[10px] font-black uppercase tracking-widest ${assignmentMode === option.value ? 'border-emerald-500 bg-emerald-50 text-emerald-700' : 'border-slate-200 bg-white text-slate-500 hover:bg-slate-50'}`}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+
+            {assignmentMode === 'SINGLE' && (
+              <select value={selectedTeacherId} onChange={event => setSelectedTeacherId(event.target.value)} className="w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold outline-none focus:border-blue-300 focus:bg-white">
+                {teachers.map(teacher => <option key={teacher.id} value={teacher.id}>{teacher.name}</option>)}
+              </select>
+            )}
+
+            {assignmentMode === 'MULTIPLE' && (
+              <div className="rounded-lg border border-slate-200 bg-slate-50 p-3">
+                <p className="mb-2 text-[10px] font-black uppercase tracking-widest text-slate-400">Docentes asignados</p>
+                <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                  {teachers.map(teacher => (
+                    <label key={teacher.id} className="flex items-center gap-2 rounded-md bg-white px-3 py-2 text-xs font-bold text-slate-600 border border-slate-100">
+                      <input
+                        type="checkbox"
+                        checked={selectedTeacherIds.includes(teacher.id)}
+                        onChange={() => toggleTeacherSelection(teacher.id)}
+                        className="h-4 w-4 rounded border-slate-300"
+                      />
+                      {teacher.name}
+                    </label>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {assignmentMode === 'ALL' && (
+              <div className="rounded-lg border border-emerald-100 bg-emerald-50 px-4 py-3 text-xs font-bold text-emerald-700">
+                Se asignara a los {teachers.length} docentes registrados actualmente en esta vista.
+              </div>
+            )}
+
+            <select value={selectedPeriodId} onChange={event => setSelectedPeriodId(event.target.value)} className="w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold outline-none focus:border-blue-300 focus:bg-white">
+              {periodOptions.map(period => <option key={period.id} value={period.id}>{period.label}</option>)}
             </select>
             <select value={selectedIndicatorCode} onChange={event => setSelectedIndicatorCode(event.target.value)} className="w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold outline-none focus:border-blue-300 focus:bg-white">
               {indicators.map(indicator => <option key={indicator.code} value={indicator.code}>{indicator.code} - {indicator.name}</option>)}
             </select>
+            <select value={selectedRequirementId} onChange={event => setSelectedRequirementId(event.target.value)} className="w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold outline-none focus:border-blue-300 focus:bg-white">
+              {selectedIndicator?.requirements.map(requirement => <option key={requirement.id} value={requirement.id}>{requirement.label}</option>)}
+            </select>
             <input value={taskTitle} onChange={event => setTaskTitle(event.target.value)} placeholder="Titulo de la tarea" className="w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold outline-none focus:border-blue-300 focus:bg-white" />
-            <input value={taskEvidence} onChange={event => setTaskEvidence(event.target.value)} placeholder="Evidencia solicitada" className="w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold outline-none focus:border-blue-300 focus:bg-white" />
+            <textarea value={taskNote} onChange={event => setTaskNote(event.target.value)} placeholder="Nota opcional para el docente" rows={3} className="w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold outline-none focus:border-blue-300 focus:bg-white" />
             <input type="date" value={dueDate} onChange={event => setDueDate(event.target.value)} className="w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold outline-none focus:border-blue-300 focus:bg-white" />
             <button onClick={handleCreateTask} className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-emerald-600 px-5 py-3 text-xs font-black uppercase tracking-widest text-white hover:bg-emerald-700">
               <Smartphone className="h-4 w-4" />
-              Publicar para app movil
+              Guardar tarea local
             </button>
           </div>
         </section>
@@ -280,22 +376,31 @@ export const AssignmentsView = ({ userRole, mockData }: AssignmentsViewProps) =>
             <h3 className="text-sm font-black uppercase tracking-tight text-slate-800">Tareas enviadas</h3>
           </div>
           <div className="space-y-3">
-            {tasks.map(task => (
+            {assignments.map(task => (
               <div key={task.id} className="rounded-lg border border-slate-200 bg-slate-50 p-4">
                 <p className="text-sm font-black text-slate-800">{task.title}</p>
                 <p className="mt-1 text-xs text-slate-500">
-                  {task.teacherName} - Indicador {task.indicatorCode} - {task.evidenceLabel}
+                  {task.assignedTeacherNames.join(', ')} - Indicador {task.indicatorCode} - {task.requirementLabel}
                 </p>
+                <p className="mt-1 text-xs text-slate-500">{task.periodLabel}</p>
                 <div className="mt-3 flex flex-wrap gap-2">
                   <span className="rounded-md bg-white px-2.5 py-1 text-[10px] font-black uppercase tracking-widest text-slate-500 border border-slate-200">
                     Entrega {task.dueDate}
                   </span>
+                  <span className="rounded-md bg-white px-2.5 py-1 text-[10px] font-black uppercase tracking-widest text-slate-500 border border-slate-200">
+                    {task.state}
+                  </span>
                   <span className="rounded-md bg-white px-2.5 py-1 text-[10px] font-black uppercase tracking-widest text-blue-700 border border-blue-100">
-                    Visible en movil
+                    Apoyo para prototipo movil
                   </span>
                 </div>
               </div>
             ))}
+            {!assignments.length && (
+              <div className="rounded-lg border border-dashed border-slate-200 bg-slate-50 p-4 text-xs font-bold text-slate-400">
+                Todavia no hay tareas guardadas en este navegador.
+              </div>
+            )}
           </div>
         </section>
       </div>
