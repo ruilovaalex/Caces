@@ -24,7 +24,13 @@ import { useAssignments } from '../hooks/useAssignments';
 
 import { getIndicatorCurrentStatus } from '../utils/progressUtils';
 import { getReadableAllowedFormats, isFileAllowedForRequirement } from '../utils/evidenceFormatUtils';
-import { canUserAssign, canUserDelete, canUserUpload } from '../utils/permissions';
+import {
+  canAccessAssignments,
+  canAccessRepository,
+  canAccessTemplates,
+  canUserDelete,
+  canUserUpload
+} from '../utils/permissions';
 import { viewTransition } from '../utils/animations';
 import { getAcademicPeriodsForYear } from '../utils/academicPeriodUtils';
 import { Indicator, Requirement, Status } from '../types';
@@ -79,7 +85,7 @@ export default function App() {
   useAssignments();
 
   useEffect(() => {
-    if (userRole === 'ADMIN') {
+    if (userRole === 'DOCENTE') {
       setIsEditorOpen(false);
       setIsUploadOpen(false);
       setIsHistoryOpen(false);
@@ -87,20 +93,35 @@ export default function App() {
       setIsTemplatesOpen(false);
       setActiveRequirement(null);
       setSelectedIndicator(null);
-      setIsAssignmentsOpen(true);
+      setIsAssignmentsOpen(false);
       return;
     }
 
-    if (userRole === 'EVALUADOR') {
-      setIsEditorOpen(false);
-      setIsUploadOpen(false);
-      setIsHistoryOpen(false);
-      setIsChecklistOpen(false);
-      setIsTemplatesOpen(false);
-      setActiveRequirement(null);
+    if (!canAccessAssignments(userRole) && isAssignmentsOpen) {
       setIsAssignmentsOpen(false);
     }
-  }, [setSelectedIndicator, userRole]);
+
+    if (!canAccessTemplates(userRole) && isTemplatesOpen) {
+      setIsTemplatesOpen(false);
+    }
+
+    if (!canAccessRepository(userRole)) {
+      setIsChecklistOpen(false);
+      setSelectedIndicator(null);
+    }
+
+    if (!canUserUpload(userRole)) {
+      setIsEditorOpen(false);
+      setIsUploadOpen(false);
+      setActiveRequirement(null);
+    }
+
+    if (userRole === 'EVALUADOR') {
+      setIsHistoryOpen(false);
+      setIsTemplatesOpen(false);
+      setIsAssignmentsOpen(false);
+    }
+  }, [isAssignmentsOpen, isTemplatesOpen, setSelectedIndicator, userRole]);
 
   const handleIndicatorSelect = useCallback((indicator: Indicator) => {
     setIsChecklistOpen(false);
@@ -121,7 +142,7 @@ export default function App() {
   }, [setSelectedIndicator]);
 
   const handleOpenTemplates = useCallback(() => {
-    if (userRole !== 'ADMIN' && userRole !== 'COORDINADOR') return;
+    if (!canAccessTemplates(userRole)) return;
     setIsEditorOpen(false);
     setIsUploadOpen(false);
     setIsHistoryOpen(false);
@@ -133,7 +154,7 @@ export default function App() {
   }, [setSelectedIndicator, userRole]);
 
   const handleOpenAssignments = useCallback(() => {
-    if (userRole !== 'ADMIN' && !canUserAssign(userRole)) return;
+    if (!canAccessAssignments(userRole)) return;
     setIsEditorOpen(false);
     setIsUploadOpen(false);
     setIsHistoryOpen(false);
@@ -237,12 +258,13 @@ export default function App() {
     }
   };
 
-  const canAccessAssignments = userRole === 'ADMIN' || canUserAssign(userRole);
+  const canOpenAssignments = canAccessAssignments(userRole);
+  const canOpenRepository = canAccessRepository(userRole);
   const activeView = selectedIndicator
     ? 'indicator'
     : isTemplatesOpen
       ? 'templates'
-    : isAssignmentsOpen && canAccessAssignments
+    : isAssignmentsOpen && canOpenAssignments
       ? 'assignments'
       : isChecklistOpen
         ? 'checklist'
@@ -306,7 +328,7 @@ export default function App() {
         ) : (
           <div className="flex-1 overflow-y-auto p-8 bg-[#f4f6f9]">
             <AnimatePresence mode="wait">
-              {!selectedIndicator && !isChecklistOpen && !isTemplatesOpen && (!isAssignmentsOpen || !canAccessAssignments) && (
+              {!selectedIndicator && canOpenRepository && !isChecklistOpen && !isTemplatesOpen && (!isAssignmentsOpen || !canOpenAssignments) && (
                 <motion.div key="dashboard" variants={viewTransition} initial="initial" animate="animate" exit="exit">
                   <Dashboard
                     mockData={mockData}
@@ -315,12 +337,12 @@ export default function App() {
                     onViewChecklist={() => setIsChecklistOpen(true)}
                     onOpenCriterionSubCriteria={openCriterionSubCriteria}
                     onOpenAssignments={handleOpenAssignments}
-                    canManageAssignments={canUserAssign(userRole)}
+                    canManageAssignments={canOpenAssignments}
                   />
                 </motion.div>
               )}
 
-              {!selectedIndicator && isChecklistOpen && !isAssignmentsOpen && !isTemplatesOpen && (
+              {!selectedIndicator && canOpenRepository && isChecklistOpen && !isAssignmentsOpen && !isTemplatesOpen && (
                 <motion.div key="checklist" variants={viewTransition} initial="initial" animate="animate" exit="exit">
                   <ChecklistView
                     mockData={mockData}
@@ -330,19 +352,19 @@ export default function App() {
                 </motion.div>
               )}
 
-              {!selectedIndicator && isTemplatesOpen && (
+              {!selectedIndicator && isTemplatesOpen && canAccessTemplates(userRole) && (
                 <motion.div key="templates" variants={viewTransition} initial="initial" animate="animate" exit="exit">
                   <TemplatesView />
                 </motion.div>
               )}
 
-              {!selectedIndicator && isAssignmentsOpen && canAccessAssignments && !isTemplatesOpen && (
+              {!selectedIndicator && isAssignmentsOpen && canOpenAssignments && !isTemplatesOpen && (
                 <motion.div key="assignments" variants={viewTransition} initial="initial" animate="animate" exit="exit">
                   <AssignmentsView userRole={userRole} mockData={mockData} />
                 </motion.div>
               )}
 
-              {selectedIndicator && (
+              {selectedIndicator && canOpenRepository && (
                 <motion.div
                   key="indicator"
                   variants={viewTransition}

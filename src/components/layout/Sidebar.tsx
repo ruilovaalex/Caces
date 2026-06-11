@@ -11,6 +11,7 @@ import { AnimatePresence, motion } from 'motion/react';
 import { Indicator, UserRole, YearPeriod } from '../../types';
 import { getAcademicPeriodsForYear } from '../../utils/academicPeriodUtils';
 import { fadeInRight, slideDown, staggerContainerFast } from '../../utils/animations';
+import { canAccessAssignments, canAccessRepository, canAccessTemplates } from '../../utils/permissions';
 
 interface SidebarProps {
   mockData: YearPeriod[];
@@ -49,6 +50,9 @@ export const Sidebar = ({
     activeView === 'dashboard' || activeView === 'indicator' || activeView === 'checklist';
   const isTemplatesActive = activeView === 'templates';
   const isAssignmentsActive = activeView === 'assignments';
+  const canOpenRepository = canAccessRepository(userRole);
+  const canOpenTemplates = canAccessTemplates(userRole);
+  const canOpenAssignments = canAccessAssignments(userRole);
 
   const roleNames: Record<UserRole, string> = {
     ADMIN: 'Admin Sudamericano',
@@ -92,7 +96,7 @@ export const Sidebar = ({
         animate="animate"
         className="p-4 border-b border-[#e2e8f0] space-y-2"
       >
-        {(userRole === 'COORDINADOR' || userRole === 'EVALUADOR') && (
+        {canOpenRepository && (
           <motion.button
             variants={fadeInRight}
             whileHover={
@@ -125,7 +129,7 @@ export const Sidebar = ({
           </motion.button>
         )}
 
-        {(userRole === 'ADMIN' || userRole === 'COORDINADOR') && (
+        {canOpenTemplates && (
           <motion.button
             variants={fadeInRight}
             whileHover={
@@ -158,7 +162,7 @@ export const Sidebar = ({
           </motion.button>
         )}
 
-        {(userRole === 'ADMIN' || userRole === 'COORDINADOR') && (
+        {canOpenAssignments && (
           <motion.button
             variants={fadeInRight}
             whileHover={
@@ -192,7 +196,7 @@ export const Sidebar = ({
         )}
       </motion.div>
 
-      {userRole === 'COORDINADOR' || userRole === 'EVALUADOR' ? (
+      {canOpenRepository ? (
         <nav
           className="flex-1 overflow-y-auto p-4 space-y-1 outline-none"
           onKeyDown={onKeyDown}
@@ -380,7 +384,7 @@ export const Sidebar = ({
           <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
             <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Administrador</p>
             <p className="mt-2 text-sm font-bold leading-relaxed text-slate-700">
-              Perfil limitado a crear roles. La gestion de docentes, indicadores y evidencias queda a cargo del coordinador.
+              Supervisa el repositorio, consulta plantillas y mantiene la base local de administracion. La edicion CACES queda desactivada en esta fase.
             </p>
           </div>
         </div>

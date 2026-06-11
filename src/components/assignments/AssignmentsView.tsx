@@ -67,7 +67,7 @@ const initialTasks: TeacherTask[] = [
 ];
 
 const roleDescriptions: Record<UserRole, string> = {
-  ADMIN: 'Crea y mantiene roles del sistema.',
+  ADMIN: 'Supervisa el sistema y mantiene la base local de roles en esta fase.',
   COORDINADOR: 'Crea docentes, indicadores, evidencias y tareas.',
   EVALUADOR: 'Revisa, observa, rechaza o valida evidencias.',
   DOCENTE: 'Prepara y entrega los soportes documentales asignados.'
@@ -157,9 +157,9 @@ export const AssignmentsView = ({ userRole, mockData }: AssignmentsViewProps) =>
               <Shield className="h-5 w-5" />
             </div>
             <div>
-              <h2 className="text-2xl font-black text-slate-800 tracking-tight leading-tight">Administracion de roles</h2>
+              <h2 className="text-2xl font-black text-slate-800 tracking-tight leading-tight">Administracion local del sistema</h2>
               <p className="text-xs font-bold uppercase tracking-widest text-slate-400 mt-1">
-                El administrador solo crea roles del sistema.
+                Base de supervision del prototipo. La edicion de criterios, indicadores y evidencias CACES sigue desactivada.
               </p>
             </div>
           </div>
@@ -176,7 +176,7 @@ export const AssignmentsView = ({ userRole, mockData }: AssignmentsViewProps) =>
               className="inline-flex items-center justify-center gap-2 rounded-lg bg-slate-900 px-5 py-3 text-xs font-black uppercase tracking-widest text-white hover:bg-slate-800"
             >
               <Plus className="h-4 w-4" />
-              Crear rol
+              Registrar rol local
             </button>
           </div>
 
