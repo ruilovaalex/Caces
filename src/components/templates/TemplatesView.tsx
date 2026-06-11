@@ -12,6 +12,17 @@ import {
 import { motion } from 'motion/react';
 import { MOCK_DATA } from '../../data/cacesMockData';
 import { TEMPLATES } from '../../data/templates';
+import { FileContentService } from '../../services/fileContentService';
+
+interface OfficialTemplate {
+  id: string;
+  name: string;
+  description: string;
+  fileName: string;
+  fileType: string;
+  uploadDate: string;
+  linkedRequirements: string[];
+}
 
 const categories = [
   {
@@ -63,6 +74,14 @@ const featuredIds = ['acta', 'informe', 'registro', 'plan'];
 export const TemplatesView = () => {
   const [query, setQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState<string>('');
+  const [officialTemplates, setOfficialTemplates] = useState<OfficialTemplate[]>([]);
+
+  React.useEffect(() => {
+    const saved = localStorage.getItem('edusudamericano_official_templates_v1');
+    if (saved) {
+      setOfficialTemplates(JSON.parse(saved));
+    }
+  }, []);
 
   const activeCategoryData = categories.find(category => category.id === activeCategory);
 
@@ -108,6 +127,25 @@ export const TemplatesView = () => {
     anchor.download = `plantilla-${template.id}.txt`;
     anchor.click();
     URL.revokeObjectURL(url);
+  };
+
+  const handleDownloadOfficial = async (template: OfficialTemplate) => {
+    try {
+      const blob = await FileContentService.get(`official_template_${template.id}`);
+      if (!blob) {
+        alert('El archivo de la plantilla no se encontró en la base de datos local.');
+        return;
+      }
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement('a');
+      anchor.href = url;
+      anchor.download = template.fileName;
+      anchor.click();
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error al descargar plantilla oficial', error);
+      alert('Hubo un error al intentar descargar el archivo.');
+    }
   };
 
   return (
@@ -166,11 +204,44 @@ export const TemplatesView = () => {
         </div>
       </section>
 
+      {!query && activeCategory === '' && officialTemplates.length > 0 && (
+        <section className="space-y-4">
+          <div className="flex items-center gap-2">
+            <Star className="h-4 w-4 fill-indigo-600 text-indigo-600" />
+            <h2 className="text-xs font-black uppercase tracking-[0.24em] text-slate-500">Plantillas Oficiales de Admin</h2>
+          </div>
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+            {officialTemplates.map(template => (
+              <article key={template.id} className="flex min-h-[190px] flex-col rounded-[24px] border border-indigo-200 bg-white p-5 shadow-sm">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-indigo-50 text-indigo-600">
+                    <FileText className="h-5 w-5" />
+                  </div>
+                  <span className="rounded-full bg-indigo-50 px-2.5 py-1 text-[9px] font-black uppercase tracking-[0.2em] text-indigo-700">
+                    OFICIAL
+                  </span>
+                </div>
+                <h3 className="mt-4 text-sm font-black text-slate-900">{template.name}</h3>
+                <p className="mt-2 flex-1 text-xs leading-relaxed text-slate-500 line-clamp-2">{template.description || 'Sin descripción'}</p>
+                <div className="mt-2 mb-2 text-[9px] text-slate-400">Archivo: {template.fileName}</div>
+                <button
+                  onClick={() => handleDownloadOfficial(template)}
+                  className="mt-2 inline-flex items-center gap-2 self-start rounded-full bg-indigo-600 px-4 py-2 text-[10px] font-black uppercase tracking-[0.18em] text-white transition-colors hover:bg-indigo-700"
+                >
+                  <Download className="h-3.5 w-3.5" />
+                  Descargar Real
+                </button>
+              </article>
+            ))}
+          </div>
+        </section>
+      )}
+
       {!query && activeCategory === '' && (
         <section className="space-y-4">
           <div className="flex items-center gap-2">
             <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
-            <h2 className="text-xs font-black uppercase tracking-[0.24em] text-slate-500">Plantillas mas utilizadas</h2>
+            <h2 className="text-xs font-black uppercase tracking-[0.24em] text-slate-500">Bases de texto sugeridas</h2>
           </div>
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
             {featuredTemplates.map(template => (

@@ -16,6 +16,9 @@ import {
   Upload,
   X,
   XCircle,
+  AlertCircle,
+  PlayCircle,
+  ChevronDown
 } from 'lucide-react';
 import { motion } from 'motion/react';
 import { Indicator, Requirement, Status, UploadedFile, UserRole } from '../../types';
@@ -62,6 +65,16 @@ export const EvidenceTable = ({
   const [guideRequirement, setGuideRequirement] = useState<Requirement | null>(null);
   const [previewFile, setPreviewFile] = useState<UploadedFile | null>(null);
   const [isTemplateLibraryOpen, setIsTemplateLibraryOpen] = useState(false);
+  const [expandedFolders, setExpandedFolders] = useState<Set<string>>(new Set());
+  
+  const CAREER_FOLDERS = [
+    { id: 'general', name: 'Institucional / General' },
+    { id: 'enfermeria', name: 'Enfermería' },
+    { id: 'desarrollo_software', name: 'Desarrollo de Software' },
+    { id: 'marketing', name: 'Marketing' },
+    { id: 'sistemas', name: 'Sistemas' }
+  ];
+
   const canUpload = canUserUpload(userRole);
   const isEvaluator = userRole === 'EVALUADOR';
 
@@ -306,75 +319,100 @@ export const EvidenceTable = ({
                       )}
                     </div>
 
-                    <div className="space-y-2">
-                      <div className="rounded-lg border border-slate-200 bg-white">
-                        <div className="flex items-center gap-3 border-b border-slate-100 px-4 py-3">
-                          <FolderOpen className={`h-4 w-4 ${files.length > 0 ? 'text-emerald-600' : 'text-blue-600'}`} />
-                          <p className="text-sm font-black text-slate-700">Archivos cargados</p>
-                          <span className="ml-auto text-xs font-bold text-slate-400">{files.length}</span>
-                        </div>
+                      <div className="space-y-2">
+                        <div className="space-y-4">
+                          {files.length > 0 ? (
+                          CAREER_FOLDERS.map(folder => {
+                            const folderFiles = files.filter(f => (f.folderId || 'general') === folder.id);
+                            if (folderFiles.length === 0) return null;
+                            const isExpanded = expandedFolders.has(folder.id);
 
-                        {files.length > 0 ? (
-                          <div className="divide-y divide-slate-100">
-                            {files.map(file => (
-                              <div
-                                key={file.id}
-                                className="flex items-center gap-3 px-4 py-3 transition-colors hover:bg-blue-50"
-                              >
+                            return (
+                              <div key={folder.id} className="rounded-lg border border-slate-200 bg-white overflow-hidden">
                                 <button
-                                  onClick={() => setPreviewFile(file)}
-                                  className="flex min-w-0 flex-1 items-center gap-3 text-left"
-                                  title="Visualizar archivo"
+                                  onClick={() => {
+                                    setExpandedFolders(prev => {
+                                      const next = new Set(prev);
+                                      if (next.has(folder.id)) next.delete(folder.id);
+                                      else next.add(folder.id);
+                                      return next;
+                                    });
+                                  }}
+                                  className="w-full flex items-center justify-between px-4 py-3 bg-slate-50 border-b border-slate-100 hover:bg-slate-100 transition-colors"
                                 >
-                                  <span className="relative shrink-0">
-                                    <FileText className="h-4 w-4 text-emerald-600" />
-                                    <CheckCircle2 className="absolute -bottom-1 -right-1 h-2.5 w-2.5 rounded-full bg-white text-emerald-600" />
-                                  </span>
-                                  <div className="min-w-0 flex-1">
-                                    <p className="truncate text-sm font-bold text-slate-700">{file.fileName}</p>
-                                    <p className="mt-0.5 text-[10px] text-slate-400">
-                                      v{file.version} · {file.uploadDate} · {file.uploadedBy}
-                                    </p>
+                                  <div className="flex items-center gap-3">
+                                    <FolderOpen className="h-4 w-4 text-emerald-600" />
+                                    <p className="text-sm font-black text-slate-700">{folder.name}</p>
+                                    <span className="text-xs font-bold text-slate-400 bg-white px-2 py-0.5 rounded-md border border-slate-200">{folderFiles.length} archivos</span>
                                   </div>
+                                  <ChevronDown className={`h-4 w-4 text-slate-400 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
                                 </button>
 
-                                <EvidenceStatusBadge status={file.status} />
+                                {isExpanded && (
+                                  <div className="divide-y divide-slate-100">
+                                    {folderFiles.map(file => (
+                                      <div
+                                        key={file.id}
+                                        className="flex items-center gap-3 px-4 py-3 transition-colors hover:bg-blue-50"
+                                      >
+                                        <button
+                                          onClick={() => setPreviewFile(file)}
+                                          className="flex min-w-0 flex-1 items-center gap-3 text-left"
+                                          title="Visualizar archivo"
+                                        >
+                                          <span className="relative shrink-0">
+                                            <FileText className="h-4 w-4 text-emerald-600" />
+                                            <CheckCircle2 className="absolute -bottom-1 -right-1 h-2.5 w-2.5 rounded-full bg-white text-emerald-600" />
+                                          </span>
+                                          <div className="min-w-0 flex-1">
+                                            <p className="truncate text-sm font-bold text-slate-700">{file.fileName}</p>
+                                            <p className="mt-0.5 text-[10px] text-slate-400">
+                                              v{file.version} · {file.uploadDate} · {file.uploadedBy}
+                                            </p>
+                                          </div>
+                                        </button>
 
-                                {isEvaluator && (
-                                  <div className="flex shrink-0 items-center gap-2">
-                                    <button
-                                      onClick={() => setPreviewFile(file)}
-                                      className="inline-flex items-center gap-2 rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-[10px] font-black uppercase tracking-widest text-blue-700 hover:bg-blue-600 hover:text-white"
-                                      title="Visualizar archivo subido"
-                                    >
-                                      <Eye className="h-3.5 w-3.5" />
-                                      Visualizar
-                                    </button>
-                                    <button
-                                      onClick={() => confirmFile(file)}
-                                      disabled={file.status === 'Validado'}
-                                      className="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-3 py-2 text-[10px] font-black uppercase tracking-widest text-white hover:bg-emerald-700 disabled:cursor-not-allowed disabled:bg-emerald-200"
-                                      title="Confirmar evidencia"
-                                    >
-                                      <CheckCircle2 className="h-3.5 w-3.5" />
-                                      Confirmar
-                                    </button>
-                                    <button
-                                      onClick={() => denyFile(file)}
-                                      disabled={file.status === 'Rechazado'}
-                                      className="inline-flex items-center gap-2 rounded-lg bg-rose-600 px-3 py-2 text-[10px] font-black uppercase tracking-widest text-white hover:bg-rose-700 disabled:cursor-not-allowed disabled:bg-rose-200"
-                                      title="Denegar evidencia"
-                                    >
-                                      <XCircle className="h-3.5 w-3.5" />
-                                      Denegar
-                                    </button>
+                                        <EvidenceStatusBadge status={file.status} />
+
+                                        {isEvaluator && (
+                                          <div className="flex shrink-0 items-center gap-2">
+                                            <button
+                                              onClick={() => setPreviewFile(file)}
+                                              className="inline-flex items-center gap-2 rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-[10px] font-black uppercase tracking-widest text-blue-700 hover:bg-blue-600 hover:text-white"
+                                              title="Visualizar archivo subido"
+                                            >
+                                              <Eye className="h-3.5 w-3.5" />
+                                              Visualizar
+                                            </button>
+                                            <button
+                                              onClick={() => confirmFile(file)}
+                                              disabled={file.status === 'Validado'}
+                                              className="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-3 py-2 text-[10px] font-black uppercase tracking-widest text-white hover:bg-emerald-700 disabled:cursor-not-allowed disabled:bg-emerald-200"
+                                              title="Confirmar evidencia"
+                                            >
+                                              <CheckCircle2 className="h-3.5 w-3.5" />
+                                              Confirmar
+                                            </button>
+                                            <button
+                                              onClick={() => denyFile(file)}
+                                              disabled={file.status === 'Rechazado'}
+                                              className="inline-flex items-center gap-2 rounded-lg bg-rose-600 px-3 py-2 text-[10px] font-black uppercase tracking-widest text-white hover:bg-rose-700 disabled:cursor-not-allowed disabled:bg-rose-200"
+                                              title="Denegar evidencia"
+                                            >
+                                              <XCircle className="h-3.5 w-3.5" />
+                                              Denegar
+                                            </button>
+                                          </div>
+                                        )}
+                                      </div>
+                                    ))}
                                   </div>
                                 )}
                               </div>
-                            ))}
-                          </div>
+                            );
+                          })
                         ) : (
-                          <div className="flex items-center gap-3 px-4 py-5 text-sm text-slate-400">
+                          <div className="rounded-lg border border-slate-200 bg-white flex items-center gap-3 px-4 py-5 text-sm text-slate-400">
                             <FileClock className="h-4 w-4" />
                             Todavia no hay archivos en esta evidencia.
                           </div>

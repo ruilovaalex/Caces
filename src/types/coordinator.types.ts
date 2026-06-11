@@ -42,3 +42,24 @@ export interface DraftHistoryEntry {
   version: number;
   changes: string;
 }
+
+export interface Coordinator {
+  id: string;
+  name: string;
+  email: string;
+  assignedIndicators: string[];
+}
+
+export interface TeacherAssignment {
+  indicatorCode: string;
+  requirementId: string;
+}
+
+export interface Teacher {
+  id: string;
+  name: string;
+  email: string;
+  specialty: string;
+  coordinatorId: string;
+  assignments: TeacherAssignment[];
+}

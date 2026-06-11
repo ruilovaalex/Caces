@@ -22,6 +22,15 @@ export const EvidenceHistoryModal = ({
 }: EvidenceHistoryModalProps) => {
   const [statusFilter, setStatusFilter] = useState<'Todos' | Status>('Todos');
   const [typeFilter, setTypeFilter] = useState('Todos');
+  const [folderFilter, setFolderFilter] = useState('Todos');
+
+  const CAREER_FOLDERS = [
+    { id: 'general', name: 'Institucional / General' },
+    { id: 'enfermeria', name: 'Enfermería' },
+    { id: 'desarrollo_software', name: 'Desarrollo de Software' },
+    { id: 'marketing', name: 'Marketing' },
+    { id: 'sistemas', name: 'Sistemas' }
+  ];
 
   const fileTypes = useMemo(() => {
     const normalizedTypes = files
@@ -33,13 +42,15 @@ export const EvidenceHistoryModal = ({
   const filteredFiles = useMemo(() => {
     return files.filter(file => {
       const normalizedType = getDisplayFileType(file.fileName, file.fileType);
+      const fileFolder = file.folderId || 'general';
 
       const matchesStatus = statusFilter === 'Todos' || file.status === statusFilter;
       const matchesType = typeFilter === 'Todos' || normalizedType === typeFilter;
+      const matchesFolder = folderFilter === 'Todos' || fileFolder === folderFilter;
 
-      return matchesStatus && matchesType;
+      return matchesStatus && matchesType && matchesFolder;
     });
-  }, [files, statusFilter, typeFilter]);
+  }, [files, statusFilter, typeFilter, folderFilter]);
 
   const handleDeleteFile = (file: UploadedFile) => {
     if (!onDeleteFile) return;
@@ -81,7 +92,7 @@ export const EvidenceHistoryModal = ({
               <Filter className="h-3.5 w-3.5" />
               Filtros del historial
             </div>
-            <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+            <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
               <label className="space-y-1">
                 <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Estado</span>
                 <select
@@ -108,6 +119,19 @@ export const EvidenceHistoryModal = ({
                   <option value="Todos">Todos los tipos</option>
                   {fileTypes.map(type => (
                     <option key={type} value={type}>{type}</option>
+                  ))}
+                </select>
+              </label>
+              <label className="space-y-1">
+                <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Carpeta</span>
+                <select
+                  value={folderFilter}
+                  onChange={event => setFolderFilter(event.target.value)}
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-bold text-slate-600 outline-none transition-colors focus:border-blue-300 focus:bg-white"
+                >
+                  <option value="Todos">Todas las carpetas</option>
+                  {CAREER_FOLDERS.map(folder => (
+                    <option key={folder.id} value={folder.id}>{folder.name}</option>
                   ))}
                 </select>
               </label>

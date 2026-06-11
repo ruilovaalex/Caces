@@ -2,7 +2,7 @@ import React, { useMemo, useState, useEffect } from 'react';
 import { Folder, ChevronRight, AlertCircle } from 'lucide-react';
 import { motion } from 'motion/react';
 import { YearPeriod, UploadedFile, Indicator } from '../../types';
-import { calculateIndicatorProgress } from '../../utils/progressUtils';
+import { calculateIndicatorProgress, getIndicatorStats } from '../../utils/progressUtils';
 import { staggerContainer, fadeInUp, hoverScale, tapScale, hoverCardLift, useCountUp } from '../../utils/animations';
 
 
@@ -54,20 +54,24 @@ export const Dashboard = ({
     [mockData]
   );
 
-  const subCriterionProgress = useMemo(() => {
-    const progressBySubCriterion = new Map<string, number>();
+  const subCriterionStats = useMemo(() => {
+    const statsBySub = new Map<string, { loaded: number, total: number, percent: number }>();
 
     mockData[0].criteria.forEach(criterion => {
       criterion.subCriteria.forEach(subCriterion => {
-        const progress = Math.round(
-          subCriterion.indicators.reduce((sum, indicator) => sum + calculateIndicatorProgress(indicator, allFiles), 0) /
-          (subCriterion.indicators.length || 1)
-        );
-        progressBySubCriterion.set(subCriterion.id, progress);
+        let loaded = 0;
+        let total = 0;
+        subCriterion.indicators.forEach(indicator => {
+          const stats = getIndicatorStats(indicator, allFiles);
+          loaded += stats.loaded;
+          total += stats.total;
+        });
+        const percent = total > 0 ? Math.round((loaded / total) * 100) : 0;
+        statsBySub.set(subCriterion.id, { loaded, total, percent });
       });
     });
 
-    return progressBySubCriterion;
+    return statsBySub;
   }, [allFiles, mockData]);
 
   const totalCount = useCountUp(dashboardStats.totalEvidences);
@@ -144,18 +148,18 @@ export const Dashboard = ({
               </p>
               <div className="space-y-4">
                  {crit.subCriteria.map(sub => {
-                   const subProgress = subCriterionProgress.get(sub.id) || 0;
+                   const stats = subCriterionStats.get(sub.id) || { loaded: 0, total: 0, percent: 0 };
                    return (
                      <div key={sub.id} className="space-y-2">
                        <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-wider">
                          <span className="text-[#64748b] truncate max-w-[80%]">{sub.name}</span>
-                         <span className="text-[#2563eb]">{subProgress}%</span>
+                         <span className="text-[#2563eb]">{stats.loaded}/{stats.total} ({stats.percent}%)</span>
                        </div>
                        <div className="w-full h-1.5 bg-[#f1f5f9] rounded-full overflow-hidden">
                          <motion.div 
                            className="h-full bg-[#22c55e] rounded-full" 
                            initial={{ width: '0%' }}
-                           whileInView={{ width: `${subProgress}%` }}
+                           whileInView={{ width: `${stats.percent}%` }}
                            viewport={{ once: true }}
                            transition={{ duration: 1.2, ease: "easeOut", delay: 0.2 + index * 0.1 }}
                          />

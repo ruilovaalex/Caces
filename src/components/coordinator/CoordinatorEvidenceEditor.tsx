@@ -155,143 +155,6 @@ export const CoordinatorEvidenceEditor = ({
     onUpdateEvidenceStatus(currentFile.id, status, reviewObservation.trim() || undefined);
   };
 
-  const normalizeFileName = useCallback((value: string) => value
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^a-zA-Z0-9]+/g, '_')
-    .replace(/^_+|_+$/g, '')
-    .toUpperCase(), []);
-
-  const escapeHtml = useCallback((value: string) => value
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;'), []);
-
-  const generatedFileName = useMemo(() => {
-    const generatedAt = new Date();
-    return [
-      'SIG',
-      'EV',
-      normalizeFileName(indicator.code),
-      normalizeFileName(requirement.id),
-      generatedAt.toISOString().slice(0, 10).replace(/-/g, '')
-    ].join('-');
-  }, [indicator.code, normalizeFileName, requirement.id]);
-
-  const buildGeneratedDocument = useCallback(() => {
-    if (!draft) return null;
-
-    const generatedAt = new Date();
-    const fileName = [
-      'SIG',
-      'EV',
-      normalizeFileName(indicator.code),
-      normalizeFileName(requirement.id),
-      generatedAt.toISOString().slice(0, 10).replace(/-/g, '')
-    ].join('-');
-
-    const sections = draft.sections.map((section, index) => `
-      <h2>${index + 1}. ${escapeHtml(section.title)}</h2>
-      <p>${escapeHtml(section.content || 'Contenido pendiente de completar.').replace(/\n/g, '<br />')}</p>
-    `).join('');
-
-    const html = `
-      <!doctype html>
-      <html>
-        <head>
-          <meta charset="utf-8" />
-          <title>${fileName}</title>
-          <style>
-            body { font-family: Arial, sans-serif; color: #1f2937; line-height: 1.55; margin: 44px; }
-            .brand { border-bottom: 3px solid #2563eb; padding-bottom: 16px; margin-bottom: 22px; }
-            .brand p { color: #64748b; font-size: 11px; font-weight: 700; letter-spacing: 1.4px; margin: 0 0 4px; text-transform: uppercase; }
-            h1 { font-size: 22px; margin: 0 0 8px; text-transform: uppercase; }
-            h2 { font-size: 15px; margin: 28px 0 8px; color: #0f172a; text-transform: uppercase; border-bottom: 1px solid #dbeafe; padding-bottom: 6px; }
-            p { font-size: 12px; margin: 0 0 10px; }
-            .meta { border: 1px solid #cbd5e1; padding: 14px; margin: 20px 0 24px; background: #f8fafc; }
-            .meta p { margin: 4px 0; }
-          </style>
-        </head>
-        <body>
-          <div class="brand">
-            <p>Instituto Superior Tecnologico Sudamericano</p>
-            <h1>Documento unico de evidencia</h1>
-            <p><strong>Codigo:</strong> ${fileName}</p>
-          </div>
-          <div class="meta">
-            <p><strong>Indicador:</strong> ${escapeHtml(indicator.code)} - ${escapeHtml(indicator.name)}</p>
-            <p><strong>Evidencia:</strong> ${escapeHtml(requirement.label)}</p>
-            <p><strong>Formato requerido:</strong> ${escapeHtml(requirement.format)}</p>
-            <p><strong>Generado por:</strong> ${escapeHtml(currentUserName)}</p>
-            <p><strong>Fecha:</strong> ${generatedAt.toLocaleString()}</p>
-          </div>
-          <h2>Descripcion de la evidencia</h2>
-          <p>${escapeHtml(requirement.description)}</p>
-          ${sections}
-        </body>
-      </html>
-    `;
-
-    return { fileName, html };
-  }, [
-    currentUserName,
-    draft,
-    escapeHtml,
-    indicator.code,
-    indicator.name,
-    normalizeFileName,
-    requirement.description,
-    requirement.format,
-    requirement.id,
-    requirement.label
-  ]);
-
-  const persistGeneratedDocument = (fileName: string, html: string) => {
-    EvidenceService.saveDoc({
-      id: crypto.randomUUID(),
-      indicatorCode: indicator.code,
-      requirementId: requirement.id,
-      requirementLabel: requirement.label,
-      templateId: draft?.templateId || `blank-${indicator.code}-${requirement.id}`,
-      content: html,
-      timestamp: new Date().toLocaleString(),
-      label: fileName,
-      fileName: `${fileName}.doc`,
-      fileType: 'DOC',
-      isUpload: false
-    });
-
-    if (draft) {
-      const updatedDraft = {
-        ...draft,
-        status: 'DOCUMENTO_GENERADO' as DraftStatus,
-        updatedAt: new Date().toISOString(),
-        updatedBy: currentUserName
-      };
-      DraftService.saveDraft(updatedDraft);
-      setDraft(updatedDraft);
-    }
-  };
-
-  const handleDownloadGeneratedDocument = () => {
-    const generatedDocument = buildGeneratedDocument();
-    if (!generatedDocument) return;
-
-    const blob = new Blob(['\ufeff', generatedDocument.html], {
-      type: 'application/msword;charset=utf-8'
-    });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `${generatedDocument.fileName}.doc`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-    persistGeneratedDocument(generatedDocument.fileName, generatedDocument.html);
-  };
 
   const completedSections = draft?.sections.filter(section => section.content.trim()).length || 0;
   const totalSections = draft?.sections.length || 0;
@@ -375,8 +238,7 @@ export const CoordinatorEvidenceEditor = ({
                   {[
                     { label: 'Plantilla', detail: draft ? 'Seleccionada' : 'Pendiente', icon: Layout, active: !draft },
                     { label: 'Redaccion', detail: draft ? `${completionPercent}% completo` : 'Crear borrador', icon: PenSquare, active: Boolean(draft && workspaceMode === 'compose') },
-                    { label: 'Vista previa', detail: draft ? 'Disponible' : 'Sin contenido', icon: Eye, active: workspaceMode === 'preview' },
-                    { label: 'Descarga', detail: draft ? generatedFileName : 'Formato unico', icon: FileDown, active: draft?.status === 'DOCUMENTO_GENERADO' }
+                    { label: 'Vista previa', detail: draft ? 'Disponible' : 'Sin contenido', icon: Eye, active: workspaceMode === 'preview' }
                   ].map(step => {
                     const StepIcon = step.icon;
                     return (
@@ -418,13 +280,13 @@ export const CoordinatorEvidenceEditor = ({
               </div>
               <div className="rounded-xl border border-slate-200 bg-white p-4">
                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                  {evaluatorMode ? 'Subida actual' : 'Formato unico'}
+                  Subida actual
                 </p>
                 <p className="mt-2 truncate text-sm font-bold text-slate-700">
-                  {evaluatorMode ? (currentFile?.fileName || 'Aun no se ha subido archivo') : (draft ? generatedFileName : 'SIG-EV-...')}
+                  {currentFile?.fileName || 'Aun no se ha subido archivo'}
                 </p>
                 <p className="mt-1 text-xs text-slate-400">
-                  {evaluatorMode ? (currentFile ? `Ultima carga: ${currentFile.uploadDate}` : 'Cuando se cargue una version, aparecera aqui.') : 'Nombre institucional generado por la app.'}
+                  {currentFile ? `Ultima carga: ${currentFile.uploadDate}` : 'Cuando se cargue una version, aparecera aqui.'}
                 </p>
               </div>
             </div>
@@ -519,8 +381,7 @@ export const CoordinatorEvidenceEditor = ({
                     <div className="mx-auto max-w-3xl rounded-sm bg-white p-10 shadow-xl ring-1 ring-slate-200">
                       <div className="border-b-4 border-blue-600 pb-4">
                         <p className="text-[10px] font-black uppercase tracking-[0.24em] text-slate-500">Instituto Superior Tecnologico Sudamericano</p>
-                        <h1 className="mt-2 text-xl font-black uppercase text-slate-900">Documento unico de evidencia</h1>
-                        <p className="mt-1 text-xs font-bold text-slate-500">Codigo: {generatedFileName}</p>
+                        <h1 className="mt-2 text-xl font-black uppercase text-slate-900">Borrador de evidencia</h1>
                       </div>
                       <div className="mt-6 rounded-xl border border-slate-200 bg-slate-50 p-4 text-xs text-slate-600">
                         <p><span className="font-black">Indicador:</span> {indicator.code} - {indicator.name}</p>
@@ -586,10 +447,6 @@ export const CoordinatorEvidenceEditor = ({
                 <button onClick={() => setWorkspaceMode('preview')} disabled={!draft} className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-5 py-3 text-xs font-black uppercase tracking-widest text-slate-600 shadow-sm transition-all hover:border-blue-300 hover:text-blue-600 disabled:cursor-not-allowed disabled:text-slate-300">
                   <Eye className="h-4 w-4" />
                   Vista previa
-                </button>
-                <button onClick={handleDownloadGeneratedDocument} disabled={!draft} className="flex items-center gap-3 px-8 py-3 bg-blue-600 text-white rounded-xl font-black text-sm uppercase tracking-widest shadow-xl shadow-blue-200 hover:bg-blue-700 transition-all disabled:cursor-not-allowed disabled:bg-slate-300 disabled:shadow-none">
-                  <FileDown className="w-5 h-5" />
-                  Descargar y guardar
                 </button>
               </div>
             )}

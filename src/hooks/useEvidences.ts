@@ -25,7 +25,8 @@ export const useEvidences = () => {
     indicator: Indicator,
     requirement: Requirement,
     userName: string,
-    observation?: string
+    observation?: string,
+    folderId?: string
   ) => {
     try {
       await EvidenceService.upload(file, {
@@ -33,6 +34,7 @@ export const useEvidences = () => {
         requirementId: requirement.id,
         requirementLabel: requirement.label,
         uploadedBy: userName,
+        folderId: folderId || 'general',
         observation
       });
       loadData();

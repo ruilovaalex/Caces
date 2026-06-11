@@ -34,15 +34,20 @@ export const EvidenceService = {
   upload: async (file: File, payload: UploadPayload): Promise<UploadedFile> => {
     const all = EvidenceService.getAll();
     
-    // Desactivar versiones anteriores del mismo requerimiento en ese indicador
+    // Desactivar versiones anteriores del mismo requerimiento en ese indicador Y carpeta
     const updated = all.map(f => {
-      if (f.indicatorCode === payload.indicatorCode && f.requirementId === payload.requirementId) {
+      if (
+        f.indicatorCode === payload.indicatorCode && 
+        f.requirementId === payload.requirementId &&
+        (f.folderId || 'general') === (payload.folderId || 'general')
+      ) {
         return { ...f, isCurrentVersion: false };
       }
       return f;
     });
 
-    const newVersion = EvidenceService.getByRequirement(payload.indicatorCode, payload.requirementId).length + 1;
+    const newVersion = EvidenceService.getByRequirement(payload.indicatorCode, payload.requirementId)
+      .filter(f => (f.folderId || 'general') === (payload.folderId || 'general')).length + 1;
 
     const fileId = crypto.randomUUID();
     const newFile: UploadedFile = {
@@ -55,6 +60,7 @@ export const EvidenceService = {
       fileSize: `${(file.size / 1024).toFixed(1)} KB`,
       uploadDate: new Date().toLocaleString(),
       uploadedBy: payload.uploadedBy,
+      folderId: payload.folderId,
       version: newVersion,
       status: 'Cargado',
       observation: payload.observation,
@@ -99,13 +105,18 @@ export const EvidenceService = {
     const requirementFiles = remaining
       .filter(file =>
         file.indicatorCode === evidenceToDelete.indicatorCode &&
-        file.requirementId === evidenceToDelete.requirementId
+        file.requirementId === evidenceToDelete.requirementId &&
+        (file.folderId || 'general') === (evidenceToDelete.folderId || 'general')
       )
       .sort((a, b) => b.version - a.version);
 
     const nextCurrentId = requirementFiles[0]?.id;
     const updated = remaining.map(file => {
-      if (file.indicatorCode !== evidenceToDelete.indicatorCode || file.requirementId !== evidenceToDelete.requirementId) {
+      if (
+        file.indicatorCode !== evidenceToDelete.indicatorCode || 
+        file.requirementId !== evidenceToDelete.requirementId ||
+        (file.folderId || 'general') !== (evidenceToDelete.folderId || 'general')
+      ) {
         return file;
       }
 

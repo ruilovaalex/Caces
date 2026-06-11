@@ -46,5 +46,5 @@ export const getIndicatorCurrentStatus = (indicator: Indicator, allFiles: Upload
   if (stats.observed > 0) return 'Observado';
   if (stats.valid === stats.total && stats.total > 0) return 'Validado';
   if (stats.loaded > 0) return 'Cargado';
-  return 'Pendiente';
+  return 'Falta';
 };

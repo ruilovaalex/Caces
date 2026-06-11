@@ -6,6 +6,8 @@ import {
   FilePlus2,
   FileText,
   Folder,
+  Users,
+  Settings
 } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 import { Indicator, UserRole, YearPeriod } from '../../types';
@@ -18,7 +20,7 @@ interface SidebarProps {
   expandedNodes: Set<string>;
   focusedNodeId: string | null;
   userRole: UserRole;
-  activeView: 'dashboard' | 'checklist' | 'assignments' | 'templates' | 'indicator';
+  activeView: 'dashboard' | 'checklist' | 'assignments' | 'templates' | 'indicator' | 'adminCoordinators' | 'adminCriteria' | 'adminTemplates' | 'coordinatorTeachers';
   onIndicatorSelect: (ind: Indicator) => void;
   onToggleNode: (id: string) => void;
   onSetFocusedNode: (id: string) => void;
@@ -27,6 +29,10 @@ interface SidebarProps {
   onOpenDashboard: () => void;
   onOpenTemplates: () => void;
   onOpenAssignments: () => void;
+  onOpenAdminCoordinators?: () => void;
+  onOpenAdminCriteria?: () => void;
+  onOpenAdminTemplates?: () => void;
+  onOpenCoordinatorTeachers?: () => void;
 }
 
 export const Sidebar = ({
@@ -44,11 +50,19 @@ export const Sidebar = ({
   onOpenDashboard,
   onOpenTemplates,
   onOpenAssignments,
+  onOpenAdminCoordinators,
+  onOpenAdminCriteria,
+  onOpenAdminTemplates,
+  onOpenCoordinatorTeachers,
 }: SidebarProps) => {
   const isRepositoryActive =
     activeView === 'dashboard' || activeView === 'indicator' || activeView === 'checklist';
   const isTemplatesActive = activeView === 'templates';
   const isAssignmentsActive = activeView === 'assignments';
+  const isAdminCoordinatorsActive = activeView === 'adminCoordinators';
+  const isAdminCriteriaActive = activeView === 'adminCriteria';
+  const isAdminTemplatesActive = activeView === 'adminTemplates';
+  const isCoordinatorTeachersActive = activeView === 'coordinatorTeachers';
 
   const roleNames: Record<UserRole, string> = {
     ADMIN: 'Admin Sudamericano',
@@ -149,7 +163,7 @@ export const Sidebar = ({
             }`}>
               <FilePlus2 className="w-4 h-4" />
             </span>
-            <span className="flex-1 text-left">2. Crear</span>
+            <span className="flex-1 text-left">2. Base de Plantillas</span>
             {isTemplatesActive && (
               <span className="rounded-full bg-[#2563eb] px-2.5 py-1 text-[9px] font-black uppercase tracking-[0.2em] text-white">
                 Actual
@@ -182,7 +196,7 @@ export const Sidebar = ({
             }`}>
               <ClipboardList className="w-4 h-4" />
             </span>
-            <span className="flex-1 text-left">{userRole === 'ADMIN' ? '3. Roles' : '3. Docentes y tareas'}</span>
+            <span className="flex-1 text-left">{userRole === 'ADMIN' ? '3. Roles' : '3. Tareas Genéricas'}</span>
             {isAssignmentsActive && (
               <span className="rounded-full bg-[#2563eb] px-2.5 py-1 text-[9px] font-black uppercase tracking-[0.2em] text-white">
                 Actual
@@ -190,9 +204,103 @@ export const Sidebar = ({
             )}
           </motion.button>
         )}
+
+        {userRole === 'COORDINADOR' && (
+          <motion.button
+            variants={fadeInRight}
+            whileHover={
+              isCoordinatorTeachersActive
+                ? { x: 4, boxShadow: '0 10px 24px rgba(37, 99, 235, 0.22)' }
+                : { x: 4, backgroundColor: 'rgba(244, 246, 249, 1)' }
+            }
+            onClick={onOpenCoordinatorTeachers}
+            className={`w-full flex items-center gap-3 px-3 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all border ${
+              isCoordinatorTeachersActive ? activeButtonStyles : inactiveButtonStyles
+            }`}
+          >
+            {isCoordinatorTeachersActive && <span className="absolute left-0 top-2 bottom-2 w-1.5 rounded-r-full bg-[#2563eb]" />}
+            <span className={`flex h-8 w-8 items-center justify-center rounded-xl transition-colors ${
+              isCoordinatorTeachersActive ? 'bg-[#2563eb] text-white shadow-sm shadow-blue-600/20' : 'bg-slate-100 text-slate-500'
+            }`}>
+              <Users className="w-4 h-4" />
+            </span>
+            <span className="flex-1 text-left">Mis Docentes</span>
+          </motion.button>
+        )}
+
+        {userRole === 'ADMIN' && (
+          <div className="pt-2 mt-2 border-t border-[#e2e8f0]">
+            <div className="text-[10px] font-bold text-[#94a3b8] uppercase tracking-widest px-2 mb-2">
+              Administración
+            </div>
+            
+            <motion.button
+              variants={fadeInRight}
+              whileHover={
+                isAdminCoordinatorsActive
+                  ? { x: 4, boxShadow: '0 10px 24px rgba(37, 99, 235, 0.22)' }
+                  : { x: 4, backgroundColor: 'rgba(244, 246, 249, 1)' }
+              }
+              onClick={onOpenAdminCoordinators}
+              className={`w-full flex items-center gap-3 px-3 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all border mb-2 ${
+                isAdminCoordinatorsActive ? activeButtonStyles : inactiveButtonStyles
+              }`}
+            >
+              {isAdminCoordinatorsActive && <span className="absolute left-0 top-2 bottom-2 w-1.5 rounded-r-full bg-[#2563eb]" />}
+              <span className={`flex h-8 w-8 items-center justify-center rounded-xl transition-colors ${
+                isAdminCoordinatorsActive ? 'bg-[#2563eb] text-white shadow-sm shadow-blue-600/20' : 'bg-slate-100 text-slate-500'
+              }`}>
+                <Users className="w-4 h-4" />
+              </span>
+              <span className="flex-1 text-left">Gestión de Coordinadores</span>
+            </motion.button>
+
+            <motion.button
+              variants={fadeInRight}
+              whileHover={
+                isAdminCriteriaActive
+                  ? { x: 4, boxShadow: '0 10px 24px rgba(37, 99, 235, 0.22)' }
+                  : { x: 4, backgroundColor: 'rgba(244, 246, 249, 1)' }
+              }
+              onClick={onOpenAdminCriteria}
+              className={`w-full flex items-center gap-3 px-3 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all border mb-2 ${
+                isAdminCriteriaActive ? activeButtonStyles : inactiveButtonStyles
+              }`}
+            >
+              {isAdminCriteriaActive && <span className="absolute left-0 top-2 bottom-2 w-1.5 rounded-r-full bg-[#2563eb]" />}
+              <span className={`flex h-8 w-8 items-center justify-center rounded-xl transition-colors ${
+                isAdminCriteriaActive ? 'bg-[#2563eb] text-white shadow-sm shadow-blue-600/20' : 'bg-slate-100 text-slate-500'
+              }`}>
+                <Settings className="w-4 h-4" />
+              </span>
+              <span className="flex-1 text-left">Estructura CACES</span>
+            </motion.button>
+
+            <motion.button
+              variants={fadeInRight}
+              whileHover={
+                isAdminTemplatesActive
+                  ? { x: 4, boxShadow: '0 10px 24px rgba(37, 99, 235, 0.22)' }
+                  : { x: 4, backgroundColor: 'rgba(244, 246, 249, 1)' }
+              }
+              onClick={onOpenAdminTemplates}
+              className={`w-full flex items-center gap-3 px-3 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all border mb-2 ${
+                isAdminTemplatesActive ? activeButtonStyles : inactiveButtonStyles
+              }`}
+            >
+              {isAdminTemplatesActive && <span className="absolute left-0 top-2 bottom-2 w-1.5 rounded-r-full bg-[#2563eb]" />}
+              <span className={`flex h-8 w-8 items-center justify-center rounded-xl transition-colors ${
+                isAdminTemplatesActive ? 'bg-[#2563eb] text-white shadow-sm shadow-blue-600/20' : 'bg-slate-100 text-slate-500'
+              }`}>
+                <FilePlus2 className="w-4 h-4" />
+              </span>
+              <span className="flex-1 text-left">Plantillas Oficiales</span>
+            </motion.button>
+          </div>
+        )}
       </motion.div>
 
-      {userRole === 'COORDINADOR' || userRole === 'EVALUADOR' ? (
+      {userRole === 'ADMIN' || userRole === 'COORDINADOR' || userRole === 'EVALUADOR' ? (
         <nav
           className="flex-1 overflow-y-auto p-4 space-y-1 outline-none"
           onKeyDown={onKeyDown}

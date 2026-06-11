@@ -14,6 +14,10 @@ import { CoordinatorEvidenceEditor } from '../components/coordinator/Coordinator
 import { AssignmentsView } from '../components/assignments/AssignmentsView';
 import { DocenteView } from '../components/docente/DocenteView';
 import { TemplatesView } from '../components/templates/TemplatesView';
+import { AdminCoordinatorsPanel } from '../components/admin/AdminCoordinatorsPanel';
+import { AdminCriteriaManager } from '../components/admin/AdminCriteriaManager';
+import { AdminTemplatesUploader } from '../components/admin/AdminTemplatesUploader';
+import { CoordinatorTeachersPanel } from '../components/coordinator/CoordinatorTeachersPanel';
 
 import { useAuth } from '../hooks/useAuth';
 import { useIndicators } from '../hooks/useIndicators';
@@ -27,7 +31,8 @@ import { getReadableAllowedFormats, isFileAllowedForRequirement } from '../utils
 import { canUserAssign, canUserDelete, canUserUpload } from '../utils/permissions';
 import { viewTransition } from '../utils/animations';
 import { getAcademicPeriodsForYear } from '../utils/academicPeriodUtils';
-import { Indicator, Requirement, Status } from '../types';
+import { Indicator, Requirement, Status, Teacher } from '../types';
+import { MOCK_DATA } from '../data/cacesMockData';
 
 export default function App() {
   const { isAuthenticated, userRole, login, logout, switchRole, user } = useAuth();
@@ -50,6 +55,10 @@ export default function App() {
   const [isChecklistOpen, setIsChecklistOpen] = useState(false);
   const [isAssignmentsOpen, setIsAssignmentsOpen] = useState(false);
   const [isTemplatesOpen, setIsTemplatesOpen] = useState(false);
+  const [isAdminCoordinatorsOpen, setIsAdminCoordinatorsOpen] = useState(false);
+  const [isAdminCriteriaOpen, setIsAdminCriteriaOpen] = useState(false);
+  const [isAdminTemplatesOpen, setIsAdminTemplatesOpen] = useState(false);
+  const [isCoordinatorTeachersOpen, setIsCoordinatorTeachersOpen] = useState(false);
 
   const {
     allFiles,
@@ -71,7 +80,9 @@ export default function App() {
   const {
     file: uploadFileContent,
     observation: uploadObs,
+    folderId: uploadFolderId,
     setObservation: setUploadObs,
+    setFolderId: setUploadFolderId,
     onFileChange,
     reset: resetUpload
   } = useFileUpload();
@@ -84,11 +95,11 @@ export default function App() {
       setIsUploadOpen(false);
       setIsHistoryOpen(false);
       setIsChecklistOpen(false);
-      setIsTemplatesOpen(false);
-      setActiveRequirement(null);
-      setSelectedIndicator(null);
-      setIsAssignmentsOpen(true);
-      return;
+    } else {
+      setIsAdminCoordinatorsOpen(false);
+      setIsAdminCriteriaOpen(false);
+      setIsAdminTemplatesOpen(false);
+      setIsCoordinatorTeachersOpen(false);
     }
 
     if (userRole === 'EVALUADOR') {
@@ -102,10 +113,15 @@ export default function App() {
     }
   }, [setSelectedIndicator, userRole]);
 
+
   const handleIndicatorSelect = useCallback((indicator: Indicator) => {
     setIsChecklistOpen(false);
     setIsAssignmentsOpen(false);
     setIsTemplatesOpen(false);
+    setIsAdminCoordinatorsOpen(false);
+    setIsAdminCriteriaOpen(false);
+    setIsAdminTemplatesOpen(false);
+    setIsCoordinatorTeachersOpen(false);
     selectIndicator(indicator);
   }, [selectIndicator]);
 
@@ -116,33 +132,49 @@ export default function App() {
     setIsChecklistOpen(false);
     setIsAssignmentsOpen(false);
     setIsTemplatesOpen(false);
+    setIsAdminCoordinatorsOpen(false);
+    setIsAdminCriteriaOpen(false);
+    setIsAdminTemplatesOpen(false);
+    setIsCoordinatorTeachersOpen(false);
     setActiveRequirement(null);
     setSelectedIndicator(null);
   }, [setSelectedIndicator]);
 
   const handleOpenTemplates = useCallback(() => {
     if (userRole !== 'ADMIN' && userRole !== 'COORDINADOR') return;
-    setIsEditorOpen(false);
-    setIsUploadOpen(false);
-    setIsHistoryOpen(false);
-    setIsChecklistOpen(false);
-    setIsAssignmentsOpen(false);
-    setActiveRequirement(null);
-    setSelectedIndicator(null);
+    handleGoToStart();
     setIsTemplatesOpen(true);
-  }, [setSelectedIndicator, userRole]);
+  }, [handleGoToStart, userRole]);
 
   const handleOpenAssignments = useCallback(() => {
     if (userRole !== 'ADMIN' && !canUserAssign(userRole)) return;
-    setIsEditorOpen(false);
-    setIsUploadOpen(false);
-    setIsHistoryOpen(false);
-    setIsChecklistOpen(false);
-    setIsTemplatesOpen(false);
-    setActiveRequirement(null);
-    setSelectedIndicator(null);
+    handleGoToStart();
     setIsAssignmentsOpen(true);
-  }, [setSelectedIndicator, userRole]);
+  }, [handleGoToStart, userRole]);
+
+  const handleOpenAdminCoordinators = useCallback(() => {
+    if (userRole !== 'ADMIN') return;
+    handleGoToStart();
+    setIsAdminCoordinatorsOpen(true);
+  }, [handleGoToStart, userRole]);
+
+  const handleOpenAdminCriteria = useCallback(() => {
+    if (userRole !== 'ADMIN') return;
+    handleGoToStart();
+    setIsAdminCriteriaOpen(true);
+  }, [handleGoToStart, userRole]);
+
+  const handleOpenAdminTemplates = useCallback(() => {
+    if (userRole !== 'ADMIN') return;
+    handleGoToStart();
+    setIsAdminTemplatesOpen(true);
+  }, [handleGoToStart, userRole]);
+
+  const handleOpenCoordinatorTeachers = useCallback(() => {
+    if (userRole !== 'COORDINADOR') return;
+    handleGoToStart();
+    setIsCoordinatorTeachersOpen(true);
+  }, [handleGoToStart, userRole]);
 
   const handleSaveUpload = async () => {
     if (!canUserUpload(userRole)) return;
@@ -153,7 +185,7 @@ export default function App() {
     }
 
     try {
-      await uploadFile(uploadFileContent, selectedIndicator, activeRequirement, user.name, uploadObs);
+      await uploadFile(uploadFileContent, selectedIndicator, activeRequirement, user.name, uploadObs, uploadFolderId);
       setIsUploadOpen(false);
       resetUpload();
       refreshNotifications();
@@ -240,6 +272,14 @@ export default function App() {
   const canAccessAssignments = userRole === 'ADMIN' || canUserAssign(userRole);
   const activeView = selectedIndicator
     ? 'indicator'
+    : isAdminCoordinatorsOpen
+      ? 'adminCoordinators'
+    : isAdminCriteriaOpen
+      ? 'adminCriteria'
+    : isAdminTemplatesOpen
+      ? 'adminTemplates'
+    : isCoordinatorTeachersOpen
+      ? 'coordinatorTeachers'
     : isTemplatesOpen
       ? 'templates'
     : isAssignmentsOpen && canAccessAssignments
@@ -283,10 +323,14 @@ export default function App() {
         onSetFocusedNode={setFocusedNodeId}
         onKeyDown={handleKeyDown}
         onSwitchRole={switchRole}
-        activeView={activeView}
+        activeView={activeView as any}
         onOpenDashboard={handleGoToStart}
         onOpenTemplates={handleOpenTemplates}
         onOpenAssignments={handleOpenAssignments}
+        onOpenAdminCoordinators={handleOpenAdminCoordinators}
+        onOpenAdminCriteria={handleOpenAdminCriteria}
+        onOpenAdminTemplates={handleOpenAdminTemplates}
+        onOpenCoordinatorTeachers={handleOpenCoordinatorTeachers}
       />
 
       <main className="flex-1 flex flex-col overflow-hidden">
@@ -306,7 +350,7 @@ export default function App() {
         ) : (
           <div className="flex-1 overflow-y-auto p-8 bg-[#f4f6f9]">
             <AnimatePresence mode="wait">
-              {!selectedIndicator && !isChecklistOpen && !isTemplatesOpen && (!isAssignmentsOpen || !canAccessAssignments) && (
+              {!selectedIndicator && !isChecklistOpen && !isTemplatesOpen && (!isAssignmentsOpen || !canAccessAssignments) && !isAdminCoordinatorsOpen && !isAdminCriteriaOpen && !isAdminTemplatesOpen && !isCoordinatorTeachersOpen && (
                 <motion.div key="dashboard" variants={viewTransition} initial="initial" animate="animate" exit="exit">
                   <Dashboard
                     mockData={mockData}
@@ -320,7 +364,7 @@ export default function App() {
                 </motion.div>
               )}
 
-              {!selectedIndicator && isChecklistOpen && !isAssignmentsOpen && !isTemplatesOpen && (
+              {!selectedIndicator && isChecklistOpen && !isAssignmentsOpen && !isTemplatesOpen && !isAdminCoordinatorsOpen && !isAdminCriteriaOpen && !isAdminTemplatesOpen && !isCoordinatorTeachersOpen && (
                 <motion.div key="checklist" variants={viewTransition} initial="initial" animate="animate" exit="exit">
                   <ChecklistView
                     mockData={mockData}
@@ -330,15 +374,39 @@ export default function App() {
                 </motion.div>
               )}
 
-              {!selectedIndicator && isTemplatesOpen && (
+              {!selectedIndicator && isTemplatesOpen && !isAdminCoordinatorsOpen && !isAdminCriteriaOpen && !isAdminTemplatesOpen && !isCoordinatorTeachersOpen && (
                 <motion.div key="templates" variants={viewTransition} initial="initial" animate="animate" exit="exit">
                   <TemplatesView />
                 </motion.div>
               )}
 
-              {!selectedIndicator && isAssignmentsOpen && canAccessAssignments && !isTemplatesOpen && (
+              {!selectedIndicator && isAssignmentsOpen && canAccessAssignments && !isTemplatesOpen && !isAdminCoordinatorsOpen && !isAdminCriteriaOpen && !isAdminTemplatesOpen && !isCoordinatorTeachersOpen && (
                 <motion.div key="assignments" variants={viewTransition} initial="initial" animate="animate" exit="exit">
                   <AssignmentsView userRole={userRole} mockData={mockData} />
+                </motion.div>
+              )}
+
+              {!selectedIndicator && isAdminCoordinatorsOpen && (
+                <motion.div key="adminCoordinators" variants={viewTransition} initial="initial" animate="animate" exit="exit">
+                  <AdminCoordinatorsPanel />
+                </motion.div>
+              )}
+
+              {!selectedIndicator && isAdminCriteriaOpen && (
+                <motion.div key="adminCriteria" variants={viewTransition} initial="initial" animate="animate" exit="exit">
+                  <AdminCriteriaManager />
+                </motion.div>
+              )}
+
+              {!selectedIndicator && isAdminTemplatesOpen && (
+                <motion.div key="adminTemplates" variants={viewTransition} initial="initial" animate="animate" exit="exit">
+                  <AdminTemplatesUploader />
+                </motion.div>
+              )}
+
+              {!selectedIndicator && isCoordinatorTeachersOpen && (
+                <motion.div key="coordinatorTeachers" variants={viewTransition} initial="initial" animate="animate" exit="exit">
+                  <CoordinatorTeachersPanel />
                 </motion.div>
               )}
 
@@ -379,7 +447,7 @@ export default function App() {
                   onReviewStatus={handleReviewUpdate}
                 />
               </IndicatorContent>
-                </motion.div>
+            </motion.div>
               )}
             </AnimatePresence>
           </div>
@@ -390,9 +458,10 @@ export default function App() {
         isOpen={isUploadOpen && canUserUpload(userRole)}
         onClose={() => setIsUploadOpen(false)}
         activeRequirement={activeRequirement}
-        uploadForm={{ file: uploadFileContent, obs: uploadObs }}
+        uploadForm={{ file: uploadFileContent, obs: uploadObs, folderId: uploadFolderId }}
         onFileChange={onFileChange}
         onObsChange={setUploadObs}
+        onFolderChange={setUploadFolderId}
         onSave={handleSaveUpload}
         isGenerating={false}
       />

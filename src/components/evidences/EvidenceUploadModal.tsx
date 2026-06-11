@@ -8,9 +8,10 @@ interface EvidenceUploadModalProps {
   isOpen: boolean;
   onClose: () => void;
   activeRequirement: Requirement | null;
-  uploadForm: { file: File | null; obs: string };
+  uploadForm: { file: File | null; obs: string; folderId: string };
   onFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onObsChange: (obs: string) => void;
+  onFolderChange: (folderId: string) => void;
   onSave: () => void;
   isGenerating: boolean;
 }
@@ -22,6 +23,7 @@ export const EvidenceUploadModal = ({
   uploadForm,
   onFileChange,
   onObsChange,
+  onFolderChange,
   onSave,
   isGenerating
 }: EvidenceUploadModalProps) => {
@@ -29,6 +31,14 @@ export const EvidenceUploadModal = ({
 
   const allowedFormats = getReadableAllowedFormats(activeRequirement.format);
   const isInvalidFile = Boolean(uploadForm.file && !isFileAllowedForRequirement(uploadForm.file, activeRequirement));
+
+  const CAREER_FOLDERS = [
+    { id: 'general', name: 'Institucional / General' },
+    { id: 'enfermeria', name: 'Enfermería' },
+    { id: 'desarrollo_software', name: 'Desarrollo de Software' },
+    { id: 'marketing', name: 'Marketing' },
+    { id: 'sistemas', name: 'Sistemas' }
+  ];
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Cargar Evidencia">
@@ -69,6 +79,18 @@ export const EvidenceUploadModal = ({
         )}
 
         <div className="space-y-3">
+          <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Carpeta de Destino (Carrera)</label>
+          <select
+            value={uploadForm.folderId}
+            onChange={(e) => onFolderChange(e.target.value)}
+            className="w-full bg-slate-50 border border-slate-100 rounded-2xl p-4 text-sm focus:ring-2 focus:ring-blue-500/20 focus:outline-none mb-4"
+          >
+            <option value="" disabled>Selecciona una carpeta...</option>
+            {CAREER_FOLDERS.map(folder => (
+              <option key={folder.id} value={folder.id}>{folder.name}</option>
+            ))}
+          </select>
+
           <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Observación de la Versión</label>
           <textarea 
             value={uploadForm.obs}
@@ -86,7 +108,7 @@ export const EvidenceUploadModal = ({
             Cancelar
           </button>
           <button 
-            disabled={!uploadForm.file || isInvalidFile || isGenerating}
+            disabled={!uploadForm.file || !uploadForm.folderId || isInvalidFile || isGenerating}
             onClick={onSave}
             className="flex-1 py-4 bg-slate-900 text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-slate-800 transition-all disabled:opacity-50 text-nowrap"
           >

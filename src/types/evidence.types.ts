@@ -1,4 +1,4 @@
-export type Status = 'Pendiente' | 'Cargado' | 'Validado' | 'Observado' | 'Rechazado';
+export type Status = 'Falta' | 'Pendiente' | 'Cargado' | 'Validado' | 'Observado' | 'Rechazado';
 
 export interface UploadedFile {
   id: string;
@@ -12,6 +12,7 @@ export interface UploadedFile {
   uploadedBy: string;
   version: number;
   status: Status;
+  folderId?: string;
   observation?: string;
   editableNote?: string;
   isCurrentVersion: boolean;
@@ -22,6 +23,7 @@ export interface UploadPayload {
   requirementId: string;
   requirementLabel: string;
   uploadedBy: string;
+  folderId: string;
   observation?: string;
 }
 

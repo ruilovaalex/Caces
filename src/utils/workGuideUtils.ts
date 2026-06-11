@@ -21,7 +21,14 @@ const inferDocumentFocus = (requirement: Requirement) => {
         'Resolucion o acta de aprobacion.',
         'Documento completo con firmas o sellos.',
         'Version vigente o evidencia de actualizacion.'
-      ]
+      ],
+      steps: [
+        'Revisar el estado actual de la normativa y sus anexos.',
+        'Asegurar que las firmas esten completas y legibles.',
+        'Escanear el documento original de preferencia a color.'
+      ],
+      tips: ['Si la normativa fue actualizada, asegurese de adjuntar tambien el documento que aprueba la actualizacion.'],
+      warnings: ['No se aceptaran borradores sin firma ni sello institucional.']
     };
   }
 
@@ -37,7 +44,14 @@ const inferDocumentFocus = (requirement: Requirement) => {
         'Matriz o plan aprobado.',
         'Acta, resolucion o firma de aprobacion.',
         'Informe de seguimiento si ya hubo ejecucion.'
-      ]
+      ],
+      steps: [
+        'Recopilar el POA o plan de la institucion.',
+        'Verificar que las fechas coincidan con el periodo evaluado.',
+        'Marcar o resaltar las secciones o metas correspondientes al indicador.'
+      ],
+      tips: ['Incluir matrices de Excel como anexos suele facilitar la lectura a los evaluadores externos.'],
+      warnings: ['El documento base debe estar formalmente aprobado por el organo colegiado superior.']
     };
   }
 
@@ -53,7 +67,14 @@ const inferDocumentFocus = (requirement: Requirement) => {
         'Matrices de seguimiento.',
         'Reportes, graficos o respaldos estadisticos.',
         'Actas o comunicaciones de socializacion.'
-      ]
+      ],
+      steps: [
+        'Generar el reporte consolidado del periodo evaluado.',
+        'Añadir conclusiones claras y acciones de mejora ejecutadas en el texto.',
+        'Adjuntar las evidencias primarias (como listados o fotos) como anexos.'
+      ],
+      tips: ['Las tablas y graficos estadisticos aportan mucha claridad y contundencia a los informes.'],
+      warnings: ['Evite presentar informes meramente descriptivos sin un analisis cuantitativo o cualitativo real.']
     };
   }
 
@@ -69,7 +90,14 @@ const inferDocumentFocus = (requirement: Requirement) => {
         'Archivo editable o PDF certificado.',
         'Fuente de datos o sistema institucional.',
         'Anexos que respalden los registros clave.'
-      ]
+      ],
+      steps: [
+        'Descargar la plantilla de la matriz institucional (si existe).',
+        'Completar absolutamente todos los campos sin omitir columnas.',
+        'Cruzar la informacion final con la base de datos oficial para detectar errores.'
+      ],
+      tips: ['Asegurese de que los formatos de fecha (dd/mm/aaaa) y numeros sean consistentes en toda la matriz.'],
+      warnings: ['Celdas vacias, inconsistencias de cedulas o nombres pueden causar que toda la evidencia sea rechazada.']
     };
   }
 
@@ -85,7 +113,14 @@ const inferDocumentFocus = (requirement: Requirement) => {
         'Fotografias, capturas o planos.',
         'Acta de constatacion si aplica.',
         'Archivo ZIP organizado por carpetas si son varios soportes.'
-      ]
+      ],
+      steps: [
+        'Tomar las capturas de pantalla o fotografias requeridas con buena calidad.',
+        'Agregar descripciones o pies de foto explicativos a cada imagen.',
+        'Consolidar todas las imagenes en un solo documento PDF o archivo comprimido.'
+      ],
+      tips: ['Si captura un sistema web o plataforma, asegurese de que la URL y la fecha de su ordenador esten visibles.'],
+      warnings: ['No edite, recorte agresivamente ni altere la informacion contenida en las capturas de pantalla.']
     };
   }
 
@@ -101,7 +136,14 @@ const inferDocumentFocus = (requirement: Requirement) => {
         'Actas y convocatorias.',
         'Registros de asistencia.',
         'Fotografias, correos o publicaciones.'
-      ]
+      ],
+      steps: [
+        'Recopilar el acta de la sesion correspondiente.',
+        'Verificar que el listado de firmas de asistencia este anexo.',
+        'Subrayar o resaltar los puntos del orden del dia estrictamente relacionados al indicador.'
+      ],
+      tips: ['Si la sesion o reunion fue virtual, adjuntar capturas de pantalla de la plataforma (ej. Zoom/Teams) o enlaces de grabacion en la nube.'],
+      warnings: ['Las actas sin la firma de responsabilidad del secretario y/o presidente carecen de validez oficial.']
     };
   }
 
@@ -116,7 +158,14 @@ const inferDocumentFocus = (requirement: Requirement) => {
       'Documento principal en el formato solicitado.',
       'Anexos o soportes complementarios.',
       'Firmas, fechas o respaldos de validez institucional.'
-    ]
+    ],
+    steps: [
+      'Leer detenidamente la definicion del requerimiento en el modelo CACES vigente.',
+      'Recopilar la informacion solicitada de las distintas dependencias.',
+      'Revisar exhaustivamente la calidad y legibilidad del archivo final antes de subirlo.'
+    ],
+    tips: ['Mantenga un respaldo local ordenado de todos los archivos que suba a la plataforma.'],
+    warnings: ['Cargar informacion falsa, alterada o incompleta perjudica el proceso de aseguramiento de la calidad.']
   };
 };
 
@@ -129,6 +178,9 @@ export const buildRequirementWorkGuide = (indicator: Indicator, requirement: Req
     focus: inferred.focus,
     checks: inferred.checks,
     supports: inferred.supports,
+    steps: inferred.steps,
+    tips: inferred.tips,
+    warnings: inferred.warnings,
     format: formatList(requirement.format),
     cacesDescription: requirement.description
   };

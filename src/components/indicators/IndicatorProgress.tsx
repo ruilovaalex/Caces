@@ -5,13 +5,15 @@ interface IndicatorProgressProps {
   label?: string;
   size?: 'sm' | 'md' | 'lg';
   showValue?: boolean;
+  fraction?: { loaded: number, total: number };
 }
 
 export const IndicatorProgress = ({ 
   progress, 
   label, 
   size = 'md', 
-  showValue = true 
+  showValue = true,
+  fraction
 }: IndicatorProgressProps) => {
   const heightClasses = {
     sm: 'h-1',
@@ -32,6 +34,7 @@ export const IndicatorProgress = ({
           <span className="text-slate-400">{label}</span>
           {showValue && (
             <span className={progress < 40 ? 'text-rose-600' : progress < 70 ? 'text-amber-600' : 'text-emerald-600'}>
+              {fraction && <span className="mr-2 text-slate-400">{fraction.loaded}/{fraction.total}</span>}
               {Math.round(progress)}%
             </span>
           )}

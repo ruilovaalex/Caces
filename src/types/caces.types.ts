@@ -5,6 +5,7 @@ export interface Requirement {
   label: string;
   description: string;
   format: string;
+  allowedFormats?: string[];
   reference?: string;
   status: Status;
   observation?: string;

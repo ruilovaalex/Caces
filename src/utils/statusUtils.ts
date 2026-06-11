@@ -2,6 +2,7 @@ import { Status } from '../types';
 
 export const getStatusColor = (status: Status) => {
   switch (status) {
+    case 'Falta': return 'bg-rose-50 text-rose-700 border-rose-200';
     case 'Pendiente': return 'bg-amber-50 text-[#d97706] border-amber-100';
     case 'Cargado': return 'bg-emerald-50 text-emerald-700 border-emerald-200';
     case 'Validado': return 'bg-green-50 text-[#15803d] border-green-100';

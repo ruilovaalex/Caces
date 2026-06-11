@@ -24,7 +24,7 @@ export const EvidenceRow = ({
   onOpenHistory
 }: EvidenceRowProps) => {
   const currentFile = files.find(file => file.isCurrentVersion);
-  const status = currentFile ? currentFile.status : 'Pendiente';
+  const status = currentFile ? currentFile.status : 'Falta';
   const canUploadFile = canUserUpload(userRole);
   const editorLabel =
     userRole === 'EVALUADOR'
