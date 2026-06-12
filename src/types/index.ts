@@ -4,3 +4,4 @@ export * from './evidence.types';
 export * from './notification.types';
 export * from './coordinator.types';
 export * from './assignment.types';
+export * from './coordinatorAssignment.types';

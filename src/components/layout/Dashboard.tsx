@@ -16,6 +16,7 @@ interface DashboardProps {
   onOpenCriterionSubCriteria: (year: number, criterionId: string) => void;
   onOpenAssignments: () => void;
   canManageAssignments: boolean;
+  isScopedView?: boolean;
 }
 
 export const Dashboard = ({
@@ -25,10 +26,30 @@ export const Dashboard = ({
   onViewChecklist,
   onOpenCriterionSubCriteria,
   onOpenAssignments,
-  canManageAssignments
+  canManageAssignments,
+  isScopedView = false
 }: DashboardProps) => {
+  const activeYearPeriod = mockData[0];
+  const criteria = activeYearPeriod?.criteria || [];
+
+  const visibleIndicatorCodes = useMemo(
+    () => new Set(
+      criteria.flatMap(criterion =>
+        criterion.subCriteria.flatMap(subCriterion =>
+          subCriterion.indicators.map(indicator => indicator.code)
+        )
+      )
+    ),
+    [criteria]
+  );
+
+  const visibleFiles = useMemo(
+    () => allFiles.filter(file => visibleIndicatorCodes.has(file.indicatorCode)),
+    [allFiles, visibleIndicatorCodes]
+  );
+
   const dashboardStats = useMemo(() => {
-    const totalEvidences = mockData[0].criteria.reduce(
+    const totalEvidences = criteria.reduce(
       (acc, criterion) => acc + criterion.subCriteria.reduce(
         (subAcc, subCriterion) => subAcc + subCriterion.indicators.reduce(
           (indicatorAcc, indicator) => indicatorAcc + indicator.requirements.length,
@@ -41,27 +62,27 @@ export const Dashboard = ({
 
     return {
       totalEvidences,
-      loaded: allFiles.filter(file => file.isCurrentVersion).length,
-      validated: allFiles.filter(file => file.status === 'Validado' && file.isCurrentVersion).length,
-      observed: allFiles.filter(file => file.status === 'Observado' && file.isCurrentVersion).length
+      loaded: visibleFiles.filter(file => file.isCurrentVersion).length,
+      validated: visibleFiles.filter(file => file.status === 'Validado' && file.isCurrentVersion).length,
+      observed: visibleFiles.filter(file => file.status === 'Observado' && file.isCurrentVersion).length
     };
-  }, [allFiles, mockData]);
+  }, [criteria, visibleFiles]);
 
   const pendingIndicators = useMemo(
-    () => mockData[0].criteria
+    () => criteria
       .flatMap(criterion => criterion.subCriteria.flatMap(subCriterion => subCriterion.indicators))
       .filter(indicator => indicator.status === 'Pendiente')
       .slice(0, 5),
-    [mockData]
+    [criteria]
   );
 
   const subCriterionProgress = useMemo(() => {
     const progressBySubCriterion = new Map<string, number>();
 
-    mockData[0].criteria.forEach(criterion => {
+    criteria.forEach(criterion => {
       criterion.subCriteria.forEach(subCriterion => {
         const progress = Math.round(
-          subCriterion.indicators.reduce((sum, indicator) => sum + calculateIndicatorProgress(indicator, allFiles), 0) /
+          subCriterion.indicators.reduce((sum, indicator) => sum + calculateIndicatorProgress(indicator, visibleFiles), 0) /
           (subCriterion.indicators.length || 1)
         );
         progressBySubCriterion.set(subCriterion.id, progress);
@@ -69,7 +90,7 @@ export const Dashboard = ({
     });
 
     return progressBySubCriterion;
-  }, [allFiles, mockData]);
+  }, [criteria, visibleFiles]);
 
   const totalCount = useCountUp(dashboardStats.totalEvidences);
   const loadedCount = useCountUp(dashboardStats.loaded);
@@ -92,7 +113,9 @@ export const Dashboard = ({
         className="grid grid-cols-1 md:grid-cols-4 gap-4"
       >
         <motion.div variants={fadeInUp} className="premium-card bg-white p-5 rounded-lg border-l-4 border-l-[#2563eb] space-y-2">
-          <span className="text-[9px] font-black text-[#64748b] uppercase tracking-widest leading-none">Total Evidencias</span>
+          <span className="text-[9px] font-black text-[#64748b] uppercase tracking-widest leading-none">
+            {isScopedView ? 'Evidencias asignadas' : 'Total Evidencias'}
+          </span>
           <h3 className="text-2xl font-black text-[#0f172a]">
             {totalCount}
           </h3>
@@ -120,7 +143,7 @@ export const Dashboard = ({
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <h3 className="text-sm font-black text-slate-800 uppercase tracking-tight leading-none">
-            CRITERIOS
+            {isScopedView ? 'CRITERIOS ASIGNADOS' : 'CRITERIOS'}
           </h3>
         </div>
         <motion.div 
@@ -130,13 +153,13 @@ export const Dashboard = ({
           viewport={{ once: true, margin: "-50px" }}
           className="grid grid-cols-1 md:grid-cols-2 gap-4 pb-2"
         >
-          {mockData[0].criteria.map((crit, index) => (
+          {criteria.map((crit, index) => (
             <motion.button
               variants={fadeInUp}
               whileHover={hoverCardLift}
               type="button"
               key={crit.id} 
-              onClick={() => onOpenCriterionSubCriteria(mockData[0].year, crit.id)}
+              onClick={() => activeYearPeriod && onOpenCriterionSubCriteria(activeYearPeriod.year, crit.id)}
               className="premium-card bg-white p-6 rounded-lg border border-[#e2e8f0] hover:border-[#2563eb] transition-all cursor-pointer group text-left"
             >
               <div className="flex justify-between items-start mb-4">

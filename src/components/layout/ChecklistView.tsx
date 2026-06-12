@@ -6,15 +6,17 @@ interface ChecklistViewProps {
   mockData: YearPeriod[];
   onIndicatorSelect: (ind: Indicator) => void;
   onBackToDashboard: () => void;
+  isScopedView?: boolean;
 }
 
 export const ChecklistView = ({
   mockData,
   onIndicatorSelect,
-  onBackToDashboard
+  onBackToDashboard,
+  isScopedView = false
 }: ChecklistViewProps) => {
   const indicators = useMemo(
-    () => mockData[0].criteria.flatMap(criterion =>
+    () => (mockData[0]?.criteria || []).flatMap(criterion =>
       criterion.subCriteria.flatMap(subCriterion =>
         subCriterion.indicators.map(indicator => ({
           ...indicator,
@@ -30,7 +32,9 @@ export const ChecklistView = ({
     <div className="max-w-6xl mx-auto space-y-6">
       <div className="flex items-center justify-between mb-2">
         <div>
-          <h2 className="text-2xl font-black text-slate-800 tracking-tight leading-tight">Mapa de indicadores</h2>
+          <h2 className="text-2xl font-black text-slate-800 tracking-tight leading-tight">
+            {isScopedView ? 'Mapa de indicadores asignados' : 'Mapa de indicadores'}
+          </h2>
           <p className="text-slate-400 text-xs font-bold uppercase tracking-widest mt-1">
             Escoge un indicador para preparar o revisar evidencias
           </p>
@@ -55,6 +59,13 @@ export const ChecklistView = ({
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-50">
+            {!indicators.length && (
+              <tr>
+                <td colSpan={5} className="px-6 py-10 text-center text-xs font-bold uppercase tracking-widest text-slate-400">
+                  No hay indicadores visibles en este alcance.
+                </td>
+              </tr>
+            )}
             {indicators.map(indicator => (
               <tr key={indicator.code} className="hover:bg-slate-50/50 transition-colors group">
                 <td className="px-6 py-5 align-top">

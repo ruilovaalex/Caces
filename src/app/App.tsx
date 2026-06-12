@@ -33,6 +33,11 @@ import {
 } from '../utils/permissions';
 import { viewTransition } from '../utils/animations';
 import { getAcademicPeriodsForYear } from '../utils/academicPeriodUtils';
+import { CoordinatorAssignmentService } from '../services/coordinatorAssignmentService';
+import {
+  filterMockDataByAssignedIndicators,
+  getIndicatorCodesFromMockData
+} from '../utils/coordinatorIndicatorFilterUtils';
 import { EvidenceFolder, Indicator, Requirement, Status } from '../types';
 
 export default function App() {
@@ -58,6 +63,7 @@ export default function App() {
   const [isTemplatesOpen, setIsTemplatesOpen] = useState(false);
   const [uploadFolders, setUploadFolders] = useState<EvidenceFolder[]>([]);
   const [selectedUploadFolderId, setSelectedUploadFolderId] = useState('');
+  const [assignmentVersion, setAssignmentVersion] = useState(0);
 
   const {
     allFiles,
@@ -85,6 +91,27 @@ export default function App() {
   } = useFileUpload();
 
   useAssignments();
+
+  const assignedIndicatorCodes = useMemo(() => {
+    if (userRole !== 'COORDINADOR' || !user?.id) return [];
+    return CoordinatorAssignmentService.getAssignedIndicatorCodes(user.id);
+  }, [assignmentVersion, user?.id, userRole]);
+
+  const visibleMockData = useMemo(() => {
+    if (userRole !== 'COORDINADOR') return mockData;
+    return filterMockDataByAssignedIndicators(mockData, assignedIndicatorCodes);
+  }, [assignedIndicatorCodes, mockData, userRole]);
+
+  const visibleIndicatorCodes = useMemo(
+    () => new Set(getIndicatorCodesFromMockData(visibleMockData)),
+    [visibleMockData]
+  );
+
+  const isCoordinatorScopeFiltered = userRole === 'COORDINADOR' && assignedIndicatorCodes.length > 0;
+
+  const refreshCoordinatorAssignments = useCallback(() => {
+    setAssignmentVersion(version => version + 1);
+  }, []);
 
   useEffect(() => {
     if (userRole === 'DOCENTE') {
@@ -124,6 +151,16 @@ export default function App() {
       setIsAssignmentsOpen(false);
     }
   }, [isAssignmentsOpen, isTemplatesOpen, setSelectedIndicator, userRole]);
+
+  useEffect(() => {
+    if (userRole !== 'COORDINADOR' || !selectedIndicator) return;
+    if (visibleIndicatorCodes.has(selectedIndicator.code)) return;
+    setSelectedIndicator(null);
+    setActiveRequirement(null);
+    setIsEditorOpen(false);
+    setIsUploadOpen(false);
+    setIsHistoryOpen(false);
+  }, [selectedIndicator, setSelectedIndicator, userRole, visibleIndicatorCodes]);
 
   const handleIndicatorSelect = useCallback((indicator: Indicator) => {
     setIsChecklistOpen(false);
@@ -196,7 +233,7 @@ export default function App() {
   const visibleNodes = useMemo(() => {
     const nodes: { id: string; type: string; data?: any }[] = [];
 
-    mockData.forEach(yearPeriod => {
+    visibleMockData.forEach(yearPeriod => {
       const yearId = yearPeriod.year.toString();
       nodes.push({ id: yearId, type: 'year', data: yearPeriod });
       if (!expandedNodes.has(yearId)) return;
@@ -224,7 +261,7 @@ export default function App() {
     });
 
     return nodes;
-  }, [expandedNodes, mockData]);
+  }, [expandedNodes, visibleMockData]);
 
   const handleKeyDown = (event: React.KeyboardEvent) => {
     const currentIndex = visibleNodes.findIndex(node => node.id === focusedNodeId);
@@ -300,11 +337,13 @@ export default function App() {
   return (
     <div className="flex h-screen bg-[#f4f6f9] font-sans text-slate-800">
       <Sidebar
-        mockData={mockData}
+        mockData={visibleMockData}
         selectedIndicator={selectedIndicator}
         expandedNodes={expandedNodes}
         focusedNodeId={focusedNodeId}
         userRole={userRole}
+        isCoordinatorScopeFiltered={isCoordinatorScopeFiltered}
+        visibleIndicatorCount={visibleIndicatorCodes.size}
         onIndicatorSelect={handleIndicatorSelect}
         onToggleNode={toggleNode}
         onSetFocusedNode={setFocusedNodeId}
@@ -336,13 +375,14 @@ export default function App() {
               {!selectedIndicator && canOpenRepository && !isChecklistOpen && !isTemplatesOpen && (!isAssignmentsOpen || !canOpenAssignments) && (
                 <motion.div key="dashboard" variants={viewTransition} initial="initial" animate="animate" exit="exit">
                   <Dashboard
-                    mockData={mockData}
+                    mockData={visibleMockData}
                     allFiles={allFiles}
                     onIndicatorSelect={handleIndicatorSelect}
                     onViewChecklist={() => setIsChecklistOpen(true)}
                     onOpenCriterionSubCriteria={openCriterionSubCriteria}
                     onOpenAssignments={handleOpenAssignments}
                     canManageAssignments={canOpenAssignments}
+                    isScopedView={isCoordinatorScopeFiltered}
                   />
                 </motion.div>
               )}
@@ -350,9 +390,10 @@ export default function App() {
               {!selectedIndicator && canOpenRepository && isChecklistOpen && !isAssignmentsOpen && !isTemplatesOpen && (
                 <motion.div key="checklist" variants={viewTransition} initial="initial" animate="animate" exit="exit">
                   <ChecklistView
-                    mockData={mockData}
+                    mockData={visibleMockData}
                     onIndicatorSelect={handleIndicatorSelect}
                     onBackToDashboard={handleGoToStart}
+                    isScopedView={isCoordinatorScopeFiltered}
                   />
                 </motion.div>
               )}
@@ -365,7 +406,12 @@ export default function App() {
 
               {!selectedIndicator && isAssignmentsOpen && canOpenAssignments && !isTemplatesOpen && (
                 <motion.div key="assignments" variants={viewTransition} initial="initial" animate="animate" exit="exit">
-                  <AssignmentsView userRole={userRole} mockData={mockData} />
+                  <AssignmentsView
+                    userRole={userRole}
+                    mockData={userRole === 'ADMIN' ? mockData : visibleMockData}
+                    currentUserName={user?.name}
+                    onAssignmentsChange={refreshCoordinatorAssignments}
+                  />
                 </motion.div>
               )}
 

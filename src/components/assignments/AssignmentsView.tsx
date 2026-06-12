@@ -2,20 +2,32 @@ import React, { useEffect, useMemo, useState } from 'react';
 import {
   BookOpen,
   ClipboardList,
+  Link2,
   Plus,
   Send,
   Shield,
   Smartphone,
+  Trash2,
   UserPlus,
   Users
 } from 'lucide-react';
 import { WorkflowGuide } from '../layout/WorkflowGuide';
-import { Assignment, AssignmentMode, UserRole, YearPeriod } from '../../types';
+import {
+  Assignment,
+  AssignmentMode,
+  CoordinatorProfile,
+  IndicatorCoordinatorAssignment,
+  UserRole,
+  YearPeriod
+} from '../../types';
 import { useAssignments } from '../../hooks/useAssignments';
+import { CoordinatorAssignmentService } from '../../services/coordinatorAssignmentService';
 
 interface AssignmentsViewProps {
   userRole: UserRole;
   mockData: YearPeriod[];
+  currentUserName?: string;
+  onAssignmentsChange?: () => void;
 }
 
 interface Teacher {
@@ -50,10 +62,19 @@ const roleDescriptions: Record<UserRole, string> = {
   DOCENTE: 'Prepara y entrega los soportes documentales asignados.'
 };
 
-export const AssignmentsView = ({ userRole, mockData }: AssignmentsViewProps) => {
+export const AssignmentsView = ({
+  userRole,
+  mockData,
+  currentUserName = 'Admin local',
+  onAssignmentsChange
+}: AssignmentsViewProps) => {
   const { assignments, createAssignment } = useAssignments();
   const [roles, setRoles] = useState<UserRole[]>(['ADMIN', 'COORDINADOR', 'EVALUADOR', 'DOCENTE']);
   const [newRole, setNewRole] = useState('');
+  const [coordinators, setCoordinators] = useState<CoordinatorProfile[]>(() => CoordinatorAssignmentService.getCoordinators());
+  const [indicatorAssignments, setIndicatorAssignments] = useState<IndicatorCoordinatorAssignment[]>(() => CoordinatorAssignmentService.getAssignments());
+  const [selectedCoordinatorId, setSelectedCoordinatorId] = useState('coord-1');
+  const [selectedAssignmentIndicatorCode, setSelectedAssignmentIndicatorCode] = useState('');
   const [teachers, setTeachers] = useState<Teacher[]>(initialTeachers);
   const [teacherName, setTeacherName] = useState('');
   const [teacherEmail, setTeacherEmail] = useState('');
@@ -103,10 +124,15 @@ export const AssignmentsView = ({ userRole, mockData }: AssignmentsViewProps) =>
   );
 
   useEffect(() => {
-    if (!selectedIndicator && indicators[0]) {
+    if (indicators[0] && !indicators.some(indicator => indicator.code === selectedIndicatorCode)) {
       setSelectedIndicatorCode(indicators[0].code);
     }
-  }, [indicators, selectedIndicator]);
+  }, [indicators, selectedIndicatorCode]);
+
+  useEffect(() => {
+    if (selectedAssignmentIndicatorCode || !indicators[0]) return;
+    setSelectedAssignmentIndicatorCode(indicators[0].code);
+  }, [indicators, selectedAssignmentIndicatorCode]);
 
   useEffect(() => {
     if (!selectedIndicator) return;
@@ -148,6 +174,36 @@ export const AssignmentsView = ({ userRole, mockData }: AssignmentsViewProps) =>
     setTeacherEmail('');
     setTeacherArea('');
   };
+
+  const refreshIndicatorAssignments = () => {
+    setCoordinators(CoordinatorAssignmentService.getCoordinators());
+    setIndicatorAssignments(CoordinatorAssignmentService.getAssignments());
+    onAssignmentsChange?.();
+  };
+
+  const handleAssignIndicator = () => {
+    const coordinator = coordinators.find(item => item.id === selectedCoordinatorId);
+    const indicator = indicators.find(item => item.code === selectedAssignmentIndicatorCode);
+    if (!coordinator || !indicator) return;
+
+    CoordinatorAssignmentService.assignIndicator({
+      coordinatorId: coordinator.id,
+      coordinatorName: coordinator.name,
+      indicatorCode: indicator.code,
+      indicatorName: indicator.name,
+      createdBy: currentUserName
+    });
+    refreshIndicatorAssignments();
+  };
+
+  const handleRemoveIndicatorAssignment = (assignmentId: string) => {
+    CoordinatorAssignmentService.removeAssignment(assignmentId);
+    refreshIndicatorAssignments();
+  };
+
+  const currentCoordinatorAssignments = indicatorAssignments.filter(
+    assignment => assignment.coordinatorId === selectedCoordinatorId
+  );
 
   const toggleTeacherSelection = (teacherId: string) => {
     setSelectedTeacherIds(previous =>
@@ -232,6 +288,93 @@ export const AssignmentsView = ({ userRole, mockData }: AssignmentsViewProps) =>
                 <p className="mt-1 text-xs text-slate-500">{roleDescriptions[role] || 'Rol personalizado pendiente de permisos en backend.'}</p>
               </div>
             ))}
+          </div>
+        </section>
+
+        <section className="rounded-lg border border-slate-200 bg-white p-6">
+          <div className="flex items-center gap-3">
+            <div className="rounded-lg bg-blue-50 p-3 text-blue-700 border border-blue-100">
+              <Link2 className="h-5 w-5" />
+            </div>
+            <div>
+              <h3 className="text-xl font-black text-slate-800 tracking-tight leading-tight">Asignar indicadores a coordinadores</h3>
+              <p className="mt-1 text-xs font-bold uppercase tracking-widest text-slate-400">
+                Asignacion local del prototipo. No modifica la matriz CACES base.
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-6 grid grid-cols-1 gap-3 lg:grid-cols-[1fr_1.5fr_auto]">
+            <select
+              value={selectedCoordinatorId}
+              onChange={event => setSelectedCoordinatorId(event.target.value)}
+              className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold text-slate-700 outline-none focus:border-blue-300 focus:bg-white"
+            >
+              {coordinators.map(coordinator => (
+                <option key={coordinator.id} value={coordinator.id}>
+                  {coordinator.name}
+                </option>
+              ))}
+            </select>
+
+            <select
+              value={selectedAssignmentIndicatorCode}
+              onChange={event => setSelectedAssignmentIndicatorCode(event.target.value)}
+              className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold text-slate-700 outline-none focus:border-blue-300 focus:bg-white"
+            >
+              {indicators.map(indicator => (
+                <option key={indicator.code} value={indicator.code}>
+                  {indicator.code} - {indicator.name}
+                </option>
+              ))}
+            </select>
+
+            <button
+              type="button"
+              onClick={handleAssignIndicator}
+              className="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-5 py-3 text-xs font-black uppercase tracking-widest text-white hover:bg-blue-700"
+            >
+              <Plus className="h-4 w-4" />
+              Asignar
+            </button>
+          </div>
+
+          <div className="mt-6 rounded-lg border border-slate-200 bg-slate-50 p-4">
+            <div className="mb-3 flex items-center justify-between gap-3">
+              <p className="text-xs font-black uppercase tracking-widest text-slate-500">
+                Asignaciones actuales
+              </p>
+              <span className="rounded-md bg-white px-2.5 py-1 text-[10px] font-black uppercase tracking-widest text-blue-700 border border-blue-100">
+                {currentCoordinatorAssignments.length} indicadores
+              </span>
+            </div>
+
+            <div className="space-y-2">
+              {currentCoordinatorAssignments.map(assignment => (
+                <div key={assignment.id} className="flex items-center justify-between gap-3 rounded-lg border border-slate-200 bg-white p-3">
+                  <div>
+                    <p className="text-sm font-black text-slate-800">{assignment.indicatorCode} - {assignment.indicatorName}</p>
+                    <p className="mt-1 text-[10px] font-bold uppercase tracking-widest text-slate-400">
+                      Coordinador: {assignment.coordinatorName}
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveIndicatorAssignment(assignment.id)}
+                    className="inline-flex items-center justify-center rounded-lg border border-red-100 bg-red-50 p-2 text-red-600 hover:bg-red-100"
+                    aria-label={`Quitar indicador ${assignment.indicatorCode}`}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                </div>
+              ))}
+
+              {!currentCoordinatorAssignments.length && (
+                <div className="rounded-lg border border-dashed border-slate-200 bg-white p-4 text-xs font-bold text-slate-400">
+                  Este coordinador no tiene indicadores asignados. Como fallback seguro, vera toda la matriz al entrar como coordinador.
+                </div>
+              )}
+            </div>
           </div>
         </section>
       </div>

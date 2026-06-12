@@ -19,6 +19,8 @@ interface SidebarProps {
   expandedNodes: Set<string>;
   focusedNodeId: string | null;
   userRole: UserRole;
+  isCoordinatorScopeFiltered?: boolean;
+  visibleIndicatorCount?: number;
   activeView: 'dashboard' | 'checklist' | 'assignments' | 'templates' | 'indicator';
   onIndicatorSelect: (ind: Indicator) => void;
   onToggleNode: (id: string) => void;
@@ -36,6 +38,8 @@ export const Sidebar = ({
   expandedNodes,
   focusedNodeId,
   userRole,
+  isCoordinatorScopeFiltered = false,
+  visibleIndicatorCount = 0,
   activeView,
   onIndicatorSelect,
   onToggleNode,
@@ -204,7 +208,7 @@ export const Sidebar = ({
           aria-label="Explorador de indicadores"
         >
           <div className="text-[10px] font-bold text-[#94a3b8] uppercase tracking-widest px-2 mb-4">
-            Gestion de periodos
+            {isCoordinatorScopeFiltered ? `Indicadores asignados (${visibleIndicatorCount})` : 'Gestion de periodos'}
           </div>
 
           {mockData.map((yearPeriod) => {
