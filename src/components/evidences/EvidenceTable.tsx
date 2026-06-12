@@ -18,7 +18,8 @@ import {
   XCircle,
 } from 'lucide-react';
 import { motion } from 'motion/react';
-import { Indicator, Requirement, Status, UploadedFile, UserRole } from '../../types';
+import { EvidenceFolder, Indicator, Requirement, Status, UploadedFile, UserRole } from '../../types';
+import { EvidenceFolderService } from '../../services/evidenceFolderService';
 import { canUserUpload } from '../../utils/permissions';
 import { EvidenceStatusBadge } from './EvidenceStatusBadge';
 import { EvidenceFilePreviewModal } from './EvidenceFilePreviewModal';
@@ -29,24 +30,19 @@ interface EvidenceTableProps {
   indicator: Indicator;
   userRole: UserRole;
   getRequirementFiles: (reqId: string) => UploadedFile[];
-  onOpenUpload: (req: Requirement) => void;
+  onOpenUpload: (req: Requirement, folders?: EvidenceFolder[]) => void;
   onOpenEditor: (req: Requirement) => void;
   onOpenHistory: (req: Requirement) => void;
   onReviewStatus: (fileId: string, status: Status, observation?: string) => void;
 }
 
-type FolderMap = Record<string, string[]>;
-
-const getFolderStorageKey = (indicatorCode: string) => `caces_repository_folders_${indicatorCode}`;
-
-const readFolders = (indicatorCode: string): FolderMap => {
-  try {
-    const saved = localStorage.getItem(getFolderStorageKey(indicatorCode));
-    return saved ? JSON.parse(saved) as FolderMap : {};
-  } catch {
-    return {};
-  }
-};
+interface FolderGroup {
+  id: string;
+  name: string;
+  files: UploadedFile[];
+  folder?: EvidenceFolder;
+  isVirtual: boolean;
+}
 
 export const EvidenceTable = ({
   indicator,
@@ -58,7 +54,7 @@ export const EvidenceTable = ({
   onReviewStatus,
 }: EvidenceTableProps) => {
   const [expandedRequirements, setExpandedRequirements] = useState<Set<string>>(new Set());
-  const [folders, setFolders] = useState<FolderMap>(() => readFolders(indicator.code));
+  const [folders, setFolders] = useState<EvidenceFolder[]>(() => EvidenceFolderService.migrateLegacyForIndicator(indicator.code));
   const [guideRequirement, setGuideRequirement] = useState<Requirement | null>(null);
   const [previewFile, setPreviewFile] = useState<UploadedFile | null>(null);
   const [isTemplateLibraryOpen, setIsTemplateLibraryOpen] = useState(false);
@@ -66,7 +62,7 @@ export const EvidenceTable = ({
   const isEvaluator = userRole === 'EVALUADOR';
 
   useEffect(() => {
-    setFolders(readFolders(indicator.code));
+    setFolders(EvidenceFolderService.migrateLegacyForIndicator(indicator.code));
     setExpandedRequirements(new Set());
   }, [indicator.code]);
 
@@ -74,6 +70,7 @@ export const EvidenceTable = ({
     () => indicator.requirements.reduce((total, requirement) => total + getRequirementFiles(requirement.id).length, 0),
     [getRequirementFiles, indicator.requirements],
   );
+
   const visibleRequirements = useMemo(
     () => isEvaluator
       ? indicator.requirements.filter(requirement => getRequirementFiles(requirement.id).length > 0)
@@ -81,9 +78,8 @@ export const EvidenceTable = ({
     [getRequirementFiles, indicator.requirements, isEvaluator],
   );
 
-  const saveFolders = (nextFolders: FolderMap) => {
-    setFolders(nextFolders);
-    localStorage.setItem(getFolderStorageKey(indicator.code), JSON.stringify(nextFolders));
+  const refreshFolders = () => {
+    setFolders(EvidenceFolderService.getByIndicator(indicator.code));
   };
 
   const toggleRequirement = (requirementId: string) => {
@@ -100,26 +96,26 @@ export const EvidenceTable = ({
     const normalizedName = name?.trim();
     if (!normalizedName) return;
 
-    const existing = folders[requirement.id] || [];
-    if (existing.some(folder => folder.toLowerCase() === normalizedName.toLowerCase())) {
+    const folder = EvidenceFolderService.create(indicator.code, requirement.id, normalizedName);
+    if (!folder) {
       window.alert('Ya existe una carpeta con ese nombre.');
       return;
     }
 
-    saveFolders({
-      ...folders,
-      [requirement.id]: [...existing, normalizedName],
-    });
+    refreshFolders();
   };
 
-  const removeFolder = (requirementId: string, folderName: string) => {
-    const confirmed = window.confirm(`Eliminar la carpeta "${folderName}"?`);
+  const removeFolder = (folder: EvidenceFolder, files: UploadedFile[]) => {
+    if (EvidenceFolderService.folderHasFiles(folder.id, files)) {
+      window.alert('No se puede eliminar una carpeta que contiene archivos.');
+      return;
+    }
+
+    const confirmed = window.confirm(`Eliminar la carpeta "${folder.name}"?`);
     if (!confirmed) return;
 
-    saveFolders({
-      ...folders,
-      [requirementId]: (folders[requirementId] || []).filter(folder => folder !== folderName),
-    });
+    EvidenceFolderService.delete(folder.id, files);
+    refreshFolders();
   };
 
   const confirmFile = (file: UploadedFile) => {
@@ -133,6 +129,22 @@ export const EvidenceTable = ({
     if (!observation?.trim()) return;
     onReviewStatus(file.id, 'Rechazado', observation.trim());
   };
+
+  const buildFolderGroups = (requirementFolders: EvidenceFolder[], files: UploadedFile[]): FolderGroup[] => [
+    {
+      id: '',
+      name: 'Sin carpeta',
+      files: files.filter(file => !file.folderId),
+      isVirtual: true,
+    },
+    ...requirementFolders.map(folder => ({
+      id: folder.id,
+      name: folder.name,
+      files: files.filter(file => file.folderId === folder.id),
+      folder,
+      isVirtual: false,
+    })),
+  ];
 
   return (
     <section className="bg-white">
@@ -149,7 +161,7 @@ export const EvidenceTable = ({
           <p className="mt-1 text-sm text-slate-500">
             {isEvaluator
               ? `${fileCount} archivos cargados por coordinadores o docentes disponibles para revisar.`
-              : `${indicator.requirements.length} carpetas de evidencia y ${fileCount} archivos cargados.`}
+              : `${indicator.requirements.length} evidencias y ${fileCount} archivos cargados.`}
           </p>
         </div>
 
@@ -170,7 +182,8 @@ export const EvidenceTable = ({
           const currentFile = files.find(file => file.isCurrentVersion);
           const status = currentFile?.status || 'Pendiente';
           const isExpanded = expandedRequirements.has(requirement.id);
-          const customFolders = folders[requirement.id] || [];
+          const requirementFolders = folders.filter(folder => folder.requirementId === requirement.id);
+          const folderGroups = buildFolderGroups(requirementFolders, files);
 
           return (
             <article key={requirement.id} className="bg-white">
@@ -268,7 +281,7 @@ export const EvidenceTable = ({
                   )}
                   {canUpload && (
                     <button
-                      onClick={() => onOpenUpload(requirement)}
+                      onClick={() => onOpenUpload(requirement, requirementFolders)}
                       className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-blue-600 text-white transition-colors hover:bg-blue-700"
                       title="Subir archivo"
                       aria-label="Subir archivo"
@@ -289,12 +302,12 @@ export const EvidenceTable = ({
                     {!isEvaluator && <RepositoryAction icon={BookOpen} label="Guia" onClick={() => setGuideRequirement(requirement)} />}
                     <RepositoryAction icon={History} label="Historial" onClick={() => onOpenHistory(requirement)} />
                     {isEvaluator && <RepositoryAction icon={ClipboardCheck} label="Revisar" onClick={() => onOpenEditor(requirement)} />}
-                    {canUpload && <RepositoryAction icon={Upload} label="Subir" onClick={() => onOpenUpload(requirement)} primary />}
+                    {canUpload && <RepositoryAction icon={Upload} label="Subir" onClick={() => onOpenUpload(requirement, requirementFolders)} primary />}
                   </div>
 
                   <div className="ml-5 border-l border-slate-300 pl-5">
                     <div className="mb-3 flex items-center justify-between gap-3">
-                      <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Contenido de la carpeta</p>
+                      <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Carpetas de la evidencia</p>
                       {canUpload && (
                         <button
                           onClick={() => createFolder(requirement)}
@@ -307,109 +320,53 @@ export const EvidenceTable = ({
                     </div>
 
                     <div className="space-y-2">
-                      <div className="rounded-lg border border-slate-200 bg-white">
-                        <div className="flex items-center gap-3 border-b border-slate-100 px-4 py-3">
-                          <FolderOpen className={`h-4 w-4 ${files.length > 0 ? 'text-emerald-600' : 'text-blue-600'}`} />
-                          <p className="text-sm font-black text-slate-700">Archivos cargados</p>
-                          <span className="ml-auto text-xs font-bold text-slate-400">{files.length}</span>
-                        </div>
-
-                        {files.length > 0 ? (
-                          <div className="divide-y divide-slate-100">
-                            {files.map(file => (
-                              <div
-                                key={file.id}
-                                className="flex items-center gap-3 px-4 py-3 transition-colors hover:bg-blue-50"
-                              >
-                                <button
-                                  onClick={() => setPreviewFile(file)}
-                                  className="flex min-w-0 flex-1 items-center gap-3 text-left"
-                                  title="Visualizar archivo"
-                                >
-                                  <span className="relative shrink-0">
-                                    <FileText className="h-4 w-4 text-emerald-600" />
-                                    <CheckCircle2 className="absolute -bottom-1 -right-1 h-2.5 w-2.5 rounded-full bg-white text-emerald-600" />
-                                  </span>
-                                  <div className="min-w-0 flex-1">
-                                    <p className="truncate text-sm font-bold text-slate-700">{file.fileName}</p>
-                                    <p className="mt-0.5 text-[10px] text-slate-400">
-                                      v{file.version} · {file.uploadDate} · {file.uploadedBy}
-                                    </p>
-                                  </div>
-                                </button>
-
-                                <EvidenceStatusBadge status={file.status} />
-
-                                {isEvaluator && (
-                                  <div className="flex shrink-0 items-center gap-2">
-                                    <button
-                                      onClick={() => setPreviewFile(file)}
-                                      className="inline-flex items-center gap-2 rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-[10px] font-black uppercase tracking-widest text-blue-700 hover:bg-blue-600 hover:text-white"
-                                      title="Visualizar archivo subido"
-                                    >
-                                      <Eye className="h-3.5 w-3.5" />
-                                      Visualizar
-                                    </button>
-                                    <button
-                                      onClick={() => confirmFile(file)}
-                                      disabled={file.status === 'Validado'}
-                                      className="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-3 py-2 text-[10px] font-black uppercase tracking-widest text-white hover:bg-emerald-700 disabled:cursor-not-allowed disabled:bg-emerald-200"
-                                      title="Confirmar evidencia"
-                                    >
-                                      <CheckCircle2 className="h-3.5 w-3.5" />
-                                      Confirmar
-                                    </button>
-                                    <button
-                                      onClick={() => denyFile(file)}
-                                      disabled={file.status === 'Rechazado'}
-                                      className="inline-flex items-center gap-2 rounded-lg bg-rose-600 px-3 py-2 text-[10px] font-black uppercase tracking-widest text-white hover:bg-rose-700 disabled:cursor-not-allowed disabled:bg-rose-200"
-                                      title="Denegar evidencia"
-                                    >
-                                      <XCircle className="h-3.5 w-3.5" />
-                                      Denegar
-                                    </button>
-                                  </div>
-                                )}
-                              </div>
-                            ))}
-                          </div>
-                        ) : (
-                          <div className="flex items-center gap-3 px-4 py-5 text-sm text-slate-400">
-                            <FileClock className="h-4 w-4" />
-                            Todavia no hay archivos en esta evidencia.
-                          </div>
-                        )}
-                      </div>
-
-                      {!isEvaluator && (
-                        <>
-                          <div className="flex items-center gap-3 rounded-lg border border-slate-200 bg-white px-4 py-3">
-                            <Folder className="h-4 w-4 text-amber-500" />
-                            <p className="text-sm font-bold text-slate-700">Anexos y respaldos</p>
-                            <span className="ml-auto text-xs font-bold text-slate-400">0</span>
-                          </div>
-
-                          {customFolders.map(folder => (
-                            <div key={folder} className="flex items-center gap-3 rounded-lg border border-slate-200 bg-white px-4 py-3">
-                              <Folder className="h-4 w-4 text-amber-500" />
-                              <p className="min-w-0 flex-1 truncate text-sm font-bold text-slate-700">{folder}</p>
-                              <span className="text-xs font-bold text-slate-400">0</span>
+                      {folderGroups.map(group => (
+                        <div key={group.id || 'without-folder'} className="rounded-lg border border-slate-200 bg-white">
+                          <div className="flex items-center gap-3 border-b border-slate-100 px-4 py-3">
+                            {group.isVirtual ? (
+                              <FolderOpen className={`h-4 w-4 ${group.files.length > 0 ? 'text-emerald-600' : 'text-blue-600'}`} />
+                            ) : (
+                              <Folder className={`h-4 w-4 ${group.files.length > 0 ? 'text-emerald-600' : 'text-amber-500'}`} />
+                            )}
+                            <p className="min-w-0 flex-1 truncate text-sm font-black text-slate-700">{group.name}</p>
+                            <span className="text-xs font-bold text-slate-400">{group.files.length}</span>
+                            {!isEvaluator && !group.isVirtual && group.folder && (
                               <button
-                                onClick={() => removeFolder(requirement.id, folder)}
+                                onClick={() => removeFolder(group.folder, files)}
                                 className="inline-flex h-7 w-7 items-center justify-center rounded-md text-slate-400 hover:bg-rose-50 hover:text-rose-600"
                                 title="Eliminar carpeta"
-                                aria-label={`Eliminar carpeta ${folder}`}
+                                aria-label={`Eliminar carpeta ${group.name}`}
                               >
                                 <X className="h-3.5 w-3.5" />
                               </button>
+                            )}
+                          </div>
+
+                          {group.files.length > 0 ? (
+                            <div className="divide-y divide-slate-100">
+                              {group.files.map(file => (
+                                <FileRow
+                                  key={file.id}
+                                  file={file}
+                                  isEvaluator={isEvaluator}
+                                  onPreview={setPreviewFile}
+                                  onConfirm={confirmFile}
+                                  onDeny={denyFile}
+                                />
+                              ))}
                             </div>
-                          ))}
-                        </>
-                      )}
+                          ) : (
+                            <div className="flex items-center gap-3 px-4 py-5 text-sm text-slate-400">
+                              <FileClock className="h-4 w-4" />
+                              Todavia no hay archivos en esta carpeta.
+                            </div>
+                          )}
+                        </div>
+                      ))}
 
                       {canUpload && (
                         <button
-                          onClick={() => onOpenUpload(requirement)}
+                          onClick={() => onOpenUpload(requirement, requirementFolders)}
                           className="flex w-full items-center justify-center gap-2 rounded-lg border-2 border-dashed border-slate-300 bg-white px-4 py-4 text-xs font-black uppercase tracking-widest text-slate-500 transition-colors hover:border-blue-400 hover:bg-blue-50 hover:text-blue-700"
                         >
                           <Plus className="h-4 w-4" />
@@ -456,6 +413,68 @@ export const EvidenceTable = ({
     </section>
   );
 };
+
+interface FileRowProps {
+  file: UploadedFile;
+  isEvaluator: boolean;
+  onPreview: (file: UploadedFile) => void;
+  onConfirm: (file: UploadedFile) => void;
+  onDeny: (file: UploadedFile) => void;
+}
+
+const FileRow = ({ file, isEvaluator, onPreview, onConfirm, onDeny }: FileRowProps) => (
+  <div className="flex items-center gap-3 px-4 py-3 transition-colors hover:bg-blue-50">
+    <button
+      onClick={() => onPreview(file)}
+      className="flex min-w-0 flex-1 items-center gap-3 text-left"
+      title="Visualizar archivo"
+    >
+      <span className="relative shrink-0">
+        <FileText className="h-4 w-4 text-emerald-600" />
+        <CheckCircle2 className="absolute -bottom-1 -right-1 h-2.5 w-2.5 rounded-full bg-white text-emerald-600" />
+      </span>
+      <div className="min-w-0 flex-1">
+        <p className="truncate text-sm font-bold text-slate-700">{file.fileName}</p>
+        <p className="mt-0.5 text-[10px] text-slate-400">
+          v{file.version} · {file.uploadDate} · {file.uploadedBy}
+        </p>
+      </div>
+    </button>
+
+    <EvidenceStatusBadge status={file.status} />
+
+    {isEvaluator && (
+      <div className="flex shrink-0 items-center gap-2">
+        <button
+          onClick={() => onPreview(file)}
+          className="inline-flex items-center gap-2 rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-[10px] font-black uppercase tracking-widest text-blue-700 hover:bg-blue-600 hover:text-white"
+          title="Visualizar archivo subido"
+        >
+          <Eye className="h-3.5 w-3.5" />
+          Visualizar
+        </button>
+        <button
+          onClick={() => onConfirm(file)}
+          disabled={file.status === 'Validado'}
+          className="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-3 py-2 text-[10px] font-black uppercase tracking-widest text-white hover:bg-emerald-700 disabled:cursor-not-allowed disabled:bg-emerald-200"
+          title="Confirmar evidencia"
+        >
+          <CheckCircle2 className="h-3.5 w-3.5" />
+          Confirmar
+        </button>
+        <button
+          onClick={() => onDeny(file)}
+          disabled={file.status === 'Rechazado'}
+          className="inline-flex items-center gap-2 rounded-lg bg-rose-600 px-3 py-2 text-[10px] font-black uppercase tracking-widest text-white hover:bg-rose-700 disabled:cursor-not-allowed disabled:bg-rose-200"
+          title="Denegar evidencia"
+        >
+          <XCircle className="h-3.5 w-3.5" />
+          Denegar
+        </button>
+      </div>
+    )}
+  </div>
+);
 
 interface RepositoryActionProps {
   icon: React.ComponentType<{ className?: string }>;

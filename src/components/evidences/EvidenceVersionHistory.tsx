@@ -19,6 +19,7 @@ export const EvidenceVersionHistory = ({ files, onDeleteFile }: EvidenceVersionH
             <th className="px-4 py-4">Fecha</th>
             <th className="px-4 py-4">Estado</th>
             <th className="px-4 py-4">Tipo</th>
+            <th className="px-4 py-4">Carpeta</th>
             <th className="px-4 py-4">Tamano</th>
             <th className="px-4 py-4">Subido por</th>
             <th className="px-4 py-4 text-right">Archivo</th>
@@ -34,6 +35,7 @@ export const EvidenceVersionHistory = ({ files, onDeleteFile }: EvidenceVersionH
               <td className="px-4 py-5 text-[10px] font-black text-slate-500 uppercase">
                 {getDisplayFileType(file.fileName, file.fileType)}
               </td>
+              <td className="px-4 py-5 text-[10px] font-bold text-slate-500">{file.folderName || 'Sin carpeta'}</td>
               <td className="px-4 py-5 text-[10px] font-bold text-slate-500">{file.fileSize}</td>
               <td className="px-4 py-5 text-[10px] font-bold text-slate-500">{file.uploadedBy}</td>
               <td className="px-4 py-5 text-right">

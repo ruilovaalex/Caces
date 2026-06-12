@@ -1,13 +1,16 @@
 import React from 'react';
 import { Upload, CheckCircle2, FileText } from 'lucide-react';
 import { Modal } from '../common/Modal';
-import { Requirement } from '../../types';
+import { EvidenceFolder, Requirement } from '../../types';
 import { getAcceptAttribute, getReadableAllowedFormats, isFileAllowedForRequirement } from '../../utils/evidenceFormatUtils';
 
 interface EvidenceUploadModalProps {
   isOpen: boolean;
   onClose: () => void;
   activeRequirement: Requirement | null;
+  folders: EvidenceFolder[];
+  selectedFolderId: string;
+  onFolderChange: (folderId: string) => void;
   uploadForm: { file: File | null; obs: string };
   onFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onObsChange: (obs: string) => void;
@@ -19,6 +22,9 @@ export const EvidenceUploadModal = ({
   isOpen,
   onClose,
   activeRequirement,
+  folders,
+  selectedFolderId,
+  onFolderChange,
   uploadForm,
   onFileChange,
   onObsChange,
@@ -67,6 +73,23 @@ export const EvidenceUploadModal = ({
             Este archivo no corresponde al formato requerido. Para esta evidencia solo se acepta: {allowedFormats}.
           </div>
         )}
+
+        <div className="space-y-2">
+          <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Carpeta destino</label>
+          <select
+            value={selectedFolderId}
+            onChange={event => onFolderChange(event.target.value)}
+            className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-4 py-3 text-sm font-bold text-slate-700 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
+          >
+            <option value="">Sin carpeta</option>
+            {folders.map(folder => (
+              <option key={folder.id} value={folder.id}>{folder.name}</option>
+            ))}
+          </select>
+          <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">
+            Los archivos antiguos sin carpeta seguiran apareciendo en Sin carpeta.
+          </p>
+        </div>
 
         <div className="space-y-3">
           <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Observación de la Versión</label>

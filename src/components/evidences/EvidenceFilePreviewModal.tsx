@@ -79,6 +79,9 @@ export const EvidenceFilePreviewModal = ({
             <p className="mt-1 text-xs text-slate-400">
               v{file.version} · {file.uploadDate} · {file.uploadedBy}
             </p>
+            <p className="mt-1 text-[10px] font-black uppercase tracking-widest text-slate-400">
+              Carpeta: {file.folderName || 'Sin carpeta'}
+            </p>
           </div>
           <EvidenceStatusBadge status={file.status} />
         </div>

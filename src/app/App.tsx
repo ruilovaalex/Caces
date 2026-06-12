@@ -33,7 +33,7 @@ import {
 } from '../utils/permissions';
 import { viewTransition } from '../utils/animations';
 import { getAcademicPeriodsForYear } from '../utils/academicPeriodUtils';
-import { Indicator, Requirement, Status } from '../types';
+import { EvidenceFolder, Indicator, Requirement, Status } from '../types';
 
 export default function App() {
   const { isAuthenticated, userRole, login, logout, switchRole, user } = useAuth();
@@ -56,6 +56,8 @@ export default function App() {
   const [isChecklistOpen, setIsChecklistOpen] = useState(false);
   const [isAssignmentsOpen, setIsAssignmentsOpen] = useState(false);
   const [isTemplatesOpen, setIsTemplatesOpen] = useState(false);
+  const [uploadFolders, setUploadFolders] = useState<EvidenceFolder[]>([]);
+  const [selectedUploadFolderId, setSelectedUploadFolderId] = useState('');
 
   const {
     allFiles,
@@ -174,8 +176,11 @@ export default function App() {
     }
 
     try {
-      await uploadFile(uploadFileContent, selectedIndicator, activeRequirement, user.name, uploadObs);
+      const selectedUploadFolder = uploadFolders.find(folder => folder.id === selectedUploadFolderId) || null;
+      await uploadFile(uploadFileContent, selectedIndicator, activeRequirement, user.name, uploadObs, selectedUploadFolder);
       setIsUploadOpen(false);
+      setSelectedUploadFolderId('');
+      setUploadFolders([]);
       resetUpload();
       refreshNotifications();
     } catch (error) {
@@ -384,9 +389,11 @@ export default function App() {
                   indicator={selectedIndicator}
                   userRole={userRole}
                   getRequirementFiles={requirementId => getRequirementFiles(requirementId, selectedIndicator.code)}
-                  onOpenUpload={requirement => {
+                  onOpenUpload={(requirement, folders = []) => {
                     if (!canUserUpload(userRole)) return;
                     setActiveRequirement(requirement);
+                    setUploadFolders(folders);
+                    setSelectedUploadFolderId('');
                     setIsUploadOpen(true);
                     resetUpload();
                   }}
@@ -410,8 +417,15 @@ export default function App() {
 
       <EvidenceUploadModal
         isOpen={isUploadOpen && canUserUpload(userRole)}
-        onClose={() => setIsUploadOpen(false)}
+        onClose={() => {
+          setIsUploadOpen(false);
+          setSelectedUploadFolderId('');
+          setUploadFolders([]);
+        }}
         activeRequirement={activeRequirement}
+        folders={uploadFolders}
+        selectedFolderId={selectedUploadFolderId}
+        onFolderChange={setSelectedUploadFolderId}
         uploadForm={{ file: uploadFileContent, obs: uploadObs }}
         onFileChange={onFileChange}
         onObsChange={setUploadObs}

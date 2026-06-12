@@ -50,6 +50,8 @@ export const EvidenceService = {
       indicatorCode: payload.indicatorCode,
       requirementId: payload.requirementId,
       requirementLabel: payload.requirementLabel,
+      folderId: payload.folderId,
+      folderName: payload.folderName,
       fileName: file.name,
       fileType: getDisplayFileType(file.name, file.type),
       fileSize: `${(file.size / 1024).toFixed(1)} KB`,

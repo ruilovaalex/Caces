@@ -1,10 +1,24 @@
 export type Status = 'Pendiente' | 'Cargado' | 'Validado' | 'Observado' | 'Rechazado';
+export type EvidenceFolderType = 'GENERAL' | 'CARRERA' | 'AREA';
+
+export interface EvidenceFolder {
+  id: string;
+  indicatorCode: string;
+  requirementId: string;
+  name: string;
+  type: EvidenceFolderType;
+  createdAt: string;
+  updatedAt: string;
+  createdBy?: string;
+}
 
 export interface UploadedFile {
   id: string;
   indicatorCode: string;
   requirementId: string;
   requirementLabel: string;
+  folderId?: string;
+  folderName?: string;
   fileName: string;
   fileType: string;
   fileSize: string;
@@ -21,6 +35,8 @@ export interface UploadPayload {
   indicatorCode: string;
   requirementId: string;
   requirementLabel: string;
+  folderId?: string;
+  folderName?: string;
   uploadedBy: string;
   observation?: string;
 }

@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { UploadedFile, GeneratedDoc, Status, Requirement, Indicator } from '../types';
+import { UploadedFile, GeneratedDoc, Status, Requirement, Indicator, EvidenceFolder } from '../types';
 import { EvidenceService } from '../services/evidenceService';
 import { NotificationService } from '../services/notificationService';
 
@@ -25,13 +25,16 @@ export const useEvidences = () => {
     indicator: Indicator,
     requirement: Requirement,
     userName: string,
-    observation?: string
+    observation?: string,
+    folder?: EvidenceFolder | null
   ) => {
     try {
       await EvidenceService.upload(file, {
         indicatorCode: indicator.code,
         requirementId: requirement.id,
         requirementLabel: requirement.label,
+        folderId: folder?.id,
+        folderName: folder?.name,
         uploadedBy: userName,
         observation
       });
