@@ -2,6 +2,9 @@ import React, { useMemo, useState } from 'react';
 import { Download, FileSpreadsheet, FileText, Search, Sparkles, Star } from 'lucide-react';
 import { MOCK_DATA } from '../../data/cacesMockData';
 import { TEMPLATES } from '../../data/templates';
+import { OfficialFormat } from '../../types';
+import { OfficialFormatContentService } from '../../services/officialFormatContentService';
+import { OfficialFormatService } from '../../services/officialFormatService';
 import { Modal } from '../common/Modal';
 
 interface TemplateLibraryModalProps {
@@ -13,7 +16,7 @@ const categories = [
   {
     id: 'criterio-1',
     label: MOCK_DATA[0].criteria[0].name,
-    shortLabel: 'C1 ORGANIZACIÓN',
+    shortLabel: 'C1 ORGANIZACION',
     description: 'Plantillas para planificacion, seguimiento institucional, actas, informes y soporte de gestion.',
     templateIds: ['acta', 'informe', 'registro', 'oficio', 'documento'],
   },
@@ -41,14 +44,14 @@ const categories = [
   {
     id: 'criterio-5',
     label: MOCK_DATA[0].criteria[4].name,
-    shortLabel: 'C5 INVESTIGACIÓN',
+    shortLabel: 'C5 INVESTIGACION',
     description: 'Apoyos para proyectos, productos, seguimiento y respaldo de resultados.',
     templateIds: ['plan', 'informe', 'evidencia', 'matriz', 'certificado'],
   },
   {
     id: 'criterio-6',
     label: MOCK_DATA[0].criteria[5].name,
-    shortLabel: 'C6 VINCULACIÓN',
+    shortLabel: 'C6 VINCULACION',
     description: 'Modelos para convenios, actas, informes, evidencias y relacion con actores externos.',
     templateIds: ['convenio', 'acta', 'informe', 'evidencia', 'oficio'],
   },
@@ -56,12 +59,52 @@ const categories = [
 
 const featuredIds = ['acta', 'informe', 'registro', 'plan'];
 
+const downloadStaticTemplate = (templateId: string) => {
+  const template = TEMPLATES.find(item => item.id === templateId);
+  if (!template) return;
+
+  const content = [
+    `PLANTILLA INSTITUCIONAL: ${template.label.toUpperCase()}`,
+    '',
+    template.description,
+    '',
+    '1. Datos generales',
+    '2. Objetivo',
+    '3. Desarrollo',
+    '4. Resultados o acuerdos',
+    '5. Responsables y fechas',
+    '6. Firmas y anexos',
+  ].join('\n');
+  const url = URL.createObjectURL(new Blob([content], { type: 'text/plain;charset=utf-8' }));
+  const anchor = document.createElement('a');
+  anchor.href = url;
+  anchor.download = `plantilla-${template.id}.txt`;
+  anchor.click();
+  URL.revokeObjectURL(url);
+};
+
+const downloadOfficialFormat = async (format: OfficialFormat) => {
+  const blob = await OfficialFormatContentService.get(format.id);
+  if (!blob) {
+    window.alert('No se encontro el archivo local de este formato.');
+    return;
+  }
+
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement('a');
+  anchor.href = url;
+  anchor.download = format.fileName;
+  anchor.click();
+  URL.revokeObjectURL(url);
+};
+
 export const TemplateLibraryModal = ({
   isOpen,
   onClose,
 }: TemplateLibraryModalProps) => {
   const [query, setQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState('');
+  const officialFormats = OfficialFormatService.getActive();
 
   const activeCategoryData = categories.find(category => category.id === activeCategory);
 
@@ -78,34 +121,21 @@ export const TemplateLibraryModal = ({
     });
   }, [activeCategoryData, query]);
 
-  const handleDownload = (templateId: string) => {
-    const template = TEMPLATES.find(item => item.id === templateId);
-    if (!template) return;
+  const filteredFormats = useMemo(() => {
+    const normalizedQuery = query.trim().toLowerCase();
+    if (!normalizedQuery) return officialFormats;
 
-    const content = [
-      `PLANTILLA INSTITUCIONAL: ${template.label.toUpperCase()}`,
-      '',
-      template.description,
-      '',
-      '1. Datos generales',
-      '2. Objetivo',
-      '3. Desarrollo',
-      '4. Resultados o acuerdos',
-      '5. Responsables y fechas',
-      '6. Firmas y anexos',
-    ].join('\n');
-    const url = URL.createObjectURL(new Blob([content], { type: 'text/plain;charset=utf-8' }));
-    const anchor = document.createElement('a');
-    anchor.href = url;
-    anchor.download = `plantilla-${template.id}.txt`;
-    anchor.click();
-    URL.revokeObjectURL(url);
-  };
+    return officialFormats.filter(format =>
+      format.title.toLowerCase().includes(normalizedQuery) ||
+      format.description.toLowerCase().includes(normalizedQuery) ||
+      format.fileName.toLowerCase().includes(normalizedQuery)
+    );
+  }, [officialFormats, query]);
 
   const featuredTemplates = TEMPLATES.filter(template => featuredIds.includes(template.id));
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Biblioteca de plantillas" maxWidth="max-w-6xl">
+    <Modal isOpen={isOpen} onClose={onClose} title="Biblioteca de formatos y plantillas" maxWidth="max-w-6xl">
       <div className="space-y-7 border-t border-slate-100 bg-slate-50 p-7">
         <div className="flex flex-col gap-3">
           <label className="relative">
@@ -113,7 +143,7 @@ export const TemplateLibraryModal = ({
             <input
               value={query}
               onChange={event => setQuery(event.target.value)}
-              placeholder="Buscar una plantilla"
+              placeholder="Buscar un formato o plantilla"
               className="h-11 w-full rounded-lg border border-slate-200 bg-white pl-10 pr-4 text-sm outline-none focus:border-blue-400"
             />
           </label>
@@ -130,22 +160,40 @@ export const TemplateLibraryModal = ({
           </div>
         </div>
 
+        <section>
+          <div className="mb-3 flex items-center gap-2">
+            <FileSpreadsheet className="h-4 w-4 text-emerald-600" />
+            <h3 className="text-xs font-black uppercase tracking-widest text-slate-700">Formatos oficiales locales</h3>
+          </div>
+          {filteredFormats.length > 0 ? (
+            <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+              {filteredFormats.map(format => (
+                <OfficialFormatCard key={format.id} format={format} onDownload={downloadOfficialFormat} />
+              ))}
+            </div>
+          ) : (
+            <div className="rounded-lg border-2 border-dashed border-slate-200 bg-white p-6 text-center text-sm font-semibold text-slate-400">
+              No hay formatos oficiales locales disponibles.
+            </div>
+          )}
+        </section>
+
         {!query && activeCategory === '' && (
           <section>
             <div className="mb-3 flex items-center gap-2">
               <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
-              <h3 className="text-xs font-black uppercase tracking-widest text-slate-700">Plantillas mas utilizadas</h3>
+              <h3 className="text-xs font-black uppercase tracking-widest text-slate-700">Plantillas sugeridas mas utilizadas</h3>
             </div>
             <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
               {featuredTemplates.map(template => (
-                <TemplateCard key={template.id} template={template} onDownload={handleDownload} featured />
+                <TemplateCard key={template.id} template={template} onDownload={downloadStaticTemplate} featured />
               ))}
             </div>
           </section>
         )}
 
         <section>
-          <h3 className="mb-3 text-xs font-black uppercase tracking-widest text-slate-700">Plantillas por criterio</h3>
+          <h3 className="mb-3 text-xs font-black uppercase tracking-widest text-slate-700">Plantillas sugeridas por criterio</h3>
           <div className="grid gap-2 md:grid-cols-2 xl:grid-cols-3">
             {categories.map(category => (
               <button
@@ -186,7 +234,7 @@ export const TemplateLibraryModal = ({
             {filteredTemplates.length > 0 ? (
               <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
                 {filteredTemplates.map(template => (
-                  <TemplateCard key={template.id} template={template} onDownload={handleDownload} />
+                  <TemplateCard key={template.id} template={template} onDownload={downloadStaticTemplate} />
                 ))}
               </div>
             ) : (
@@ -197,8 +245,8 @@ export const TemplateLibraryModal = ({
           </section>
         ) : (
           <section className="rounded-2xl border border-dashed border-slate-200 bg-white p-10 text-center">
-            <p className="text-sm font-bold text-slate-600">Selecciona un criterio para ver sus plantillas.</p>
-            <p className="mt-2 text-xs text-slate-400">La parte inferior se abre solo cuando eliges un criterio.</p>
+            <p className="text-sm font-bold text-slate-600">Selecciona un criterio para ver sus plantillas sugeridas.</p>
+            <p className="mt-2 text-xs text-slate-400">Los formatos oficiales locales se muestran arriba.</p>
           </section>
         )}
       </div>
@@ -225,6 +273,27 @@ const FilterChip = ({
   >
     {label}
   </button>
+);
+
+const OfficialFormatCard = ({ format, onDownload }: { format: OfficialFormat; onDownload: (format: OfficialFormat) => void }) => (
+  <article className="flex min-h-[150px] flex-col rounded-lg border border-emerald-100 bg-white p-4">
+    <div className="flex items-start justify-between gap-3">
+      <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600">
+        <FileSpreadsheet className="h-4 w-4" />
+      </div>
+      <span className="text-[9px] font-black uppercase tracking-widest text-emerald-600">Oficial</span>
+    </div>
+    <h4 className="mt-3 text-sm font-black text-slate-800">{format.title}</h4>
+    <p className="mt-1 flex-1 text-xs leading-relaxed text-slate-500">{format.description}</p>
+    <p className="mt-2 text-[10px] font-bold text-slate-400">{format.fileName}</p>
+    <button
+      onClick={() => onDownload(format)}
+      className="mt-4 inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-emerald-700 hover:text-emerald-900"
+    >
+      <Download className="h-3.5 w-3.5" />
+      Descargar formato
+    </button>
+  </article>
 );
 
 interface TemplateCardProps {

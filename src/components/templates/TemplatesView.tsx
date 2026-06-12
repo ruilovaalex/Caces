@@ -5,19 +5,29 @@ import {
   FileSpreadsheet,
   FileText,
   FolderKanban,
+  Link2,
   Search,
   Sparkles,
   Star,
+  UploadCloud,
 } from 'lucide-react';
 import { motion } from 'motion/react';
 import { MOCK_DATA } from '../../data/cacesMockData';
 import { TEMPLATES } from '../../data/templates';
+import { OfficialFormat, UserRole } from '../../types';
+import { OfficialFormatContentService } from '../../services/officialFormatContentService';
+import { OfficialFormatService } from '../../services/officialFormatService';
+
+interface TemplatesViewProps {
+  userRole: UserRole;
+  userName?: string;
+}
 
 const categories = [
   {
     id: 'criterio-1',
     label: MOCK_DATA[0].criteria[0].name,
-    chipLabel: 'C1 ORGANIZACIÓN',
+    chipLabel: 'C1 ORGANIZACION',
     description: 'Plantillas para planificacion, seguimiento institucional, actas, informes y soporte de gestion.',
     templateIds: ['acta', 'informe', 'registro', 'oficio', 'documento'],
   },
@@ -45,14 +55,14 @@ const categories = [
   {
     id: 'criterio-5',
     label: MOCK_DATA[0].criteria[4].name,
-    chipLabel: 'C5 INVESTIGACIÓN',
+    chipLabel: 'C5 INVESTIGACION',
     description: 'Apoyos para proyectos, productos, seguimiento y respaldo de resultados.',
     templateIds: ['plan', 'informe', 'evidencia', 'matriz', 'certificado'],
   },
   {
     id: 'criterio-6',
     label: MOCK_DATA[0].criteria[5].name,
-    chipLabel: 'C6 VINCULACIÓN',
+    chipLabel: 'C6 VINCULACION',
     description: 'Modelos para convenios, actas, informes, evidencias y relacion con actores externos.',
     templateIds: ['convenio', 'acta', 'informe', 'evidencia', 'oficio'],
   },
@@ -60,11 +70,76 @@ const categories = [
 
 const featuredIds = ['acta', 'informe', 'registro', 'plan'];
 
-export const TemplatesView = () => {
+const evidenceOptions = MOCK_DATA.flatMap(yearPeriod =>
+  yearPeriod.criteria.flatMap(criterion =>
+    criterion.subCriteria.flatMap(subCriterion =>
+      subCriterion.indicators.flatMap(indicator =>
+        indicator.requirements.map(requirement => ({
+          id: `${indicator.code}::${requirement.id}`,
+          indicatorCode: indicator.code,
+          indicatorName: indicator.name,
+          requirementId: requirement.id,
+          requirementLabel: requirement.label
+        }))
+      )
+    )
+  )
+);
+
+const downloadStaticTemplate = (templateId: string) => {
+  const template = TEMPLATES.find(item => item.id === templateId);
+  if (!template) return;
+
+  const content = [
+    `PLANTILLA INSTITUCIONAL: ${template.label.toUpperCase()}`,
+    '',
+    template.description,
+    '',
+    '1. Datos generales',
+    '2. Objetivo o alcance',
+    '3. Desarrollo',
+    '4. Resultados, acuerdos o evidencias',
+    '5. Responsables',
+    '6. Firmas y anexos',
+  ].join('\n');
+
+  const url = URL.createObjectURL(new Blob([content], { type: 'text/plain;charset=utf-8' }));
+  const anchor = document.createElement('a');
+  anchor.href = url;
+  anchor.download = `plantilla-${template.id}.txt`;
+  anchor.click();
+  URL.revokeObjectURL(url);
+};
+
+const downloadOfficialFormat = async (format: OfficialFormat) => {
+  const blob = await OfficialFormatContentService.get(format.id);
+  if (!blob) {
+    window.alert('No se encontro el archivo local de este formato.');
+    return;
+  }
+
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement('a');
+  anchor.href = url;
+  anchor.download = format.fileName;
+  anchor.click();
+  URL.revokeObjectURL(url);
+};
+
+export const TemplatesView = ({ userRole, userName = 'Administrador' }: TemplatesViewProps) => {
   const [query, setQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState<string>('');
+  const [officialFormats, setOfficialFormats] = useState<OfficialFormat[]>(() => OfficialFormatService.getAll());
+  const [links, setLinks] = useState(() => OfficialFormatService.getLinks());
+  const [formatTitle, setFormatTitle] = useState('');
+  const [formatDescription, setFormatDescription] = useState('');
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [selectedFormatId, setSelectedFormatId] = useState('');
+  const [selectedEvidenceId, setSelectedEvidenceId] = useState(evidenceOptions[0]?.id || '');
+  const isAdmin = userRole === 'ADMIN';
 
   const activeCategoryData = categories.find(category => category.id === activeCategory);
+  const activeFormats = officialFormats.filter(format => format.status === 'ACTIVO');
 
   const filteredTemplates = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
@@ -80,34 +155,69 @@ export const TemplatesView = () => {
     });
   }, [activeCategoryData, query]);
 
+  const filteredFormats = useMemo(() => {
+    const normalizedQuery = query.trim().toLowerCase();
+    if (!normalizedQuery) return activeFormats;
+
+    return activeFormats.filter(format =>
+      format.title.toLowerCase().includes(normalizedQuery) ||
+      format.description.toLowerCase().includes(normalizedQuery) ||
+      format.fileName.toLowerCase().includes(normalizedQuery)
+    );
+  }, [activeFormats, query]);
+
   const featuredTemplates = useMemo(
     () => TEMPLATES.filter(template => featuredIds.includes(template.id)),
     []
   );
 
-  const handleDownload = (templateId: string) => {
-    const template = TEMPLATES.find(item => item.id === templateId);
-    if (!template) return;
+  const refreshLocalFormats = () => {
+    setOfficialFormats(OfficialFormatService.getAll());
+    setLinks(OfficialFormatService.getLinks());
+  };
 
-    const content = [
-      `PLANTILLA INSTITUCIONAL: ${template.label.toUpperCase()}`,
-      '',
-      template.description,
-      '',
-      '1. Datos generales',
-      '2. Objetivo o alcance',
-      '3. Desarrollo',
-      '4. Resultados, acuerdos o evidencias',
-      '5. Responsables',
-      '6. Firmas y anexos',
-    ].join('\n');
+  const handleCreateOfficialFormat = async () => {
+    if (!selectedFile || !formatTitle.trim()) return;
 
-    const url = URL.createObjectURL(new Blob([content], { type: 'text/plain;charset=utf-8' }));
-    const anchor = document.createElement('a');
-    anchor.href = url;
-    anchor.download = `plantilla-${template.id}.txt`;
-    anchor.click();
-    URL.revokeObjectURL(url);
+    const format = OfficialFormatService.create({
+      title: formatTitle,
+      description: formatDescription || selectedFile.name,
+      fileName: selectedFile.name,
+      fileType: selectedFile.type || 'Archivo',
+      fileSize: `${(selectedFile.size / 1024).toFixed(1)} KB`,
+      uploadedBy: userName
+    });
+
+    if (!format) {
+      window.alert('Ya existe un formato con ese titulo y archivo.');
+      return;
+    }
+
+    await OfficialFormatContentService.save(format.id, selectedFile);
+    setFormatTitle('');
+    setFormatDescription('');
+    setSelectedFile(null);
+    setSelectedFormatId(format.id);
+    refreshLocalFormats();
+  };
+
+  const handleLinkFormat = () => {
+    const evidence = evidenceOptions.find(option => option.id === selectedEvidenceId);
+    if (!selectedFormatId || !evidence) return;
+
+    OfficialFormatService.linkToEvidence({
+      formatId: selectedFormatId,
+      indicatorCode: evidence.indicatorCode,
+      requirementId: evidence.requirementId,
+      requirementLabel: evidence.requirementLabel,
+      createdBy: userName
+    });
+    refreshLocalFormats();
+  };
+
+  const handleToggleFormat = (format: OfficialFormat) => {
+    OfficialFormatService.setStatus(format.id, format.status === 'ACTIVO' ? 'INACTIVO' : 'ACTIVO');
+    refreshLocalFormats();
   };
 
   return (
@@ -121,25 +231,104 @@ export const TemplatesView = () => {
           <div className="max-w-3xl">
             <div className="inline-flex items-center gap-2 rounded-full border border-blue-100 bg-blue-50 px-4 py-2 text-[10px] font-black uppercase tracking-[0.24em] text-blue-700">
               <Blocks className="h-3.5 w-3.5" />
-              Centro de creacion
+              Formatos oficiales
             </div>
             <h1 className="mt-4 text-3xl font-black tracking-tight text-slate-900">
-              Plantillas
+              Plantillas y formatos
             </h1>
             <p className="mt-3 max-w-2xl text-sm leading-relaxed text-slate-500">
-              Aqui encuentras las plantillas mas usadas y una biblioteca organizada por criterio CACES.
-              Entra, filtra y descarga una base limpia para comenzar a trabajar.
+              Administra formatos oficiales locales y conserva la biblioteca de plantillas sugeridas como apoyo.
             </p>
           </div>
 
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-            <MetricCard label="Mas usadas" value="4" accent="text-amber-600" />
-            <MetricCard label="Biblioteca" value={String(TEMPLATES.length)} accent="text-blue-600" />
-            <MetricCard label="Criterios" value={String(categories.length)} accent="text-emerald-600" />
-            <MetricCard label="Base" value="TXT" accent="text-violet-600" />
+            <MetricCard label="Formatos" value={String(activeFormats.length)} accent="text-emerald-600" />
+            <MetricCard label="Asociaciones" value={String(links.length)} accent="text-blue-600" />
+            <MetricCard label="Plantillas" value={String(TEMPLATES.length)} accent="text-amber-600" />
+            <MetricCard label="Base" value="Local" accent="text-violet-600" />
           </div>
         </div>
       </section>
+
+      {isAdmin && (
+        <section className="grid gap-5 lg:grid-cols-[1fr_1fr]">
+          <div className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm">
+            <div className="flex items-center gap-2">
+              <UploadCloud className="h-5 w-5 text-blue-600" />
+              <h2 className="text-sm font-black uppercase tracking-widest text-slate-800">Cargar formato oficial</h2>
+            </div>
+            <div className="mt-5 space-y-3">
+              <input
+                value={formatTitle}
+                onChange={event => setFormatTitle(event.target.value)}
+                placeholder="Titulo del formato oficial"
+                className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold outline-none focus:border-blue-300 focus:bg-white"
+              />
+              <textarea
+                value={formatDescription}
+                onChange={event => setFormatDescription(event.target.value)}
+                placeholder="Descripcion de uso"
+                rows={3}
+                className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold outline-none focus:border-blue-300 focus:bg-white"
+              />
+              <input
+                type="file"
+                onChange={event => setSelectedFile(event.target.files?.[0] || null)}
+                className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold text-slate-600"
+              />
+              <button
+                onClick={handleCreateOfficialFormat}
+                disabled={!selectedFile || !formatTitle.trim()}
+                className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-blue-600 px-5 py-3 text-xs font-black uppercase tracking-widest text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-slate-300"
+              >
+                <UploadCloud className="h-4 w-4" />
+                Guardar formato local
+              </button>
+            </div>
+          </div>
+
+          <div className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm">
+            <div className="flex items-center gap-2">
+              <Link2 className="h-5 w-5 text-emerald-600" />
+              <h2 className="text-sm font-black uppercase tracking-widest text-slate-800">Asociar a evidencia</h2>
+            </div>
+            <div className="mt-5 space-y-3">
+              <select
+                value={selectedFormatId}
+                onChange={event => setSelectedFormatId(event.target.value)}
+                className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold outline-none focus:border-blue-300 focus:bg-white"
+              >
+                <option value="">Selecciona un formato</option>
+                {activeFormats.map(format => (
+                  <option key={format.id} value={format.id}>{format.title}</option>
+                ))}
+              </select>
+              <select
+                value={selectedEvidenceId}
+                onChange={event => setSelectedEvidenceId(event.target.value)}
+                className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold outline-none focus:border-blue-300 focus:bg-white"
+              >
+                {evidenceOptions.map(option => (
+                  <option key={option.id} value={option.id}>
+                    {option.indicatorCode} - Evidencia {option.requirementId}: {option.requirementLabel}
+                  </option>
+                ))}
+              </select>
+              <button
+                onClick={handleLinkFormat}
+                disabled={!selectedFormatId || !selectedEvidenceId}
+                className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-emerald-600 px-5 py-3 text-xs font-black uppercase tracking-widest text-white hover:bg-emerald-700 disabled:cursor-not-allowed disabled:bg-slate-300"
+              >
+                <Link2 className="h-4 w-4" />
+                Asociar formato
+              </button>
+              <p className="text-xs font-bold text-slate-400">
+                La asociacion usa indicador + evidencia; no modifica la matriz CACES.
+              </p>
+            </div>
+          </div>
+        </section>
+      )}
 
       <section className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center">
@@ -148,7 +337,7 @@ export const TemplatesView = () => {
             <input
               value={query}
               onChange={event => setQuery(event.target.value)}
-              placeholder="Buscar una plantilla por nombre o uso"
+              placeholder="Buscar formato o plantilla"
               className="h-12 w-full rounded-2xl border border-slate-200 bg-slate-50 pl-11 pr-4 text-sm font-medium outline-none transition-all focus:border-blue-400 focus:bg-white"
             />
           </label>
@@ -166,15 +355,40 @@ export const TemplatesView = () => {
         </div>
       </section>
 
+      <section className="space-y-4">
+        <div className="flex items-center gap-2">
+          <FileSpreadsheet className="h-4 w-4 text-emerald-600" />
+          <h2 className="text-xs font-black uppercase tracking-[0.24em] text-slate-500">Formatos oficiales locales</h2>
+        </div>
+        {filteredFormats.length > 0 ? (
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {filteredFormats.map(format => (
+              <OfficialFormatCard
+                key={format.id}
+                format={format}
+                links={links.filter(link => link.formatId === format.id).length}
+                isAdmin={isAdmin}
+                onDownload={downloadOfficialFormat}
+                onToggle={handleToggleFormat}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="rounded-[24px] border border-dashed border-slate-200 bg-white p-8 text-center text-sm font-bold text-slate-400">
+            No hay formatos oficiales locales visibles.
+          </div>
+        )}
+      </section>
+
       {!query && activeCategory === '' && (
         <section className="space-y-4">
           <div className="flex items-center gap-2">
             <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
-            <h2 className="text-xs font-black uppercase tracking-[0.24em] text-slate-500">Plantillas mas utilizadas</h2>
+            <h2 className="text-xs font-black uppercase tracking-[0.24em] text-slate-500">Plantillas sugeridas mas utilizadas</h2>
           </div>
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
             {featuredTemplates.map(template => (
-              <TemplateCard key={template.id} template={template} onDownload={handleDownload} featured />
+              <TemplateCard key={template.id} template={template} onDownload={downloadStaticTemplate} featured />
             ))}
           </div>
         </section>
@@ -183,7 +397,7 @@ export const TemplatesView = () => {
       <section className="space-y-4">
         <div className="flex items-center gap-2">
           <FolderKanban className="h-4 w-4 text-blue-600" />
-          <h2 className="text-xs font-black uppercase tracking-[0.24em] text-slate-500">Plantillas por criterio</h2>
+          <h2 className="text-xs font-black uppercase tracking-[0.24em] text-slate-500">Plantillas sugeridas por criterio</h2>
         </div>
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {categories.map(category => (
@@ -231,7 +445,7 @@ export const TemplatesView = () => {
           {filteredTemplates.length > 0 ? (
             <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
               {filteredTemplates.map(template => (
-                <TemplateCard key={template.id} template={template} onDownload={handleDownload} />
+                <TemplateCard key={template.id} template={template} onDownload={downloadStaticTemplate} />
               ))}
             </div>
           ) : (
@@ -243,8 +457,8 @@ export const TemplatesView = () => {
         </section>
       ) : (
         <section className="rounded-[28px] border border-dashed border-slate-200 bg-white p-12 text-center shadow-sm">
-          <p className="text-sm font-bold text-slate-600">Selecciona un criterio para ver sus plantillas.</p>
-          <p className="mt-2 text-xs text-slate-400">La biblioteca inferior se abre solo cuando eliges un criterio.</p>
+          <p className="text-sm font-bold text-slate-600">Selecciona un criterio para ver sus plantillas sugeridas.</p>
+          <p className="mt-2 text-xs text-slate-400">Los formatos oficiales locales se muestran arriba.</p>
         </section>
       )}
     </motion.div>
@@ -277,6 +491,53 @@ const FilterChip = ({
   >
     {label}
   </button>
+);
+
+const OfficialFormatCard = ({
+  format,
+  links,
+  isAdmin,
+  onDownload,
+  onToggle,
+}: {
+  format: OfficialFormat;
+  links: number;
+  isAdmin: boolean;
+  onDownload: (format: OfficialFormat) => void;
+  onToggle: (format: OfficialFormat) => void;
+}) => (
+  <article className="flex min-h-[210px] flex-col rounded-[24px] border border-slate-200 bg-white p-5">
+    <div className="flex items-start justify-between gap-3">
+      <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600">
+        <FileSpreadsheet className="h-5 w-5" />
+      </div>
+      <span className="rounded-full bg-emerald-50 px-2.5 py-1 text-[9px] font-black uppercase tracking-[0.2em] text-emerald-700">
+        Oficial
+      </span>
+    </div>
+    <h3 className="mt-4 text-sm font-black text-slate-900">{format.title}</h3>
+    <p className="mt-2 flex-1 text-xs leading-relaxed text-slate-500">{format.description}</p>
+    <p className="mt-3 text-[10px] font-bold uppercase tracking-widest text-slate-400">
+      {format.fileName} · {format.fileSize} · {links} evidencia{links === 1 ? '' : 's'}
+    </p>
+    <div className="mt-5 flex flex-wrap gap-2">
+      <button
+        onClick={() => onDownload(format)}
+        className="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-4 py-2 text-[10px] font-black uppercase tracking-[0.18em] text-emerald-700 transition-colors hover:bg-emerald-100"
+      >
+        <Download className="h-3.5 w-3.5" />
+        Descargar
+      </button>
+      {isAdmin && (
+        <button
+          onClick={() => onToggle(format)}
+          className="inline-flex items-center gap-2 rounded-full bg-slate-100 px-4 py-2 text-[10px] font-black uppercase tracking-[0.18em] text-slate-600 transition-colors hover:bg-slate-200"
+        >
+          Desactivar
+        </button>
+      )}
+    </div>
+  </article>
 );
 
 const TemplateCard = ({

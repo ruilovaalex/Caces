@@ -172,7 +172,7 @@ export const CoordinatorEvidenceEditor = ({
   const generatedFileName = useMemo(() => {
     const generatedAt = new Date();
     return [
-      'SIG',
+      'BORRADOR',
       'EV',
       normalizeFileName(indicator.code),
       normalizeFileName(requirement.id),
@@ -217,7 +217,7 @@ export const CoordinatorEvidenceEditor = ({
         <body>
           <div class="brand">
             <p>Instituto Superior Tecnologico Sudamericano</p>
-            <h1>Documento unico de evidencia</h1>
+            <h1>Borrador auxiliar de evidencia</h1>
             <p><strong>Codigo:</strong> ${fileName}</p>
           </div>
           <div class="meta">
@@ -302,14 +302,14 @@ export const CoordinatorEvidenceEditor = ({
       SIN_INICIAR: 'bg-slate-100 text-slate-500',
       EN_EDICION: 'bg-blue-100 text-blue-600',
       BORRADOR_GUARDADO: 'bg-amber-100 text-amber-600',
-      DOCUMENTO_GENERADO: 'bg-emerald-100 text-emerald-600',
+      DOCUMENTO_GENERADO: 'bg-sky-100 text-sky-600',
       LISTO_PARA_SUBIR: 'bg-emerald-100 text-emerald-600',
       ARCHIVO_FINAL_CARGADO: 'bg-purple-100 text-purple-600'
     };
 
     return (
       <span className={`px-2 py-1 rounded-md text-[10px] font-black uppercase tracking-widest ${styles[status]}`}>
-        {status.replace(/_/g, ' ')}
+        {status === 'DOCUMENTO_GENERADO' ? 'BORRADOR AUXILIAR' : status.replace(/_/g, ' ')}
       </span>
     );
   };
@@ -376,7 +376,7 @@ export const CoordinatorEvidenceEditor = ({
                     { label: 'Plantilla', detail: draft ? 'Seleccionada' : 'Pendiente', icon: Layout, active: !draft },
                     { label: 'Redaccion', detail: draft ? `${completionPercent}% completo` : 'Crear borrador', icon: PenSquare, active: Boolean(draft && workspaceMode === 'compose') },
                     { label: 'Vista previa', detail: draft ? 'Disponible' : 'Sin contenido', icon: Eye, active: workspaceMode === 'preview' },
-                    { label: 'Descarga', detail: draft ? generatedFileName : 'Formato unico', icon: FileDown, active: draft?.status === 'DOCUMENTO_GENERADO' }
+                    { label: 'Borrador', detail: draft ? generatedFileName : 'Apoyo auxiliar', icon: FileDown, active: draft?.status === 'DOCUMENTO_GENERADO' }
                   ].map(step => {
                     const StepIcon = step.icon;
                     return (
@@ -418,13 +418,13 @@ export const CoordinatorEvidenceEditor = ({
               </div>
               <div className="rounded-xl border border-slate-200 bg-white p-4">
                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                  {evaluatorMode ? 'Subida actual' : 'Formato unico'}
+                  {evaluatorMode ? 'Subida actual' : 'Borrador auxiliar'}
                 </p>
                 <p className="mt-2 truncate text-sm font-bold text-slate-700">
-                  {evaluatorMode ? (currentFile?.fileName || 'Aun no se ha subido archivo') : (draft ? generatedFileName : 'SIG-EV-...')}
+                  {evaluatorMode ? (currentFile?.fileName || 'Aun no se ha subido archivo') : (draft ? generatedFileName : 'BORRADOR-EV-...')}
                 </p>
                 <p className="mt-1 text-xs text-slate-400">
-                  {evaluatorMode ? (currentFile ? `Ultima carga: ${currentFile.uploadDate}` : 'Cuando se cargue una version, aparecera aqui.') : 'Nombre institucional generado por la app.'}
+                  {evaluatorMode ? (currentFile ? `Ultima carga: ${currentFile.uploadDate}` : 'Cuando se cargue una version, aparecera aqui.') : 'Nombre de borrador auxiliar generado por la app.'}
                 </p>
               </div>
             </div>
@@ -509,8 +509,8 @@ export const CoordinatorEvidenceEditor = ({
                   <div className="rounded-xl border border-slate-200 bg-slate-100 p-5">
                     <div className="mb-4 flex items-center justify-between">
                       <div>
-                        <h4 className="text-sm font-black uppercase tracking-tight text-slate-800">Vista previa institucional</h4>
-                        <p className="mt-1 text-xs text-slate-500">Asi se estructura el archivo unico antes de descargarlo.</p>
+                        <h4 className="text-sm font-black uppercase tracking-tight text-slate-800">Vista previa del borrador auxiliar</h4>
+                        <p className="mt-1 text-xs text-slate-500">Este archivo ayuda a redactar; el documento final debe subirse como evidencia.</p>
                       </div>
                       <button onClick={() => setWorkspaceMode('compose')} className="rounded-xl border border-slate-200 bg-white px-4 py-2 text-[10px] font-black uppercase tracking-widest text-slate-600 transition-all hover:border-blue-300 hover:text-blue-600">
                         Editar
@@ -519,7 +519,7 @@ export const CoordinatorEvidenceEditor = ({
                     <div className="mx-auto max-w-3xl rounded-sm bg-white p-10 shadow-xl ring-1 ring-slate-200">
                       <div className="border-b-4 border-blue-600 pb-4">
                         <p className="text-[10px] font-black uppercase tracking-[0.24em] text-slate-500">Instituto Superior Tecnologico Sudamericano</p>
-                        <h1 className="mt-2 text-xl font-black uppercase text-slate-900">Documento unico de evidencia</h1>
+                        <h1 className="mt-2 text-xl font-black uppercase text-slate-900">Borrador auxiliar de evidencia</h1>
                         <p className="mt-1 text-xs font-bold text-slate-500">Codigo: {generatedFileName}</p>
                       </div>
                       <div className="mt-6 rounded-xl border border-slate-200 bg-slate-50 p-4 text-xs text-slate-600">
@@ -578,7 +578,7 @@ export const CoordinatorEvidenceEditor = ({
 
           <div className="p-6 border-t border-slate-100 bg-slate-50 flex items-center justify-between">
             <p className="text-xs text-slate-500 leading-relaxed">
-              {evaluatorMode ? 'Flujo de revision y observaciones.' : 'Flujo manual de documento institucional.'}
+              {evaluatorMode ? 'Flujo de revision y observaciones.' : 'Flujo manual de borrador auxiliar y respaldo institucional.'}
             </p>
 
             {canDraft && (
@@ -589,7 +589,7 @@ export const CoordinatorEvidenceEditor = ({
                 </button>
                 <button onClick={handleDownloadGeneratedDocument} disabled={!draft} className="flex items-center gap-3 px-8 py-3 bg-blue-600 text-white rounded-xl font-black text-sm uppercase tracking-widest shadow-xl shadow-blue-200 hover:bg-blue-700 transition-all disabled:cursor-not-allowed disabled:bg-slate-300 disabled:shadow-none">
                   <FileDown className="w-5 h-5" />
-                  Descargar y guardar
+                  Descargar borrador
                 </button>
               </div>
             )}

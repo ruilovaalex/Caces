@@ -359,7 +359,7 @@ export default function App() {
 
               {!selectedIndicator && isTemplatesOpen && canAccessTemplates(userRole) && (
                 <motion.div key="templates" variants={viewTransition} initial="initial" animate="animate" exit="exit">
-                  <TemplatesView />
+                  <TemplatesView userRole={userRole} userName={user?.name} />
                 </motion.div>
               )}
 

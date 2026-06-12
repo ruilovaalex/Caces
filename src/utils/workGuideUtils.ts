@@ -122,14 +122,20 @@ const inferDocumentFocus = (requirement: Requirement) => {
 
 export const buildRequirementWorkGuide = (indicator: Indicator, requirement: Requirement) => {
   const inferred = inferDocumentFocus(requirement);
+  const allowedFormat = formatList(requirement.format);
 
   return {
     title: `Guia para ${requirement.label}`,
     intro: `Esta evidencia aporta al indicador ${indicator.code}: ${indicator.name}.`,
+    description: requirement.description,
+    whatToPrepare: inferred.focus,
+    minimumContent: inferred.checks,
+    suggestedSupports: inferred.supports,
+    allowedFormat,
     focus: inferred.focus,
     checks: inferred.checks,
     supports: inferred.supports,
-    format: formatList(requirement.format),
+    format: allowedFormat,
     cacesDescription: requirement.description
   };
 };
