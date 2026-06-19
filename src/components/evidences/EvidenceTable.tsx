@@ -13,21 +13,25 @@ import {
   History,
   LayoutTemplate,
   Plus,
+  Trash2,
   Upload,
   X,
   XCircle,
 } from 'lucide-react';
 import { motion } from 'motion/react';
 import { Indicator, Requirement, Status, UploadedFile, UserRole } from '../../types';
+import { RepositoryFolderFile, RepositoryFolderService } from '../../services/repositoryFolderService';
 import { canUserUpload } from '../../utils/permissions';
 import { EvidenceStatusBadge } from './EvidenceStatusBadge';
 import { EvidenceFilePreviewModal } from './EvidenceFilePreviewModal';
 import { EvidenceGuideModal } from './EvidenceGuideModal';
+import { RequirementTemplateManagerModal } from './RequirementTemplateManagerModal';
 import { TemplateLibraryModal } from './TemplateLibraryModal';
 
 interface EvidenceTableProps {
   indicator: Indicator;
   userRole: UserRole;
+  currentUserName?: string;
   getRequirementFiles: (reqId: string) => UploadedFile[];
   onOpenUpload: (req: Requirement) => void;
   onOpenEditor: (req: Requirement) => void;
@@ -51,6 +55,7 @@ const readFolders = (indicatorCode: string): FolderMap => {
 export const EvidenceTable = ({
   indicator,
   userRole,
+  currentUserName,
   getRequirementFiles,
   onOpenUpload,
   onOpenEditor,
@@ -60,13 +65,17 @@ export const EvidenceTable = ({
   const [expandedRequirements, setExpandedRequirements] = useState<Set<string>>(new Set());
   const [folders, setFolders] = useState<FolderMap>(() => readFolders(indicator.code));
   const [guideRequirement, setGuideRequirement] = useState<Requirement | null>(null);
+  const [templateRequirement, setTemplateRequirement] = useState<Requirement | null>(null);
   const [previewFile, setPreviewFile] = useState<UploadedFile | null>(null);
   const [isTemplateLibraryOpen, setIsTemplateLibraryOpen] = useState(false);
+  const [folderFiles, setFolderFiles] = useState<RepositoryFolderFile[]>([]);
   const canUpload = canUserUpload(userRole);
   const isEvaluator = userRole === 'EVALUADOR';
+  const isAdmin = userRole === 'ADMIN';
 
   useEffect(() => {
     setFolders(readFolders(indicator.code));
+    setFolderFiles(RepositoryFolderService.getAll().filter(file => file.indicatorCode === indicator.code));
     setExpandedRequirements(new Set());
   }, [indicator.code]);
 
@@ -86,6 +95,10 @@ export const EvidenceTable = ({
     localStorage.setItem(getFolderStorageKey(indicator.code), JSON.stringify(nextFolders));
   };
 
+  const refreshFolderFiles = () => {
+    setFolderFiles(RepositoryFolderService.getAll().filter(file => file.indicatorCode === indicator.code));
+  };
+
   const toggleRequirement = (requirementId: string) => {
     setExpandedRequirements(current => {
       const next = new Set(current);
@@ -96,6 +109,7 @@ export const EvidenceTable = ({
   };
 
   const createFolder = (requirement: Requirement) => {
+    if (isAdmin) return;
     const name = window.prompt('Nombre de la nueva carpeta');
     const normalizedName = name?.trim();
     if (!normalizedName) return;
@@ -112,14 +126,40 @@ export const EvidenceTable = ({
     });
   };
 
-  const removeFolder = (requirementId: string, folderName: string) => {
+  const removeFolder = async (requirementId: string, folderName: string) => {
     const confirmed = window.confirm(`Eliminar la carpeta "${folderName}"?`);
     if (!confirmed) return;
+
+    const linkedFiles = RepositoryFolderService.getByFolder(indicator.code, requirementId, folderName);
+    await Promise.all(linkedFiles.map(file => RepositoryFolderService.delete(file.id)));
 
     saveFolders({
       ...folders,
       [requirementId]: (folders[requirementId] || []).filter(folder => folder !== folderName),
     });
+    refreshFolderFiles();
+  };
+
+  const uploadToFolder = async (requirement: Requirement, folderName: string, file: File | null) => {
+    if (!file) return;
+
+    await RepositoryFolderService.upload(file, {
+      indicatorCode: indicator.code,
+      requirementId: requirement.id,
+      requirementLabel: requirement.label,
+      folderName,
+      uploadedBy: userRole === 'COORDINADOR' ? 'Coordinador' : userRole,
+    });
+
+    refreshFolderFiles();
+  };
+
+  const removeFolderFile = async (file: RepositoryFolderFile) => {
+    const confirmed = window.confirm(`Eliminar el archivo "${file.fileName}" de la carpeta "${file.folderName}"?`);
+    if (!confirmed) return;
+
+    await RepositoryFolderService.delete(file.id);
+    refreshFolderFiles();
   };
 
   const confirmFile = (file: UploadedFile) => {
@@ -171,6 +211,7 @@ export const EvidenceTable = ({
           const status = currentFile?.status || 'Pendiente';
           const isExpanded = expandedRequirements.has(requirement.id);
           const customFolders = folders[requirement.id] || [];
+          const requirementFolderFiles = folderFiles.filter(file => file.requirementId === requirement.id);
 
           return (
             <article key={requirement.id} className="bg-white">
@@ -218,6 +259,16 @@ export const EvidenceTable = ({
                       aria-label="Ver guia de carga"
                     >
                       <BookOpen className="h-4 w-4" />
+                    </button>
+                  )}
+                  {isAdmin && (
+                    <button
+                      onClick={() => setTemplateRequirement(requirement)}
+                      className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-blue-600 transition-colors hover:bg-blue-50 hover:text-blue-700"
+                      title="Gestionar plantillas de esta evidencia"
+                      aria-label="Gestionar plantillas de esta evidencia"
+                    >
+                      <LayoutTemplate className="h-4 w-4" />
                     </button>
                   )}
                   <button
@@ -287,6 +338,7 @@ export const EvidenceTable = ({
                 >
                   <div className="mb-4 flex flex-wrap gap-2 sm:hidden">
                     {!isEvaluator && <RepositoryAction icon={BookOpen} label="Guia" onClick={() => setGuideRequirement(requirement)} />}
+                    {isAdmin && <RepositoryAction icon={LayoutTemplate} label="Plantillas" onClick={() => setTemplateRequirement(requirement)} />}
                     <RepositoryAction icon={History} label="Historial" onClick={() => onOpenHistory(requirement)} />
                     {isEvaluator && <RepositoryAction icon={ClipboardCheck} label="Revisar" onClick={() => onOpenEditor(requirement)} />}
                     {canUpload && <RepositoryAction icon={Upload} label="Subir" onClick={() => onOpenUpload(requirement)} primary />}
@@ -381,27 +433,101 @@ export const EvidenceTable = ({
                         )}
                       </div>
 
+                      {isAdmin && (
+                        <div className="rounded-lg border border-blue-200 bg-blue-50 px-4 py-4">
+                          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                            <div>
+                              <p className="text-sm font-black text-slate-800">Plantillas de esta evidencia</p>
+                              <p className="mt-1 text-xs text-slate-500">
+                                Publica formatos especificos para que los coordinadores los descarguen desde esta misma evidencia.
+                              </p>
+                            </div>
+                            <button
+                              onClick={() => setTemplateRequirement(requirement)}
+                              className="inline-flex items-center gap-2 rounded-lg bg-white px-4 py-2 text-[10px] font-black uppercase tracking-widest text-blue-700 hover:bg-blue-100"
+                            >
+                              <LayoutTemplate className="h-3.5 w-3.5" />
+                              Gestionar plantillas
+                            </button>
+                          </div>
+                        </div>
+                      )}
+
                       {!isEvaluator && (
                         <>
-                          <div className="flex items-center gap-3 rounded-lg border border-slate-200 bg-white px-4 py-3">
-                            <Folder className="h-4 w-4 text-amber-500" />
-                            <p className="text-sm font-bold text-slate-700">Anexos y respaldos</p>
-                            <span className="ml-auto text-xs font-bold text-slate-400">0</span>
-                          </div>
-
                           {customFolders.map(folder => (
-                            <div key={folder} className="flex items-center gap-3 rounded-lg border border-slate-200 bg-white px-4 py-3">
-                              <Folder className="h-4 w-4 text-amber-500" />
-                              <p className="min-w-0 flex-1 truncate text-sm font-bold text-slate-700">{folder}</p>
-                              <span className="text-xs font-bold text-slate-400">0</span>
-                              <button
-                                onClick={() => removeFolder(requirement.id, folder)}
-                                className="inline-flex h-7 w-7 items-center justify-center rounded-md text-slate-400 hover:bg-rose-50 hover:text-rose-600"
-                                title="Eliminar carpeta"
-                                aria-label={`Eliminar carpeta ${folder}`}
-                              >
-                                <X className="h-3.5 w-3.5" />
-                              </button>
+                            <div key={folder} className="rounded-lg border border-slate-200 bg-white">
+                              <div className="flex items-center gap-3 border-b border-slate-100 px-4 py-3">
+                                <Folder className="h-4 w-4 text-amber-500" />
+                                <p className="min-w-0 flex-1 truncate text-sm font-bold text-slate-700">{folder}</p>
+                                <span className="text-xs font-bold text-slate-400">
+                                  {requirementFolderFiles.filter(file => file.folderName === folder).length}
+                                </span>
+                                <label className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-[10px] font-black uppercase tracking-widest text-slate-600 hover:border-blue-300 hover:text-blue-600">
+                                  <Upload className="h-3.5 w-3.5" />
+                                  Subir
+                                  <input
+                                    type="file"
+                                    className="hidden"
+                                    onChange={async event => {
+                                      const selectedFile = event.target.files?.[0] || null;
+                                      await uploadToFolder(requirement, folder, selectedFile);
+                                      event.target.value = '';
+                                    }}
+                                  />
+                                </label>
+                                <button
+                                  onClick={() => void removeFolder(requirement.id, folder)}
+                                  className="inline-flex h-8 w-8 items-center justify-center rounded-md text-slate-400 hover:bg-rose-50 hover:text-rose-600"
+                                  title="Eliminar carpeta"
+                                  aria-label={`Eliminar carpeta ${folder}`}
+                                >
+                                  <X className="h-3.5 w-3.5" />
+                                </button>
+                              </div>
+
+                              {requirementFolderFiles.filter(file => file.folderName === folder).length > 0 ? (
+                                <div className="divide-y divide-slate-100">
+                                  {requirementFolderFiles
+                                    .filter(file => file.folderName === folder)
+                                    .map(file => (
+                                      <div key={file.id} className="flex items-center gap-3 px-4 py-3 transition-colors hover:bg-slate-50">
+                                        <button
+                                          onClick={() => setPreviewFile(file)}
+                                          className="flex min-w-0 flex-1 items-center gap-3 text-left"
+                                        >
+                                          <FileText className="h-4 w-4 shrink-0 text-amber-600" />
+                                          <div className="min-w-0 flex-1">
+                                            <p className="truncate text-sm font-bold text-slate-700">{file.fileName}</p>
+                                            <p className="mt-0.5 text-[10px] text-slate-400">
+                                              {file.fileType} · {file.uploadDate} · {file.uploadedBy}
+                                            </p>
+                                          </div>
+                                        </button>
+                                        <button
+                                          onClick={() => setPreviewFile(file)}
+                                          className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-[10px] font-black uppercase tracking-widest text-slate-600 hover:border-blue-300 hover:text-blue-600"
+                                        >
+                                          <Eye className="h-3.5 w-3.5" />
+                                          Ver
+                                        </button>
+                                        <button
+                                          onClick={() => void removeFolderFile(file)}
+                                          className="inline-flex h-8 w-8 items-center justify-center rounded-md text-slate-400 hover:bg-rose-50 hover:text-rose-600"
+                                          title="Eliminar archivo"
+                                          aria-label={`Eliminar archivo ${file.fileName}`}
+                                        >
+                                          <Trash2 className="h-3.5 w-3.5" />
+                                        </button>
+                                      </div>
+                                    ))}
+                                </div>
+                              ) : (
+                                <div className="flex items-center gap-3 px-4 py-5 text-sm text-slate-400">
+                                  <FileClock className="h-4 w-4" />
+                                  Todavia no hay archivos en esta carpeta.
+                                </div>
+                              )}
                             </div>
                           ))}
                         </>
@@ -447,6 +573,15 @@ export const EvidenceTable = ({
             onClose={() => setIsTemplateLibraryOpen(false)}
           />
         </>
+      )}
+      {isAdmin && (
+        <RequirementTemplateManagerModal
+          isOpen={Boolean(templateRequirement)}
+          indicator={indicator}
+          requirement={templateRequirement}
+          currentUserName={currentUserName}
+          onClose={() => setTemplateRequirement(null)}
+        />
       )}
       <EvidenceFilePreviewModal
         isOpen={Boolean(previewFile)}

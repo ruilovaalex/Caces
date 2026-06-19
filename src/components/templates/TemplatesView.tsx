@@ -10,104 +10,114 @@ import {
   Star,
 } from 'lucide-react';
 import { motion } from 'motion/react';
-import { MOCK_DATA } from '../../data/cacesMockData';
+import { FEATURED_TEMPLATE_IDS, TEMPLATE_CATEGORIES } from '../../data/templateCategories';
 import { TEMPLATES } from '../../data/templates';
+import { useTemplateLibrary } from '../../hooks/useTemplateLibrary';
+import { TemplateService } from '../../services/templateService';
+import { PublishedTemplate, Template, UserRole } from '../../types';
+import { AdminTemplateManager } from './AdminTemplateManager';
 
-const categories = [
-  {
-    id: 'criterio-1',
-    label: MOCK_DATA[0].criteria[0].name,
-    chipLabel: 'C1 ORGANIZACIÓN',
-    description: 'Plantillas para planificacion, seguimiento institucional, actas, informes y soporte de gestion.',
-    templateIds: ['acta', 'informe', 'registro', 'oficio', 'documento'],
-  },
-  {
-    id: 'criterio-2',
-    label: MOCK_DATA[0].criteria[1].name,
-    chipLabel: 'C2 INFRAESTRUCTURA',
-    description: 'Modelos para constataciones, reportes, matrices y evidencias de recursos fisicos y tecnologicos.',
-    templateIds: ['informe', 'registro', 'matriz', 'evidencia', 'oficio'],
-  },
-  {
-    id: 'criterio-3',
-    label: MOCK_DATA[0].criteria[2].name,
-    chipLabel: 'C3 PROFESORES',
-    description: 'Formatos para seguimiento docente, certificaciones, planes, registros y control de actividades.',
-    templateIds: ['informe', 'registro', 'evidencia', 'certificado', 'matriz'],
-  },
-  {
-    id: 'criterio-4',
-    label: MOCK_DATA[0].criteria[3].name,
-    chipLabel: 'C4 DOCENCIA',
-    description: 'Plantillas para programas, actas, evidencias de clase, cronogramas y seguimiento academico.',
-    templateIds: ['plan', 'acta', 'registro', 'evidencia', 'cronograma'],
-  },
-  {
-    id: 'criterio-5',
-    label: MOCK_DATA[0].criteria[4].name,
-    chipLabel: 'C5 INVESTIGACIÓN',
-    description: 'Apoyos para proyectos, productos, seguimiento y respaldo de resultados.',
-    templateIds: ['plan', 'informe', 'evidencia', 'matriz', 'certificado'],
-  },
-  {
-    id: 'criterio-6',
-    label: MOCK_DATA[0].criteria[5].name,
-    chipLabel: 'C6 VINCULACIÓN',
-    description: 'Modelos para convenios, actas, informes, evidencias y relacion con actores externos.',
-    templateIds: ['convenio', 'acta', 'informe', 'evidencia', 'oficio'],
-  },
-] as const;
+interface TemplatesViewProps {
+  userRole: UserRole;
+  currentUserName?: string;
+}
 
-const featuredIds = ['acta', 'informe', 'registro', 'plan'];
+interface DisplayTemplate extends Template {
+  criterionId: string;
+  source: 'base' | 'admin';
+  indicatorCode?: string;
+  requirementId?: string;
+  requirementLabel?: string;
+  targetLabel?: string;
+  fileName?: string;
+  fileType?: string;
+  uploadedBy?: string;
+  uploadedAt?: string;
+  fileContentId?: string;
+}
 
-export const TemplatesView = () => {
+export const TemplatesView = ({ userRole, currentUserName }: TemplatesViewProps) => {
   const [query, setQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState<string>('');
+  const { customTemplates, refreshCustomTemplates } = useTemplateLibrary();
 
-  const activeCategoryData = categories.find(category => category.id === activeCategory);
+  const activeCategoryData = TEMPLATE_CATEGORIES.find(category => category.id === activeCategory);
+  const isAdmin = userRole === 'ADMIN';
+
+  const getTemplatesByCategory = (categoryId: string): DisplayTemplate[] => {
+    const category = TEMPLATE_CATEGORIES.find(item => item.id === categoryId);
+    if (!category) return [];
+
+    const baseTemplates = category.templateIds
+      .map(templateId => TEMPLATES.find(template => template.id === templateId))
+      .filter((template): template is Template => Boolean(template))
+      .map(template => ({
+        ...template,
+        criterionId: category.id,
+        source: 'base' as const,
+      }));
+
+    const adminTemplates = customTemplates.filter(template => template.criterionId === category.id);
+
+    return [...baseTemplates, ...adminTemplates];
+  };
 
   const filteredTemplates = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
+    const scopedTemplates = activeCategoryData ? getTemplatesByCategory(activeCategoryData.id) : [];
 
-    return TEMPLATES.filter(template => {
-      const matchesCategory = !activeCategoryData || activeCategoryData.templateIds.includes(template.id as never);
-      const matchesQuery =
-        !normalizedQuery ||
-        template.label.toLowerCase().includes(normalizedQuery) ||
-        template.description.toLowerCase().includes(normalizedQuery);
-
-      return matchesCategory && matchesQuery;
-    });
-  }, [activeCategoryData, query]);
+    return scopedTemplates.filter(template => (
+      !normalizedQuery ||
+      template.label.toLowerCase().includes(normalizedQuery) ||
+      template.description.toLowerCase().includes(normalizedQuery) ||
+      template.fileName?.toLowerCase().includes(normalizedQuery) ||
+      template.requirementLabel?.toLowerCase().includes(normalizedQuery) ||
+      template.targetLabel?.toLowerCase().includes(normalizedQuery)
+    ));
+  }, [activeCategoryData, customTemplates, query]);
 
   const featuredTemplates = useMemo(
-    () => TEMPLATES.filter(template => featuredIds.includes(template.id)),
+    () => TEMPLATES.filter(template => FEATURED_TEMPLATE_IDS.includes(template.id)).map(template => ({
+      ...template,
+      criterionId: 'featured',
+      source: 'base' as const,
+    })),
     []
   );
 
-  const handleDownload = (templateId: string) => {
-    const template = TEMPLATES.find(item => item.id === templateId);
-    if (!template) return;
+  const handleDownload = async (template: DisplayTemplate | PublishedTemplate) => {
+    await TemplateService.downloadTemplate(template);
+  };
 
-    const content = [
-      `PLANTILLA INSTITUCIONAL: ${template.label.toUpperCase()}`,
-      '',
-      template.description,
-      '',
-      '1. Datos generales',
-      '2. Objetivo o alcance',
-      '3. Desarrollo',
-      '4. Resultados, acuerdos o evidencias',
-      '5. Responsables',
-      '6. Firmas y anexos',
-    ].join('\n');
+  const handleCreateTemplate = async (payload: {
+    label: string;
+    description: string;
+    criterionId: string;
+    targetLabel?: string;
+    file: File;
+  }) => {
+    await TemplateService.createCustomTemplate({
+      ...payload,
+      uploadedBy: currentUserName || 'Administrador',
+    });
+    refreshCustomTemplates();
+  };
 
-    const url = URL.createObjectURL(new Blob([content], { type: 'text/plain;charset=utf-8' }));
-    const anchor = document.createElement('a');
-    anchor.href = url;
-    anchor.download = `plantilla-${template.id}.txt`;
-    anchor.click();
-    URL.revokeObjectURL(url);
+  const handleUpdateTemplate = async (
+    templateId: string,
+    payload: {
+      label: string;
+      description: string;
+      criterionId: string;
+      targetLabel?: string;
+      file?: File | null;
+    }
+  ) => {
+    await TemplateService.updateCustomTemplate(templateId, {
+      ...payload,
+      uploadedBy: currentUserName || 'Administrador',
+    });
+    refreshCustomTemplates();
   };
 
   return (
@@ -116,6 +126,15 @@ export const TemplatesView = () => {
       animate={{ opacity: 1, y: 0 }}
       className="mx-auto max-w-7xl space-y-8"
     >
+      {isAdmin && (
+        <AdminTemplateManager
+          customTemplates={customTemplates}
+          onCreateTemplate={handleCreateTemplate}
+          onUpdateTemplate={handleUpdateTemplate}
+          onDownloadTemplate={handleDownload}
+        />
+      )}
+
       <section className="rounded-[28px] border border-blue-100 bg-white p-8 shadow-sm">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
           <div className="max-w-3xl">
@@ -127,16 +146,16 @@ export const TemplatesView = () => {
               Plantillas
             </h1>
             <p className="mt-3 max-w-2xl text-sm leading-relaxed text-slate-500">
-              Aqui encuentras las plantillas mas usadas y una biblioteca organizada por criterio CACES.
-              Entra, filtra y descarga una base limpia para comenzar a trabajar.
+              Aqui encuentras las plantillas base y los formatos publicados por administracion, organizados por criterio CACES
+              para que todos trabajen con una referencia comun.
             </p>
           </div>
 
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             <MetricCard label="Mas usadas" value="4" accent="text-amber-600" />
-            <MetricCard label="Biblioteca" value={String(TEMPLATES.length)} accent="text-blue-600" />
-            <MetricCard label="Criterios" value={String(categories.length)} accent="text-emerald-600" />
-            <MetricCard label="Base" value="TXT" accent="text-violet-600" />
+            <MetricCard label="Base" value={String(TEMPLATES.length)} accent="text-blue-600" />
+            <MetricCard label="Publicadas" value={String(customTemplates.length)} accent="text-emerald-600" />
+            <MetricCard label="Criterios" value={String(TEMPLATE_CATEGORIES.length)} accent="text-violet-600" />
           </div>
         </div>
       </section>
@@ -148,13 +167,13 @@ export const TemplatesView = () => {
             <input
               value={query}
               onChange={event => setQuery(event.target.value)}
-              placeholder="Buscar una plantilla por nombre o uso"
+              placeholder="Buscar una plantilla por nombre o archivo"
               className="h-12 w-full rounded-2xl border border-slate-200 bg-slate-50 pl-11 pr-4 text-sm font-medium outline-none transition-all focus:border-blue-400 focus:bg-white"
             />
           </label>
           <div className="flex flex-wrap gap-2">
             <FilterChip label="Todas" active={activeCategory === ''} onClick={() => setActiveCategory('')} />
-            {categories.map(category => (
+            {TEMPLATE_CATEGORIES.map(category => (
               <FilterChip
                 key={category.id}
                 label={category.chipLabel}
@@ -186,28 +205,39 @@ export const TemplatesView = () => {
           <h2 className="text-xs font-black uppercase tracking-[0.24em] text-slate-500">Plantillas por criterio</h2>
         </div>
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {categories.map(category => (
-            <button
-              key={category.id}
-              onClick={() => setActiveCategory(category.id)}
-              className={`rounded-[24px] border p-5 text-left transition-all ${
-                activeCategory === category.id
-                  ? 'border-blue-300 bg-blue-50 shadow-sm'
-                  : 'border-slate-200 bg-white hover:border-blue-200 hover:bg-slate-50'
-              }`}
-            >
-              <div className={`flex h-11 w-11 items-center justify-center rounded-2xl ${
-                activeCategory === category.id ? 'bg-[#2563eb] text-white' : 'bg-slate-100 text-slate-500'
-              }`}>
-                <FileSpreadsheet className="h-5 w-5" />
-              </div>
-              <h3 className="mt-4 text-sm font-black text-slate-800">{category.label}</h3>
-              <p className="mt-2 text-xs leading-relaxed text-slate-500">{category.description}</p>
-              <p className="mt-4 text-[10px] font-black uppercase tracking-[0.2em] text-blue-600">
-                {category.templateIds.length} plantillas sugeridas
-              </p>
-            </button>
-          ))}
+          {TEMPLATE_CATEGORIES.map(category => {
+            const publishedCount = customTemplates.filter(template => template.criterionId === category.id).length;
+
+            return (
+              <button
+                key={category.id}
+                onClick={() => setActiveCategory(category.id)}
+                className={`rounded-[24px] border p-5 text-left transition-all ${
+                  activeCategory === category.id
+                    ? 'border-blue-300 bg-blue-50 shadow-sm'
+                    : 'border-slate-200 bg-white hover:border-blue-200 hover:bg-slate-50'
+                }`}
+              >
+                <div className={`flex h-11 w-11 items-center justify-center rounded-2xl ${
+                  activeCategory === category.id ? 'bg-[#2563eb] text-white' : 'bg-slate-100 text-slate-500'
+                }`}>
+                  <FileSpreadsheet className="h-5 w-5" />
+                </div>
+                <h3 className="mt-4 text-sm font-black text-slate-800">{category.label}</h3>
+                <p className="mt-2 text-xs leading-relaxed text-slate-500">{category.description}</p>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-600">
+                    {category.templateIds.length} base
+                  </p>
+                  {publishedCount > 0 && (
+                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-600">
+                      {publishedCount} publicadas
+                    </p>
+                  )}
+                </div>
+              </button>
+            );
+          })}
         </div>
       </section>
 
@@ -231,7 +261,7 @@ export const TemplatesView = () => {
           {filteredTemplates.length > 0 ? (
             <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
               {filteredTemplates.map(template => (
-                <TemplateCard key={template.id} template={template} onDownload={handleDownload} />
+                <TemplateCard key={`${template.source}-${template.id}-${template.criterionId}`} template={template} onDownload={handleDownload} />
               ))}
             </div>
           ) : (
@@ -284,33 +314,63 @@ const TemplateCard = ({
   onDownload,
   featured = false,
 }: {
-  template: (typeof TEMPLATES)[number];
-  onDownload: (templateId: string) => void;
+  template: DisplayTemplate;
+  onDownload: (template: DisplayTemplate) => Promise<void>;
   featured?: boolean;
 }) => (
   <article className="flex min-h-[190px] flex-col rounded-[24px] border border-slate-200 bg-white p-5">
     <div className="flex items-start justify-between gap-3">
       <div className={`flex h-11 w-11 items-center justify-center rounded-2xl ${
-        featured ? 'bg-amber-50 text-amber-600' : 'bg-blue-50 text-blue-600'
+        featured ? 'bg-amber-50 text-amber-600' : template.source === 'admin' ? 'bg-emerald-50 text-emerald-600' : 'bg-blue-50 text-blue-600'
       }`}>
         <FileText className="h-5 w-5" />
       </div>
-      {featured && (
-        <span className="rounded-full bg-amber-50 px-2.5 py-1 text-[9px] font-black uppercase tracking-[0.2em] text-amber-700">
-          Frecuente
-        </span>
-      )}
+      <div className="flex flex-col items-end gap-2">
+        {featured && (
+          <span className="rounded-full bg-amber-50 px-2.5 py-1 text-[9px] font-black uppercase tracking-[0.2em] text-amber-700">
+            Frecuente
+          </span>
+        )}
+        {template.source === 'admin' && (
+          <span className="rounded-full bg-emerald-50 px-2.5 py-1 text-[9px] font-black uppercase tracking-[0.2em] text-emerald-700">
+            Publicada
+          </span>
+        )}
+      </div>
     </div>
 
     <h3 className="mt-4 text-sm font-black text-slate-900">{template.label}</h3>
     <p className="mt-2 flex-1 text-xs leading-relaxed text-slate-500">{template.description}</p>
 
+    <div className="mt-4 flex flex-wrap gap-2">
+      {template.fileName && (
+        <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[9px] font-black uppercase tracking-[0.18em] text-slate-500">
+          {template.fileName}
+        </span>
+      )}
+      {template.uploadedBy && (
+        <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[9px] font-black uppercase tracking-[0.18em] text-slate-500">
+          {template.uploadedBy}
+        </span>
+      )}
+      {template.targetLabel && (
+        <span className="rounded-full bg-blue-50 px-2.5 py-1 text-[9px] font-black uppercase tracking-[0.18em] text-blue-700">
+          {template.targetLabel}
+        </span>
+      )}
+      {template.requirementLabel && (
+        <span className="rounded-full bg-emerald-50 px-2.5 py-1 text-[9px] font-black uppercase tracking-[0.18em] text-emerald-700">
+          {template.requirementLabel}
+        </span>
+      )}
+    </div>
+
     <button
-      onClick={() => onDownload(template.id)}
+      onClick={() => void onDownload(template)}
       className="mt-5 inline-flex items-center gap-2 self-start rounded-full bg-slate-100 px-4 py-2 text-[10px] font-black uppercase tracking-[0.18em] text-blue-700 transition-colors hover:bg-blue-50"
     >
       <Download className="h-3.5 w-3.5" />
-      Descargar base
+      {template.source === 'admin' ? 'Descargar formato' : 'Descargar base'}
     </button>
   </article>
 );

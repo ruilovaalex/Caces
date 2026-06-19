@@ -80,15 +80,7 @@ export default function App() {
 
   useEffect(() => {
     if (userRole === 'ADMIN') {
-      setIsEditorOpen(false);
-      setIsUploadOpen(false);
-      setIsHistoryOpen(false);
-      setIsChecklistOpen(false);
       setIsTemplatesOpen(false);
-      setActiveRequirement(null);
-      setSelectedIndicator(null);
-      setIsAssignmentsOpen(true);
-      return;
     }
 
     if (userRole === 'EVALUADOR') {
@@ -121,7 +113,7 @@ export default function App() {
   }, [setSelectedIndicator]);
 
   const handleOpenTemplates = useCallback(() => {
-    if (userRole !== 'ADMIN' && userRole !== 'COORDINADOR') return;
+    if (userRole !== 'COORDINADOR') return;
     setIsEditorOpen(false);
     setIsUploadOpen(false);
     setIsHistoryOpen(false);
@@ -332,7 +324,7 @@ export default function App() {
 
               {!selectedIndicator && isTemplatesOpen && (
                 <motion.div key="templates" variants={viewTransition} initial="initial" animate="animate" exit="exit">
-                  <TemplatesView />
+                  <TemplatesView userRole={userRole} currentUserName={user?.name} />
                 </motion.div>
               )}
 
@@ -361,6 +353,7 @@ export default function App() {
                 <EvidenceTable
                   indicator={selectedIndicator}
                   userRole={userRole}
+                  currentUserName={user?.name}
                   getRequirementFiles={requirementId => getRequirementFiles(requirementId, selectedIndicator.code)}
                   onOpenUpload={requirement => {
                     if (!canUserUpload(userRole)) return;

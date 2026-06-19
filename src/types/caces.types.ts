@@ -41,3 +41,28 @@ export interface Template {
   label: string;
   description: string;
 }
+
+export type TemplateSource = 'base' | 'admin';
+
+export interface PublishedTemplate extends Template {
+  criterionId: string;
+  source: TemplateSource;
+  indicatorCode?: string;
+  requirementId?: string;
+  requirementLabel?: string;
+  targetLabel?: string;
+  fileName?: string;
+  fileType?: string;
+  uploadedBy?: string;
+  uploadedAt?: string;
+  fileContentId?: string;
+}
+
+export interface TemplateCategory {
+  id: string;
+  label: string;
+  chipLabel: string;
+  shortLabel: string;
+  description: string;
+  templateIds: string[];
+}

@@ -92,7 +92,7 @@ export const Sidebar = ({
         animate="animate"
         className="p-4 border-b border-[#e2e8f0] space-y-2"
       >
-        {(userRole === 'COORDINADOR' || userRole === 'EVALUADOR') && (
+        {(userRole === 'ADMIN' || userRole === 'COORDINADOR' || userRole === 'EVALUADOR') && (
           <motion.button
             variants={fadeInRight}
             whileHover={
@@ -125,7 +125,7 @@ export const Sidebar = ({
           </motion.button>
         )}
 
-        {(userRole === 'ADMIN' || userRole === 'COORDINADOR') && (
+        {userRole === 'COORDINADOR' && (
           <motion.button
             variants={fadeInRight}
             whileHover={
@@ -192,7 +192,7 @@ export const Sidebar = ({
         )}
       </motion.div>
 
-      {userRole === 'COORDINADOR' || userRole === 'EVALUADOR' ? (
+      {userRole === 'ADMIN' || userRole === 'COORDINADOR' || userRole === 'EVALUADOR' ? (
         <nav
           className="flex-1 overflow-y-auto p-4 space-y-1 outline-none"
           onKeyDown={onKeyDown}
@@ -375,16 +375,7 @@ export const Sidebar = ({
             </p>
           </div>
         </div>
-      ) : (
-        <div className="flex-1 p-4">
-          <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
-            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Administrador</p>
-            <p className="mt-2 text-sm font-bold leading-relaxed text-slate-700">
-              Perfil limitado a crear roles. La gestion de docentes, indicadores y evidencias queda a cargo del coordinador.
-            </p>
-          </div>
-        </div>
-      )}
+      ) : null}
 
       <motion.div
         whileTap={{ scale: 0.98 }}
