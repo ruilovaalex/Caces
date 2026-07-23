@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion } from 'motion/react';
+import { Menu } from 'lucide-react';
 import { TopBar } from './TopBar';
 import { UserPanel } from './UserPanel';
 import { NotificationBell } from './NotificationBell';
@@ -14,6 +15,7 @@ interface HeaderProps {
   onClearAllNotifications: () => void;
   userName?: string;
   userRole?: UserRole;
+  onOpenMenu?: () => void;
 }
 
 export const Header = ({
@@ -24,7 +26,8 @@ export const Header = ({
   onMarkAsRead,
   onClearAllNotifications,
   userName = 'Usuario',
-  userRole = 'ADMIN'
+  userRole = 'ADMIN',
+  onOpenMenu
 }: HeaderProps) => {
   const roleLabel =
     userRole === 'ADMIN'
@@ -44,9 +47,12 @@ export const Header = ({
         className="flex w-full justify-between items-center"
       >
         <div className="flex min-w-0 items-center gap-3">
-          <h2 className="truncate text-lg font-black text-white tracking-tight">Repositorio CACES 2025</h2>
-          <div className="h-5 w-px bg-white/15" />
-          <div className="flex h-7 items-center gap-2 rounded-full border border-white/10 bg-white/10 px-3">
+          <button onClick={onOpenMenu} aria-label="Abrir menú" className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg text-white hover:bg-white/10 lg:hidden">
+            <Menu className="h-5 w-5" />
+          </button>
+          <h2 className="truncate text-base font-bold text-white sm:text-lg">Repositorio CACES 2025</h2>
+          <div className="hidden h-5 w-px bg-white/15 sm:block" />
+          <div className="hidden h-7 items-center gap-2 rounded-lg border border-white/10 bg-white/10 px-3 md:flex">
             <div className="w-1.5 h-1.5 bg-[#22c55e] rounded-full animate-pulse" />
             <span className="whitespace-nowrap text-[9px] font-black text-[#aac4e8] uppercase tracking-widest">
               {userRole === 'EVALUADOR'
@@ -58,7 +64,7 @@ export const Header = ({
           </div>
         </div>
 
-        <div className="flex shrink-0 items-center gap-3">
+        <div className="flex shrink-0 items-center gap-1 sm:gap-3">
           <NotificationBell
             notifications={notifications}
             showNotifications={showNotifications}

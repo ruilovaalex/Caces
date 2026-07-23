@@ -5,6 +5,7 @@ import { OfficialFormatContentService } from '../../services/officialFormatConte
 import { OfficialFormatService } from '../../services/officialFormatService';
 import { buildRequirementWorkGuide } from '../../utils/workGuideUtils';
 import { Modal } from '../common/Modal';
+import { useToast } from '../common/Toast';
 
 interface EvidenceGuideModalProps {
   isOpen: boolean;
@@ -19,6 +20,7 @@ export const EvidenceGuideModal = ({
   requirement,
   onClose,
 }: EvidenceGuideModalProps) => {
+  const { showToast } = useToast();
   if (!requirement) return null;
 
   const guide = buildRequirementWorkGuide(indicator, requirement);
@@ -27,7 +29,7 @@ export const EvidenceGuideModal = ({
   const handleDownloadFormat = async (format: OfficialFormat) => {
     const blob = await OfficialFormatContentService.get(format.id);
     if (!blob) {
-      window.alert('No se encontro el archivo local de este formato.');
+      showToast('No se encontró el archivo local de este formato.', 'error');
       return;
     }
 

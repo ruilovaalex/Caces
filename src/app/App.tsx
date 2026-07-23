@@ -1,19 +1,11 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { lazy, Suspense, useCallback, useEffect, useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Sidebar } from '../components/layout/Sidebar';
 import { Header } from '../components/layout/Header';
-import { Dashboard } from '../components/layout/Dashboard';
-import { ChecklistView } from '../components/layout/ChecklistView';
 import { LoginScreen } from '../components/auth/LoginScreen';
 import { IndicatorHeader } from '../components/indicators/IndicatorHeader';
 import { IndicatorContent } from '../components/indicators/IndicatorContent';
-import { EvidenceTable } from '../components/evidences/EvidenceTable';
-import { EvidenceUploadModal } from '../components/evidences/EvidenceUploadModal';
-import { EvidenceHistoryModal } from '../components/evidences/EvidenceHistoryModal';
-import { CoordinatorEvidenceEditor } from '../components/coordinator/CoordinatorEvidenceEditor';
-import { AssignmentsView } from '../components/assignments/AssignmentsView';
-import { DocenteView } from '../components/docente/DocenteView';
-import { TemplatesView } from '../components/templates/TemplatesView';
+import { LoadingSpinner } from '../components/common/LoadingSpinner';
 
 import { useAuth } from '../hooks/useAuth';
 import { useIndicators } from '../hooks/useIndicators';
@@ -39,8 +31,22 @@ import {
   getIndicatorCodesFromMockData
 } from '../utils/coordinatorIndicatorFilterUtils';
 import { EvidenceFolder, Indicator, Requirement, Status } from '../types';
+import { useToast } from '../components/common/Toast';
+
+type AppView = 'dashboard' | 'checklist' | 'indicator' | 'templates' | 'assignments';
+
+const CoordinatorEvidenceEditor = lazy(() => import('../components/coordinator/CoordinatorEvidenceEditor').then(module => ({ default: module.CoordinatorEvidenceEditor })));
+const AssignmentsView = lazy(() => import('../components/assignments/AssignmentsView').then(module => ({ default: module.AssignmentsView })));
+const DocenteView = lazy(() => import('../components/docente/DocenteView').then(module => ({ default: module.DocenteView })));
+const TemplatesView = lazy(() => import('../components/templates/TemplatesView').then(module => ({ default: module.TemplatesView })));
+const Dashboard = lazy(() => import('../components/layout/Dashboard').then(module => ({ default: module.Dashboard })));
+const ChecklistView = lazy(() => import('../components/layout/ChecklistView').then(module => ({ default: module.ChecklistView })));
+const EvidenceTable = lazy(() => import('../components/evidences/EvidenceTable').then(module => ({ default: module.EvidenceTable })));
+const EvidenceUploadModal = lazy(() => import('../components/evidences/EvidenceUploadModal').then(module => ({ default: module.EvidenceUploadModal })));
+const EvidenceHistoryModal = lazy(() => import('../components/evidences/EvidenceHistoryModal').then(module => ({ default: module.EvidenceHistoryModal })));
 
 export default function App() {
+  const { showToast } = useToast();
   const { isAuthenticated, userRole, login, logout, switchRole, user } = useAuth();
   const {
     mockData,
@@ -58,9 +64,8 @@ export default function App() {
   const [isUploadOpen, setIsUploadOpen] = useState(false);
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
-  const [isChecklistOpen, setIsChecklistOpen] = useState(false);
-  const [isAssignmentsOpen, setIsAssignmentsOpen] = useState(false);
-  const [isTemplatesOpen, setIsTemplatesOpen] = useState(false);
+  const [appView, setAppView] = useState<AppView>('dashboard');
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [uploadFolders, setUploadFolders] = useState<EvidenceFolder[]>([]);
   const [selectedUploadFolderId, setSelectedUploadFolderId] = useState('');
   const [assignmentVersion, setAssignmentVersion] = useState(0);
@@ -118,24 +123,22 @@ export default function App() {
       setIsEditorOpen(false);
       setIsUploadOpen(false);
       setIsHistoryOpen(false);
-      setIsChecklistOpen(false);
-      setIsTemplatesOpen(false);
+      setAppView('dashboard');
       setActiveRequirement(null);
       setSelectedIndicator(null);
-      setIsAssignmentsOpen(false);
       return;
     }
 
-    if (!canAccessAssignments(userRole) && isAssignmentsOpen) {
-      setIsAssignmentsOpen(false);
+    if (!canAccessAssignments(userRole) && appView === 'assignments') {
+      setAppView('dashboard');
     }
 
-    if (!canAccessTemplates(userRole) && isTemplatesOpen) {
-      setIsTemplatesOpen(false);
+    if (!canAccessTemplates(userRole) && appView === 'templates') {
+      setAppView('dashboard');
     }
 
     if (!canAccessRepository(userRole)) {
-      setIsChecklistOpen(false);
+      setAppView('dashboard');
       setSelectedIndicator(null);
     }
 
@@ -147,10 +150,9 @@ export default function App() {
 
     if (userRole === 'EVALUADOR') {
       setIsHistoryOpen(false);
-      setIsTemplatesOpen(false);
-      setIsAssignmentsOpen(false);
+      if (appView === 'templates' || appView === 'assignments') setAppView('dashboard');
     }
-  }, [isAssignmentsOpen, isTemplatesOpen, setSelectedIndicator, userRole]);
+  }, [appView, setSelectedIndicator, userRole]);
 
   useEffect(() => {
     if (userRole !== 'COORDINADOR' || !selectedIndicator) return;
@@ -160,12 +162,11 @@ export default function App() {
     setIsEditorOpen(false);
     setIsUploadOpen(false);
     setIsHistoryOpen(false);
+    setAppView('dashboard');
   }, [selectedIndicator, setSelectedIndicator, userRole, visibleIndicatorCodes]);
 
   const handleIndicatorSelect = useCallback((indicator: Indicator) => {
-    setIsChecklistOpen(false);
-    setIsAssignmentsOpen(false);
-    setIsTemplatesOpen(false);
+    setAppView('indicator');
     selectIndicator(indicator);
   }, [selectIndicator]);
 
@@ -173,9 +174,7 @@ export default function App() {
     setIsEditorOpen(false);
     setIsUploadOpen(false);
     setIsHistoryOpen(false);
-    setIsChecklistOpen(false);
-    setIsAssignmentsOpen(false);
-    setIsTemplatesOpen(false);
+    setAppView('dashboard');
     setActiveRequirement(null);
     setSelectedIndicator(null);
   }, [setSelectedIndicator]);
@@ -185,11 +184,9 @@ export default function App() {
     setIsEditorOpen(false);
     setIsUploadOpen(false);
     setIsHistoryOpen(false);
-    setIsChecklistOpen(false);
-    setIsAssignmentsOpen(false);
+    setAppView('templates');
     setActiveRequirement(null);
     setSelectedIndicator(null);
-    setIsTemplatesOpen(true);
   }, [setSelectedIndicator, userRole]);
 
   const handleOpenAssignments = useCallback(() => {
@@ -197,18 +194,16 @@ export default function App() {
     setIsEditorOpen(false);
     setIsUploadOpen(false);
     setIsHistoryOpen(false);
-    setIsChecklistOpen(false);
-    setIsTemplatesOpen(false);
+    setAppView('assignments');
     setActiveRequirement(null);
     setSelectedIndicator(null);
-    setIsAssignmentsOpen(true);
   }, [setSelectedIndicator, userRole]);
 
   const handleSaveUpload = async () => {
     if (!canUserUpload(userRole)) return;
     if (!activeRequirement || !selectedIndicator || !uploadFileContent || !user) return;
     if (!isFileAllowedForRequirement(uploadFileContent, activeRequirement)) {
-      window.alert(`Formato no permitido. Para esta evidencia solo se acepta: ${getReadableAllowedFormats(activeRequirement.format)}.`);
+      showToast(`Formato no permitido. Solo se acepta: ${getReadableAllowedFormats(activeRequirement.format)}.`, 'error');
       return;
     }
 
@@ -220,8 +215,10 @@ export default function App() {
       setUploadFolders([]);
       resetUpload();
       refreshNotifications();
+      showToast('Evidencia cargada correctamente.');
     } catch (error) {
       console.error(error);
+      showToast('No se pudo cargar la evidencia. Intenta nuevamente.', 'error');
     }
   };
 
@@ -302,15 +299,7 @@ export default function App() {
 
   const canOpenAssignments = canAccessAssignments(userRole);
   const canOpenRepository = canAccessRepository(userRole);
-  const activeView = selectedIndicator
-    ? 'indicator'
-    : isTemplatesOpen
-      ? 'templates'
-    : isAssignmentsOpen && canOpenAssignments
-      ? 'assignments'
-      : isChecklistOpen
-        ? 'checklist'
-        : 'dashboard';
+  const activeView: AppView = selectedIndicator ? 'indicator' : appView;
   const selectedIndicatorContext = useMemo(() => {
     if (!selectedIndicator) return null;
 
@@ -353,6 +342,8 @@ export default function App() {
         onOpenDashboard={handleGoToStart}
         onOpenTemplates={handleOpenTemplates}
         onOpenAssignments={handleOpenAssignments}
+        isOpen={isSidebarOpen}
+        onClose={() => setIsSidebarOpen(false)}
       />
 
       <main className="flex-1 flex flex-col overflow-hidden">
@@ -365,53 +356,64 @@ export default function App() {
           onClearAllNotifications={clearAll}
           userName={user?.name}
           userRole={userRole}
+          onOpenMenu={() => setIsSidebarOpen(true)}
         />
 
         {userRole === 'DOCENTE' ? (
-          <DocenteView onLogout={logout} />
+          <Suspense fallback={<LoadingSpinner label="Cargando portal docente" className="m-auto" />}>
+            <DocenteView onLogout={logout} />
+          </Suspense>
         ) : (
-          <div className="flex-1 overflow-y-auto p-8 bg-[#f4f6f9]">
+          <div className="flex-1 overflow-y-auto bg-[#f4f6f9] p-4 sm:p-6 lg:p-8">
             <AnimatePresence mode="wait">
-              {!selectedIndicator && canOpenRepository && !isChecklistOpen && !isTemplatesOpen && (!isAssignmentsOpen || !canOpenAssignments) && (
+              {!selectedIndicator && canOpenRepository && appView === 'dashboard' && (
                 <motion.div key="dashboard" variants={viewTransition} initial="initial" animate="animate" exit="exit">
+                  <Suspense fallback={<LoadingSpinner label="Cargando panel" />}>
                   <Dashboard
                     mockData={visibleMockData}
                     allFiles={allFiles}
                     onIndicatorSelect={handleIndicatorSelect}
-                    onViewChecklist={() => setIsChecklistOpen(true)}
+                    onViewChecklist={() => setAppView('checklist')}
                     onOpenCriterionSubCriteria={openCriterionSubCriteria}
                     onOpenAssignments={handleOpenAssignments}
                     canManageAssignments={canOpenAssignments}
                     isScopedView={isCoordinatorScopeFiltered}
                   />
+                  </Suspense>
                 </motion.div>
               )}
 
-              {!selectedIndicator && canOpenRepository && isChecklistOpen && !isAssignmentsOpen && !isTemplatesOpen && (
+              {!selectedIndicator && canOpenRepository && appView === 'checklist' && (
                 <motion.div key="checklist" variants={viewTransition} initial="initial" animate="animate" exit="exit">
+                  <Suspense fallback={<LoadingSpinner label="Cargando indicadores" />}>
                   <ChecklistView
                     mockData={visibleMockData}
                     onIndicatorSelect={handleIndicatorSelect}
                     onBackToDashboard={handleGoToStart}
                     isScopedView={isCoordinatorScopeFiltered}
                   />
+                  </Suspense>
                 </motion.div>
               )}
 
-              {!selectedIndicator && isTemplatesOpen && canAccessTemplates(userRole) && (
+              {!selectedIndicator && appView === 'templates' && canAccessTemplates(userRole) && (
                 <motion.div key="templates" variants={viewTransition} initial="initial" animate="animate" exit="exit">
-                  <TemplatesView userRole={userRole} userName={user?.name} />
+                  <Suspense fallback={<LoadingSpinner label="Cargando formatos" />}>
+                    <TemplatesView userRole={userRole} userName={user?.name} />
+                  </Suspense>
                 </motion.div>
               )}
 
-              {!selectedIndicator && isAssignmentsOpen && canOpenAssignments && !isTemplatesOpen && (
+              {!selectedIndicator && appView === 'assignments' && canOpenAssignments && (
                 <motion.div key="assignments" variants={viewTransition} initial="initial" animate="animate" exit="exit">
-                  <AssignmentsView
-                    userRole={userRole}
-                    mockData={userRole === 'ADMIN' ? mockData : visibleMockData}
-                    currentUserName={user?.name}
-                    onAssignmentsChange={refreshCoordinatorAssignments}
-                  />
+                  <Suspense fallback={<LoadingSpinner label="Cargando tareas" />}>
+                    <AssignmentsView
+                      userRole={userRole}
+                      mockData={userRole === 'ADMIN' ? mockData : visibleMockData}
+                      currentUserName={user?.name}
+                      onAssignmentsChange={refreshCoordinatorAssignments}
+                    />
+                  </Suspense>
                 </motion.div>
               )}
 
@@ -431,6 +433,7 @@ export default function App() {
                   onBackToDashboard={handleGoToStart}
                 />
 
+                <Suspense fallback={<LoadingSpinner label="Cargando evidencias" />}>
                 <EvidenceTable
                   indicator={selectedIndicator}
                   userRole={userRole}
@@ -453,6 +456,7 @@ export default function App() {
                   }}
                   onReviewStatus={handleReviewUpdate}
                 />
+                </Suspense>
               </IndicatorContent>
                 </motion.div>
               )}
@@ -461,6 +465,7 @@ export default function App() {
         )}
       </main>
 
+      <Suspense fallback={null}>
       <EvidenceUploadModal
         isOpen={isUploadOpen && canUserUpload(userRole)}
         onClose={() => {
@@ -486,20 +491,23 @@ export default function App() {
         files={selectedIndicator && activeRequirement ? getRequirementFiles(activeRequirement.id, selectedIndicator.code) : []}
         onDeleteFile={canUserDelete(userRole) ? deleteEvidence : undefined}
       />
+      </Suspense>
 
       {isEditorOpen && selectedIndicator && activeRequirement && (
-        <CoordinatorEvidenceEditor
-          indicator={selectedIndicator}
-          requirement={activeRequirement}
-          files={getRequirementFiles(activeRequirement.id, selectedIndicator.code)}
-          userRole={userRole}
-          currentUser={user}
-          criterionName={selectedIndicatorContext?.criterionName}
-          subCriterionName={selectedIndicatorContext?.subCriterionName}
-          onClose={() => setIsEditorOpen(false)}
-          onGoHome={handleGoToStart}
-          onUpdateEvidenceStatus={handleReviewUpdate}
-        />
+        <Suspense fallback={<LoadingSpinner label="Cargando editor" className="fixed inset-0 z-[200] m-auto" />}>
+          <CoordinatorEvidenceEditor
+            indicator={selectedIndicator}
+            requirement={activeRequirement}
+            files={getRequirementFiles(activeRequirement.id, selectedIndicator.code)}
+            userRole={userRole}
+            currentUser={user}
+            criterionName={selectedIndicatorContext?.criterionName}
+            subCriterionName={selectedIndicatorContext?.subCriterionName}
+            onClose={() => setIsEditorOpen(false)}
+            onGoHome={handleGoToStart}
+            onUpdateEvidenceStatus={handleReviewUpdate}
+          />
+        </Suspense>
       )}
     </div>
   );

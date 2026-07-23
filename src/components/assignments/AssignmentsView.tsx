@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import {
   BookOpen,
-  ClipboardList,
   Link2,
   Plus,
   Send,
@@ -22,6 +21,10 @@ import {
 } from '../../types';
 import { useAssignments } from '../../hooks/useAssignments';
 import { CoordinatorAssignmentService } from '../../services/coordinatorAssignmentService';
+import { FormField, fieldClassName } from '../common/FormField';
+import { Button } from '../common/Button';
+import { PageHeader } from '../common/PageHeader';
+import { useToast } from '../common/Toast';
 
 interface AssignmentsViewProps {
   userRole: UserRole;
@@ -68,6 +71,7 @@ export const AssignmentsView = ({
   currentUserName = 'Admin local',
   onAssignmentsChange
 }: AssignmentsViewProps) => {
+  const { showToast } = useToast();
   const { assignments, createAssignment } = useAssignments();
   const [roles, setRoles] = useState<UserRole[]>(['ADMIN', 'COORDINADOR', 'EVALUADOR', 'DOCENTE']);
   const [newRole, setNewRole] = useState('');
@@ -130,7 +134,8 @@ export const AssignmentsView = ({
   }, [indicators, selectedIndicatorCode]);
 
   useEffect(() => {
-    if (selectedAssignmentIndicatorCode || !indicators[0]) return;
+    if (!indicators[0]) return;
+    if (indicators.some(indicator => indicator.code === selectedAssignmentIndicatorCode)) return;
     setSelectedAssignmentIndicatorCode(indicators[0].code);
   }, [indicators, selectedAssignmentIndicatorCode]);
 
@@ -157,7 +162,10 @@ export const AssignmentsView = ({
   };
 
   const handleCreateTeacher = () => {
-    if (!teacherName.trim() || !teacherEmail.trim()) return;
+    if (!teacherName.trim() || !teacherEmail.trim()) {
+      showToast('Completa el nombre y correo del docente.', 'error');
+      return;
+    }
 
     const teacher: Teacher = {
       id: crypto.randomUUID(),
@@ -173,6 +181,7 @@ export const AssignmentsView = ({
     setTeacherName('');
     setTeacherEmail('');
     setTeacherArea('');
+    showToast('Docente creado correctamente.');
   };
 
   const refreshIndicatorAssignments = () => {
@@ -181,10 +190,24 @@ export const AssignmentsView = ({
     onAssignmentsChange?.();
   };
 
+  const effectiveAssignmentIndicatorCode = selectedAssignmentIndicatorCode || indicators[0]?.code || '';
+
+  const currentCoordinatorAssignments = indicatorAssignments.filter(
+    assignment => assignment.coordinatorId === selectedCoordinatorId
+  );
+
+  const isSelectedIndicatorAlreadyAssigned = currentCoordinatorAssignments.some(
+    assignment => assignment.indicatorCode === effectiveAssignmentIndicatorCode
+  );
+
   const handleAssignIndicator = () => {
     const coordinator = coordinators.find(item => item.id === selectedCoordinatorId);
-    const indicator = indicators.find(item => item.code === selectedAssignmentIndicatorCode);
+    const indicator = indicators.find(item => item.code === effectiveAssignmentIndicatorCode);
     if (!coordinator || !indicator) return;
+    if (isSelectedIndicatorAlreadyAssigned) {
+      refreshIndicatorAssignments();
+      return;
+    }
 
     CoordinatorAssignmentService.assignIndicator({
       coordinatorId: coordinator.id,
@@ -194,16 +217,14 @@ export const AssignmentsView = ({
       createdBy: currentUserName
     });
     refreshIndicatorAssignments();
+    showToast('Indicador asignado correctamente.');
   };
 
   const handleRemoveIndicatorAssignment = (assignmentId: string) => {
     CoordinatorAssignmentService.removeAssignment(assignmentId);
     refreshIndicatorAssignments();
+    showToast('Asignación eliminada.');
   };
-
-  const currentCoordinatorAssignments = indicatorAssignments.filter(
-    assignment => assignment.coordinatorId === selectedCoordinatorId
-  );
 
   const toggleTeacherSelection = (teacherId: string) => {
     setSelectedTeacherIds(previous =>
@@ -223,7 +244,10 @@ export const AssignmentsView = ({
 
   const handleCreateTask = () => {
     const assignedTeachers = getAssignedTeachers();
-    if (!assignedTeachers.length || !taskTitle.trim() || !selectedIndicator || !selectedRequirement || !selectedPeriod || !dueDate) return;
+    if (!assignedTeachers.length || !taskTitle.trim() || !selectedIndicator || !selectedRequirement || !selectedPeriod || !dueDate) {
+      showToast('Completa los datos obligatorios y selecciona al menos un docente.', 'error');
+      return;
+    }
 
     const task: Assignment = {
       id: crypto.randomUUID(),
@@ -245,11 +269,13 @@ export const AssignmentsView = ({
     setTaskTitle('');
     setTaskNote('');
     setDueDate('');
+    showToast('Tarea guardada localmente.');
   };
 
   if (userRole === 'ADMIN') {
     return (
       <div className="max-w-6xl mx-auto space-y-6">
+        <PageHeader title="Administración local" description="Gestiona coordinadores, roles y asignaciones del prototipo." breadcrumbs={['Inicio', 'Coordinadores y tareas']} />
         <WorkflowGuide activeStep="assignments" />
 
         <section className="rounded-lg border border-slate-200 bg-white p-6">
@@ -318,7 +344,7 @@ export const AssignmentsView = ({
             </select>
 
             <select
-              value={selectedAssignmentIndicatorCode}
+              value={effectiveAssignmentIndicatorCode}
               onChange={event => setSelectedAssignmentIndicatorCode(event.target.value)}
               className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold text-slate-700 outline-none focus:border-blue-300 focus:bg-white"
             >
@@ -332,10 +358,15 @@ export const AssignmentsView = ({
             <button
               type="button"
               onClick={handleAssignIndicator}
-              className="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-5 py-3 text-xs font-black uppercase tracking-widest text-white hover:bg-blue-700"
+              disabled={!effectiveAssignmentIndicatorCode || isSelectedIndicatorAlreadyAssigned}
+              className={`inline-flex items-center justify-center gap-2 rounded-lg px-5 py-3 text-xs font-black uppercase tracking-widest text-white ${
+                isSelectedIndicatorAlreadyAssigned
+                  ? 'cursor-not-allowed bg-slate-400'
+                  : 'bg-blue-600 hover:bg-blue-700'
+              }`}
             >
               <Plus className="h-4 w-4" />
-              Asignar
+              {isSelectedIndicatorAlreadyAssigned ? 'Ya asignado' : 'Asignar'}
             </button>
           </div>
 
@@ -383,19 +414,8 @@ export const AssignmentsView = ({
 
   return (
     <div className="max-w-6xl mx-auto space-y-6">
+      <PageHeader title="Docentes y tareas" description="Crea docentes y distribuye tareas asociadas a las evidencias." breadcrumbs={['Inicio', 'Docentes y tareas']} />
       <WorkflowGuide activeStep="assignments" />
-
-      <div className="flex items-center gap-3">
-        <div className="rounded-lg bg-emerald-50 p-3 text-emerald-700 border border-emerald-100">
-          <ClipboardList className="h-5 w-5" />
-        </div>
-        <div>
-          <h2 className="text-2xl font-black text-slate-800 tracking-tight leading-tight">Docentes y tareas</h2>
-          <p className="text-xs font-bold uppercase tracking-widest text-slate-400 mt-1">
-            El coordinador crea docentes y tareas locales de apoyo.
-          </p>
-        </div>
-      </div>
 
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
         <section className="rounded-lg border border-slate-200 bg-white p-6">
@@ -405,13 +425,10 @@ export const AssignmentsView = ({
           </div>
 
           <div className="mt-5 space-y-3">
-            <input value={teacherName} onChange={event => setTeacherName(event.target.value)} placeholder="Nombre del docente" className="w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold outline-none focus:border-blue-300 focus:bg-white" />
-            <input value={teacherEmail} onChange={event => setTeacherEmail(event.target.value)} placeholder="Correo institucional" className="w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold outline-none focus:border-blue-300 focus:bg-white" />
-            <input value={teacherArea} onChange={event => setTeacherArea(event.target.value)} placeholder="Area o carrera" className="w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold outline-none focus:border-blue-300 focus:bg-white" />
-            <button onClick={handleCreateTeacher} className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-5 py-3 text-xs font-black uppercase tracking-widest text-white hover:bg-blue-700">
-              <Plus className="h-4 w-4" />
-              Crear docente
-            </button>
+            <FormField label="Nombre del docente" required><input value={teacherName} onChange={event => setTeacherName(event.target.value)} className={fieldClassName} /></FormField>
+            <FormField label="Correo institucional" required><input type="email" value={teacherEmail} onChange={event => setTeacherEmail(event.target.value)} className={fieldClassName} /></FormField>
+            <FormField label="Área o carrera"><input value={teacherArea} onChange={event => setTeacherArea(event.target.value)} className={fieldClassName} /></FormField>
+            <Button onClick={handleCreateTeacher} icon={<Plus className="h-4 w-4" />} className="w-full">Crear docente</Button>
           </div>
         </section>
 
@@ -470,22 +487,19 @@ export const AssignmentsView = ({
               </div>
             )}
 
-            <select value={selectedPeriodId} onChange={event => setSelectedPeriodId(event.target.value)} className="w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold outline-none focus:border-blue-300 focus:bg-white">
+            <select aria-label="Período académico" value={selectedPeriodId} onChange={event => setSelectedPeriodId(event.target.value)} className={fieldClassName}>
               {periodOptions.map(period => <option key={period.id} value={period.id}>{period.label}</option>)}
             </select>
-            <select value={selectedIndicatorCode} onChange={event => setSelectedIndicatorCode(event.target.value)} className="w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold outline-none focus:border-blue-300 focus:bg-white">
+            <select aria-label="Indicador" value={selectedIndicatorCode} onChange={event => setSelectedIndicatorCode(event.target.value)} className={fieldClassName}>
               {indicators.map(indicator => <option key={indicator.code} value={indicator.code}>{indicator.code} - {indicator.name}</option>)}
             </select>
-            <select value={selectedRequirementId} onChange={event => setSelectedRequirementId(event.target.value)} className="w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold outline-none focus:border-blue-300 focus:bg-white">
+            <select aria-label="Evidencia" value={selectedRequirementId} onChange={event => setSelectedRequirementId(event.target.value)} className={fieldClassName}>
               {selectedIndicator?.requirements.map(requirement => <option key={requirement.id} value={requirement.id}>{requirement.label}</option>)}
             </select>
-            <input value={taskTitle} onChange={event => setTaskTitle(event.target.value)} placeholder="Titulo de la tarea" className="w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold outline-none focus:border-blue-300 focus:bg-white" />
-            <textarea value={taskNote} onChange={event => setTaskNote(event.target.value)} placeholder="Nota opcional para el docente" rows={3} className="w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold outline-none focus:border-blue-300 focus:bg-white" />
-            <input type="date" value={dueDate} onChange={event => setDueDate(event.target.value)} className="w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold outline-none focus:border-blue-300 focus:bg-white" />
-            <button onClick={handleCreateTask} className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-emerald-600 px-5 py-3 text-xs font-black uppercase tracking-widest text-white hover:bg-emerald-700">
-              <Smartphone className="h-4 w-4" />
-              Guardar tarea local
-            </button>
+            <FormField label="Nombre de la tarea" required><input value={taskTitle} onChange={event => setTaskTitle(event.target.value)} className={fieldClassName} /></FormField>
+            <FormField label="Nota para el docente"><textarea value={taskNote} onChange={event => setTaskNote(event.target.value)} rows={3} className={fieldClassName} /></FormField>
+            <FormField label="Fecha de entrega" required><input type="date" value={dueDate} onChange={event => setDueDate(event.target.value)} className={fieldClassName} /></FormField>
+            <Button onClick={handleCreateTask} icon={<Smartphone className="h-4 w-4" />} className="w-full">Guardar tarea local</Button>
           </div>
         </section>
       </div>

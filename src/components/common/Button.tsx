@@ -1,9 +1,11 @@
 import React from 'react';
+import { LoaderCircle } from 'lucide-react';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger';
   size?: 'sm' | 'md' | 'lg';
   icon?: React.ReactNode;
+  isLoading?: boolean;
 }
 
 export const Button = ({ 
@@ -11,31 +13,35 @@ export const Button = ({
   variant = 'primary', 
   size = 'md', 
   icon, 
+  isLoading = false,
   className = '', 
+  disabled,
   ...props 
 }: ButtonProps) => {
-  const baseStyles = 'inline-flex items-center justify-center gap-2 font-black uppercase tracking-widest transition-all active:scale-95 disabled:opacity-50 disabled:active:scale-100 rounded-2xl';
+  const baseStyles = 'min-h-11 inline-flex items-center justify-center gap-2 rounded-lg font-bold transition-colors disabled:cursor-not-allowed disabled:opacity-50';
   
   const variants = {
-    primary: 'bg-slate-900 text-white hover:bg-slate-800 shadow-lg',
-    secondary: 'bg-blue-600 text-white hover:bg-blue-700 shadow-lg shadow-blue-600/20',
-    outline: 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 shadow-sm',
+    primary: 'bg-blue-600 text-white hover:bg-blue-700',
+    secondary: 'bg-slate-800 text-white hover:bg-slate-700',
+    outline: 'bg-white border border-slate-300 text-slate-700 hover:bg-slate-50',
     ghost: 'bg-transparent text-slate-600 hover:bg-slate-100',
     danger: 'bg-rose-100 text-rose-700 hover:bg-rose-200 border border-rose-200',
   };
   
   const sizes = {
-    sm: 'px-4 py-2 text-[10px]',
-    md: 'px-6 py-3 text-[11px]',
-    lg: 'px-8 py-4 text-xs',
+    sm: 'px-3 py-2 text-xs',
+    md: 'px-4 py-2.5 text-sm',
+    lg: 'px-5 py-3 text-base',
   };
 
   return (
     <button 
       className={`${baseStyles} ${variants[variant]} ${sizes[size]} ${className}`}
+      disabled={disabled || isLoading}
+      aria-busy={isLoading}
       {...props}
     >
-      {icon}
+      {isLoading ? <LoaderCircle className="h-4 w-4 animate-spin" aria-hidden="true" /> : icon}
       {children}
     </button>
   );

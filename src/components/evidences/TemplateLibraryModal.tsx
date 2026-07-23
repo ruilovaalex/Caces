@@ -6,6 +6,7 @@ import { OfficialFormat } from '../../types';
 import { OfficialFormatContentService } from '../../services/officialFormatContentService';
 import { OfficialFormatService } from '../../services/officialFormatService';
 import { Modal } from '../common/Modal';
+import { useToast } from '../common/Toast';
 
 interface TemplateLibraryModalProps {
   isOpen: boolean;
@@ -83,10 +84,10 @@ const downloadStaticTemplate = (templateId: string) => {
   URL.revokeObjectURL(url);
 };
 
-const downloadOfficialFormat = async (format: OfficialFormat) => {
+const downloadOfficialFormat = async (format: OfficialFormat, onMissing: () => void) => {
   const blob = await OfficialFormatContentService.get(format.id);
   if (!blob) {
-    window.alert('No se encontro el archivo local de este formato.');
+    onMissing();
     return;
   }
 
@@ -102,6 +103,7 @@ export const TemplateLibraryModal = ({
   isOpen,
   onClose,
 }: TemplateLibraryModalProps) => {
+  const { showToast } = useToast();
   const [query, setQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState('');
   const officialFormats = OfficialFormatService.getActive();
@@ -168,7 +170,7 @@ export const TemplateLibraryModal = ({
           {filteredFormats.length > 0 ? (
             <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
               {filteredFormats.map(format => (
-                <OfficialFormatCard key={format.id} format={format} onDownload={downloadOfficialFormat} />
+                <OfficialFormatCard key={format.id} format={format} onDownload={format => downloadOfficialFormat(format, () => showToast('No se encontró el archivo local de este formato.', 'error'))} />
               ))}
             </div>
           ) : (

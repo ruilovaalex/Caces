@@ -4,6 +4,8 @@ import { Modal } from '../common/Modal';
 import { Requirement, Status, UploadedFile } from '../../types';
 import { EvidenceVersionHistory } from './EvidenceVersionHistory';
 import { getDisplayFileType } from '../../utils/evidenceFormatUtils';
+import { ConfirmDialog } from '../common/ConfirmDialog';
+import { useToast } from '../common/Toast';
 
 interface EvidenceHistoryModalProps {
   isOpen: boolean;
@@ -23,6 +25,8 @@ export const EvidenceHistoryModal = ({
   const [statusFilter, setStatusFilter] = useState<'Todos' | Status>('Todos');
   const [typeFilter, setTypeFilter] = useState('Todos');
   const [folderFilter, setFolderFilter] = useState('Todos');
+  const [fileToDelete, setFileToDelete] = useState<UploadedFile | null>(null);
+  const { showToast } = useToast();
 
   const fileTypes = useMemo(() => {
     const normalizedTypes = files
@@ -51,10 +55,7 @@ export const EvidenceHistoryModal = ({
 
   const handleDeleteFile = (file: UploadedFile) => {
     if (!onDeleteFile) return;
-    const confirmed = window.confirm(`Eliminar ${file.fileName}? Esta accion quitara la version v${file.version} del historial.`);
-    if (!confirmed) return;
-
-    onDeleteFile(file.id);
+    setFileToDelete(file);
   };
 
   if (!activeRequirement) return null;
@@ -154,6 +155,19 @@ export const EvidenceHistoryModal = ({
           </div>
         )}
       </div>
+      <ConfirmDialog
+        isOpen={Boolean(fileToDelete)}
+        title="Eliminar versión"
+        description={fileToDelete ? `Se eliminará ${fileToDelete.fileName}, versión ${fileToDelete.version}, del historial.` : ''}
+        confirmLabel="Eliminar"
+        onCancel={() => setFileToDelete(null)}
+        onConfirm={() => {
+          if (!fileToDelete || !onDeleteFile) return;
+          onDeleteFile(fileToDelete.id);
+          setFileToDelete(null);
+          showToast('Versión eliminada del historial.');
+        }}
+      />
     </Modal>
   );
 };

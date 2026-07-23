@@ -17,6 +17,8 @@ import { TEMPLATES } from '../../data/templates';
 import { OfficialFormat, UserRole } from '../../types';
 import { OfficialFormatContentService } from '../../services/officialFormatContentService';
 import { OfficialFormatService } from '../../services/officialFormatService';
+import { PageHeader } from '../common/PageHeader';
+import { useToast } from '../common/Toast';
 
 interface TemplatesViewProps {
   userRole: UserRole;
@@ -111,10 +113,10 @@ const downloadStaticTemplate = (templateId: string) => {
   URL.revokeObjectURL(url);
 };
 
-const downloadOfficialFormat = async (format: OfficialFormat) => {
+const downloadOfficialFormat = async (format: OfficialFormat, onMissing: () => void) => {
   const blob = await OfficialFormatContentService.get(format.id);
   if (!blob) {
-    window.alert('No se encontro el archivo local de este formato.');
+    onMissing();
     return;
   }
 
@@ -127,6 +129,7 @@ const downloadOfficialFormat = async (format: OfficialFormat) => {
 };
 
 export const TemplatesView = ({ userRole, userName = 'Administrador' }: TemplatesViewProps) => {
+  const { showToast } = useToast();
   const [query, setQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState<string>('');
   const [officialFormats, setOfficialFormats] = useState<OfficialFormat[]>(() => OfficialFormatService.getAll());
@@ -177,7 +180,10 @@ export const TemplatesView = ({ userRole, userName = 'Administrador' }: Template
   };
 
   const handleCreateOfficialFormat = async () => {
-    if (!selectedFile || !formatTitle.trim()) return;
+    if (!selectedFile || !formatTitle.trim()) {
+      showToast('Selecciona un archivo y escribe el título del formato.', 'error');
+      return;
+    }
 
     const format = OfficialFormatService.create({
       title: formatTitle,
@@ -189,7 +195,7 @@ export const TemplatesView = ({ userRole, userName = 'Administrador' }: Template
     });
 
     if (!format) {
-      window.alert('Ya existe un formato con ese titulo y archivo.');
+      showToast('Ya existe un formato con ese título y archivo.', 'error');
       return;
     }
 
@@ -199,6 +205,7 @@ export const TemplatesView = ({ userRole, userName = 'Administrador' }: Template
     setSelectedFile(null);
     setSelectedFormatId(format.id);
     refreshLocalFormats();
+    showToast('Formato oficial cargado correctamente.');
   };
 
   const handleLinkFormat = () => {
@@ -213,6 +220,7 @@ export const TemplatesView = ({ userRole, userName = 'Administrador' }: Template
       createdBy: userName
     });
     refreshLocalFormats();
+    showToast('Formato asociado a la evidencia.');
   };
 
   const handleToggleFormat = (format: OfficialFormat) => {
@@ -226,18 +234,20 @@ export const TemplatesView = ({ userRole, userName = 'Administrador' }: Template
       animate={{ opacity: 1, y: 0 }}
       className="mx-auto max-w-7xl space-y-8"
     >
-      <section className="rounded-[28px] border border-blue-100 bg-white p-8 shadow-sm">
+      <PageHeader
+        title="Plantillas y formatos"
+        description="Administra formatos oficiales locales y consulta plantillas sugeridas."
+        breadcrumbs={['Inicio', 'Formatos y plantillas']}
+      />
+      <section className="rounded-lg border border-blue-100 bg-white p-5 sm:p-6">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
           <div className="max-w-3xl">
-            <div className="inline-flex items-center gap-2 rounded-full border border-blue-100 bg-blue-50 px-4 py-2 text-[10px] font-black uppercase tracking-[0.24em] text-blue-700">
+            <div className="inline-flex items-center gap-2 rounded-md border border-blue-100 bg-blue-50 px-3 py-2 text-xs font-semibold text-blue-700">
               <Blocks className="h-3.5 w-3.5" />
               Formatos oficiales
             </div>
-            <h1 className="mt-4 text-3xl font-black tracking-tight text-slate-900">
-              Plantillas y formatos
-            </h1>
-            <p className="mt-3 max-w-2xl text-sm leading-relaxed text-slate-500">
-              Administra formatos oficiales locales y conserva la biblioteca de plantillas sugeridas como apoyo.
+            <p className="mt-3 max-w-2xl text-sm leading-relaxed text-slate-600">
+              Los formatos oficiales se almacenan localmente y pueden asociarse a una evidencia específica.
             </p>
           </div>
 
@@ -252,7 +262,7 @@ export const TemplatesView = ({ userRole, userName = 'Administrador' }: Template
 
       {isAdmin && (
         <section className="grid gap-5 lg:grid-cols-[1fr_1fr]">
-          <div className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm">
+          <div className="rounded-lg border border-slate-200 bg-white p-6">
             <div className="flex items-center gap-2">
               <UploadCloud className="h-5 w-5 text-blue-600" />
               <h2 className="text-sm font-black uppercase tracking-widest text-slate-800">Cargar formato oficial</h2>
@@ -368,7 +378,7 @@ export const TemplatesView = ({ userRole, userName = 'Administrador' }: Template
                 format={format}
                 links={links.filter(link => link.formatId === format.id).length}
                 isAdmin={isAdmin}
-                onDownload={downloadOfficialFormat}
+                onDownload={format => downloadOfficialFormat(format, () => showToast('No se encontró el archivo local de este formato.', 'error'))}
                 onToggle={handleToggleFormat}
               />
             ))}

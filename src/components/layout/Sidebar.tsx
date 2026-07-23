@@ -6,6 +6,7 @@ import {
   FilePlus2,
   FileText,
   Folder,
+  X,
 } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 import { Indicator, UserRole, YearPeriod } from '../../types';
@@ -30,6 +31,8 @@ interface SidebarProps {
   onOpenDashboard: () => void;
   onOpenTemplates: () => void;
   onOpenAssignments: () => void;
+  isOpen?: boolean;
+  onClose?: () => void;
 }
 
 export const Sidebar = ({
@@ -49,6 +52,8 @@ export const Sidebar = ({
   onOpenDashboard,
   onOpenTemplates,
   onOpenAssignments,
+  isOpen = false,
+  onClose = () => undefined,
 }: SidebarProps) => {
   const isRepositoryActive =
     activeView === 'dashboard' || activeView === 'indicator' || activeView === 'checklist';
@@ -77,12 +82,19 @@ export const Sidebar = ({
   const inactiveButtonStyles =
     'text-[#475569] border-transparent hover:bg-[#f4f6f9]';
 
+  const navigate = (action: () => void) => {
+    action();
+    onClose();
+  };
+
   return (
+    <>
+    {isOpen && <button className="fixed inset-0 z-40 bg-slate-950/45 lg:hidden" aria-label="Cerrar menú" onClick={onClose} />}
     <motion.aside
       initial={{ x: -300, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
       transition={{ duration: 0.4, ease: 'easeOut' }}
-      className="w-80 bg-white border-r border-[#e2e8f0] flex flex-col shadow-sm"
+      className={`fixed inset-y-0 left-0 z-50 flex w-[min(20rem,88vw)] flex-col border-r border-slate-200 bg-white shadow-xl transition-transform lg:static lg:z-auto lg:w-80 lg:translate-x-0 lg:shadow-sm ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}
     >
       <div className="h-16 border-b border-white/10 flex items-center gap-3 bg-[#1e2d4a] px-6">
         <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#2563eb] shadow-lg shadow-blue-600/20">
@@ -92,6 +104,9 @@ export const Sidebar = ({
           <h1 className="font-bold text-base tracking-tight text-white leading-none">CACES</h1>
           <span className="text-[9px] text-[#aac4e8] font-bold uppercase tracking-[0.2em]">Acreditacion</span>
         </div>
+        <button onClick={onClose} aria-label="Cerrar menú" className="ml-auto inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg text-white hover:bg-white/10 lg:hidden">
+          <X className="h-5 w-5" />
+        </button>
       </div>
 
       <motion.div
@@ -108,7 +123,7 @@ export const Sidebar = ({
                 ? { x: 4, boxShadow: '0 10px 24px rgba(37, 99, 235, 0.22)' }
                 : { x: 4, backgroundColor: 'rgba(244, 246, 249, 1)' }
             }
-            onClick={onOpenDashboard}
+            onClick={() => navigate(onOpenDashboard)}
             aria-current={isRepositoryActive ? 'page' : undefined}
             className={`w-full flex items-center gap-3 px-3 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all border ${
               isRepositoryActive
@@ -124,7 +139,7 @@ export const Sidebar = ({
             }`}>
               <Folder className="w-4 h-4" />
             </span>
-            <span className="flex-1 text-left">1. Repositorio</span>
+            <span className="flex-1 text-left">Repositorio</span>
             {isRepositoryActive && (
               <span className="rounded-full bg-[#2563eb] px-2.5 py-1 text-[9px] font-black uppercase tracking-[0.2em] text-white">
                 Actual
@@ -141,7 +156,7 @@ export const Sidebar = ({
                 ? { x: 4, boxShadow: '0 10px 24px rgba(37, 99, 235, 0.22)' }
                 : { x: 4, backgroundColor: 'rgba(244, 246, 249, 1)' }
             }
-            onClick={onOpenTemplates}
+            onClick={() => navigate(onOpenTemplates)}
             aria-current={isTemplatesActive ? 'page' : undefined}
             className={`w-full flex items-center gap-3 px-3 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all border ${
               isTemplatesActive
@@ -157,7 +172,7 @@ export const Sidebar = ({
             }`}>
               <FilePlus2 className="w-4 h-4" />
             </span>
-            <span className="flex-1 text-left">2. Crear</span>
+            <span className="flex-1 text-left">Formatos y plantillas</span>
             {isTemplatesActive && (
               <span className="rounded-full bg-[#2563eb] px-2.5 py-1 text-[9px] font-black uppercase tracking-[0.2em] text-white">
                 Actual
@@ -174,7 +189,7 @@ export const Sidebar = ({
                 ? { x: 4, boxShadow: '0 10px 24px rgba(37, 99, 235, 0.22)' }
                 : { x: 4, backgroundColor: 'rgba(244, 246, 249, 1)' }
             }
-            onClick={onOpenAssignments}
+            onClick={() => navigate(onOpenAssignments)}
             aria-current={isAssignmentsActive ? 'page' : undefined}
             className={`w-full flex items-center gap-3 px-3 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all border ${
               isAssignmentsActive
@@ -190,7 +205,7 @@ export const Sidebar = ({
             }`}>
               <ClipboardList className="w-4 h-4" />
             </span>
-            <span className="flex-1 text-left">{userRole === 'ADMIN' ? '3. Roles' : '3. Docentes y tareas'}</span>
+            <span className="flex-1 text-left">{userRole === 'ADMIN' ? 'Coordinadores y tareas' : 'Docentes y tareas'}</span>
             {isAssignmentsActive && (
               <span className="rounded-full bg-[#2563eb] px-2.5 py-1 text-[9px] font-black uppercase tracking-[0.2em] text-white">
                 Actual
@@ -416,5 +431,6 @@ export const Sidebar = ({
         </div>
       </motion.div>
     </motion.aside>
+    </>
   );
 };

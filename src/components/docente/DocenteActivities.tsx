@@ -21,7 +21,6 @@ export const DocenteActivities = ({ onOpenUploadModal }: DocenteActivitiesProps)
   ];
 
   const getUrgencyBadge = (days: number) => {
-    const isUrgent = days <= 2;
     const badgeClass = days <= 2
       ? 'bg-rose-100 text-rose-700'
       : days <= 7
@@ -30,15 +29,11 @@ export const DocenteActivities = ({ onOpenUploadModal }: DocenteActivitiesProps)
     const text = days <= 2 ? `¡Urgente! (${days} días)` : `Quedan ${days} días`;
 
     return (
-      <motion.span
+      <span
         className={`px-2 py-1 rounded-md text-[10px] font-black uppercase tracking-widest ${badgeClass}`}
-        {...(isUrgent ? {
-          animate: { scale: [1, 1.08, 1] },
-          transition: { duration: 1.5, repeat: Infinity, ease: 'easeInOut' }
-        } : {})}
       >
         {text}
-      </motion.span>
+      </span>
     );
   };
 

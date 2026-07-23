@@ -20,16 +20,54 @@
   --color-valid: #15803d;
   --color-observed: #dc2626;
   --color-progress: #22c55e;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --shadow-card: 0 8px 24px -18px rgba(15, 23, 42, 0.35);
+  --shadow-overlay: 0 24px 60px -24px rgba(15, 23, 42, 0.45);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  color-scheme: light;
 }
 
 body {
+  margin: 0;
+  min-width: 320px;
   background: var(--color-app-bg);
   color: var(--color-title);
+  text-rendering: optimizeLegibility;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button,
+[role="button"],
+a,
+input,
+select,
+textarea {
+  outline: none;
+}
+
+:focus-visible {
+  outline: 3px solid rgba(37, 99, 235, 0.35);
+  outline-offset: 2px;
 }
 
 @layer components {
   .indicator-card {
-    @apply bg-white rounded-xl border border-slate-200 shadow-[0_12px_30px_-20px_rgba(15,23,42,0.35)] transition-all duration-300;
+    @apply bg-white rounded-lg border border-slate-200 transition-colors duration-200;
+    box-shadow: var(--shadow-card);
   }
 
   .evidence-btn {
@@ -37,7 +75,7 @@ body {
   }
 
   .status-badge {
-    @apply px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider border;
+    @apply px-2.5 py-1 rounded-md text-[11px] font-bold uppercase border;
   }
 
   .tree-item-active {
@@ -45,7 +83,8 @@ body {
   }
 
   .premium-card {
-    @apply bg-white border border-slate-200 shadow-[0_14px_30px_-22px_rgba(15,23,42,0.45)];
+    @apply bg-white border border-slate-200 rounded-lg;
+    box-shadow: var(--shadow-card);
   }
 
   .premium-hero {
@@ -54,10 +93,9 @@ body {
   }
 }
 
-/* Custom scrollbar for a cleaner look matching Geometric Balance */
 ::-webkit-scrollbar {
-  width: 4px;
-  height: 4px;
+  width: 8px;
+  height: 8px;
 }
 
 ::-webkit-scrollbar-track {
@@ -66,7 +104,18 @@ body {
 
 ::-webkit-scrollbar-thumb {
   background: #94a3b8;
-  border-radius: 10px;
+  border-radius: 8px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 ::-webkit-scrollbar-thumb:hover {

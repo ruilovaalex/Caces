@@ -81,27 +81,6 @@ export const DocenteDashboard = ({ onViewAllFiles, onViewAllActivities }: Docent
         ))}
       </motion.div>
 
-      {/* Animated progress bar */}
-      <motion.div
-        initial={{ opacity: 0, y: 15 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, ease: 'easeOut', delay: 0.4 }}
-        className="premium-card bg-white p-6 rounded-lg space-y-4"
-      >
-        <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-wider">
-          <span className="text-[#64748b]">Progreso General de mis Entregas</span>
-          <span className="text-[#2563eb]">50%</span>
-        </div>
-        <div className="w-full h-2 bg-[#f1f5f9] rounded-full overflow-hidden">
-          <motion.div
-            className="h-full bg-[#2563eb] rounded-full"
-            initial={{ width: '0%' }}
-            animate={{ width: '50%' }}
-            transition={{ duration: 1.2, ease: 'easeOut', delay: 0.5 }}
-          />
-        </div>
-      </motion.div>
-
       {/* Bottom cards entering from the right */}
       <motion.div
         className="grid grid-cols-1 md:grid-cols-2 gap-6"

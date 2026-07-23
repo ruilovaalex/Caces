@@ -1,6 +1,8 @@
 import React, { useMemo } from 'react';
 import { CheckCircle2, ChevronRight, FileText } from 'lucide-react';
 import { YearPeriod, Indicator } from '../../types';
+import { PageHeader } from '../common/PageHeader';
+import { Button } from '../common/Button';
 
 interface ChecklistViewProps {
   mockData: YearPeriod[];
@@ -30,24 +32,14 @@ export const ChecklistView = ({
 
   return (
     <div className="max-w-6xl mx-auto space-y-6">
-      <div className="flex items-center justify-between mb-2">
-        <div>
-          <h2 className="text-2xl font-black text-slate-800 tracking-tight leading-tight">
-            {isScopedView ? 'Mapa de indicadores asignados' : 'Mapa de indicadores'}
-          </h2>
-          <p className="text-slate-400 text-xs font-bold uppercase tracking-widest mt-1">
-            Escoge un indicador para preparar o revisar evidencias
-          </p>
-        </div>
-        <button
-          onClick={onBackToDashboard}
-          className="px-5 py-2 bg-slate-900 text-white rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-slate-800 transition-all"
-        >
-          Volver
-        </button>
-      </div>
+      <PageHeader
+        title={isScopedView ? 'Mapa de indicadores asignados' : 'Mapa de indicadores'}
+        description="Escoge un indicador para preparar o revisar sus evidencias."
+        breadcrumbs={['Inicio', 'Indicadores']}
+        actions={<Button variant="outline" onClick={onBackToDashboard}>Volver</Button>}
+      />
 
-      <div className="bg-white rounded-lg border border-slate-100 shadow-sm overflow-hidden">
+      <div className="hidden overflow-x-auto rounded-lg border border-slate-200 bg-white md:block">
         <table className="w-full text-left">
           <thead className="bg-slate-50 border-b border-slate-100">
             <tr>
@@ -110,6 +102,23 @@ export const ChecklistView = ({
             ))}
           </tbody>
         </table>
+      </div>
+      <div className="grid gap-3 md:hidden">
+        {indicators.map(indicator => (
+          <article key={indicator.code} className="rounded-lg border border-slate-200 bg-white p-4">
+            <div className="flex items-start gap-3">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-xs font-bold text-blue-700">{indicator.code}</span>
+              <div className="min-w-0 flex-1">
+                <h2 className="font-semibold text-slate-800">{indicator.name}</h2>
+                <p className="mt-1 text-xs text-slate-500">{indicator.subCriterionName}</p>
+                <div className="mt-3 flex items-center justify-between gap-3">
+                  <span className="text-xs font-medium text-slate-500">{indicator.requirements.length} evidencias · {indicator.status}</span>
+                  <Button size="sm" onClick={() => onIndicatorSelect(indicator)}>Abrir</Button>
+                </div>
+              </div>
+            </div>
+          </article>
+        ))}
       </div>
     </div>
   );

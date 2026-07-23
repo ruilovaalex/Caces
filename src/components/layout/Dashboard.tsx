@@ -1,9 +1,11 @@
 import React, { useMemo, useState, useEffect } from 'react';
-import { Folder, ChevronRight, AlertCircle } from 'lucide-react';
+import { Folder, ChevronRight, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { motion } from 'motion/react';
 import { YearPeriod, UploadedFile, Indicator } from '../../types';
 import { calculateIndicatorProgress } from '../../utils/progressUtils';
 import { WorkflowGuide } from './WorkflowGuide';
+import { PageHeader } from '../common/PageHeader';
+import { EmptyState } from '../common/EmptyState';
 import { staggerContainer, fadeInUp, hoverScale, tapScale, hoverCardLift, useCountUp } from '../../utils/animations';
 
 
@@ -99,6 +101,11 @@ export const Dashboard = ({
 
   return (
     <div className="max-w-6xl mx-auto space-y-8">
+      <PageHeader
+        title={isScopedView ? 'Indicadores asignados' : 'Panel de acreditación'}
+        description={isScopedView ? 'Seguimiento de las evidencias bajo tu responsabilidad.' : 'Estado consolidado del repositorio institucional CACES.'}
+        breadcrumbs={['Inicio']}
+      />
       <WorkflowGuide
         activeStep="repository"
         canManageAssignments={canManageAssignments}
@@ -236,6 +243,9 @@ export const Dashboard = ({
                 <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-blue-600 transition-all" />
               </motion.div>
             ))}
+            {pendingIndicators.length === 0 && (
+              <EmptyState icon={CheckCircle2} title="No hay indicadores pendientes" description="Las evidencias visibles no requieren atención inmediata." />
+            )}
           </motion.div>
           <div className="p-4 bg-slate-50/50 text-center border-t border-slate-50">
             <motion.button 

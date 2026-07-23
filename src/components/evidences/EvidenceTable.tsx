@@ -25,6 +25,9 @@ import { EvidenceStatusBadge } from './EvidenceStatusBadge';
 import { EvidenceFilePreviewModal } from './EvidenceFilePreviewModal';
 import { EvidenceGuideModal } from './EvidenceGuideModal';
 import { TemplateLibraryModal } from './TemplateLibraryModal';
+import { ConfirmDialog } from '../common/ConfirmDialog';
+import { PromptDialog } from '../common/PromptDialog';
+import { useToast } from '../common/Toast';
 
 interface EvidenceTableProps {
   indicator: Indicator;
@@ -44,6 +47,13 @@ interface FolderGroup {
   isVirtual: boolean;
 }
 
+type RepositoryDialog =
+  | { kind: 'create-folder'; requirement: Requirement }
+  | { kind: 'delete-folder'; folder: EvidenceFolder; files: UploadedFile[] }
+  | { kind: 'confirm-file'; file: UploadedFile }
+  | { kind: 'deny-file'; file: UploadedFile }
+  | null;
+
 export const EvidenceTable = ({
   indicator,
   userRole,
@@ -58,6 +68,8 @@ export const EvidenceTable = ({
   const [guideRequirement, setGuideRequirement] = useState<Requirement | null>(null);
   const [previewFile, setPreviewFile] = useState<UploadedFile | null>(null);
   const [isTemplateLibraryOpen, setIsTemplateLibraryOpen] = useState(false);
+  const [dialog, setDialog] = useState<RepositoryDialog>(null);
+  const { showToast } = useToast();
   const canUpload = canUserUpload(userRole);
   const isEvaluator = userRole === 'EVALUADOR';
 
@@ -92,42 +104,57 @@ export const EvidenceTable = ({
   };
 
   const createFolder = (requirement: Requirement) => {
-    const name = window.prompt('Nombre de la nueva carpeta');
-    const normalizedName = name?.trim();
-    if (!normalizedName) return;
+    setDialog({ kind: 'create-folder', requirement });
+  };
 
-    const folder = EvidenceFolderService.create(indicator.code, requirement.id, normalizedName);
+  const saveFolder = (name: string) => {
+    if (dialog?.kind !== 'create-folder') return;
+    const folder = EvidenceFolderService.create(indicator.code, dialog.requirement.id, name);
     if (!folder) {
-      window.alert('Ya existe una carpeta con ese nombre.');
+      showToast('Ya existe una carpeta con ese nombre.', 'error');
       return;
     }
-
+    setDialog(null);
     refreshFolders();
+    showToast('Carpeta creada correctamente.');
   };
 
   const removeFolder = (folder: EvidenceFolder, files: UploadedFile[]) => {
     if (EvidenceFolderService.folderHasFiles(folder.id, files)) {
-      window.alert('No se puede eliminar una carpeta que contiene archivos.');
+      showToast('No se puede eliminar una carpeta que contiene archivos.', 'error');
       return;
     }
+    setDialog({ kind: 'delete-folder', folder, files });
+  };
 
-    const confirmed = window.confirm(`Eliminar la carpeta "${folder.name}"?`);
-    if (!confirmed) return;
-
-    EvidenceFolderService.delete(folder.id, files);
+  const executeFolderRemoval = () => {
+    if (dialog?.kind !== 'delete-folder') return;
+    EvidenceFolderService.delete(dialog.folder.id, dialog.files);
+    setDialog(null);
     refreshFolders();
+    showToast('Carpeta eliminada.');
   };
 
   const confirmFile = (file: UploadedFile) => {
-    const confirmed = window.confirm(`Confirmar y validar el archivo "${file.fileName}"?`);
-    if (!confirmed) return;
-    onReviewStatus(file.id, 'Validado');
+    setDialog({ kind: 'confirm-file', file });
+  };
+
+  const executeFileConfirmation = () => {
+    if (dialog?.kind !== 'confirm-file') return;
+    onReviewStatus(dialog.file.id, 'Validado');
+    setDialog(null);
+    showToast('Evidencia validada correctamente.');
   };
 
   const denyFile = (file: UploadedFile) => {
-    const observation = window.prompt('Indica el motivo por el que se deniega este archivo:');
-    if (!observation?.trim()) return;
-    onReviewStatus(file.id, 'Rechazado', observation.trim());
+    setDialog({ kind: 'deny-file', file });
+  };
+
+  const executeFileDenial = (observation: string) => {
+    if (dialog?.kind !== 'deny-file') return;
+    onReviewStatus(dialog.file.id, 'Rechazado', observation);
+    setDialog(null);
+    showToast('Evidencia rechazada con una observación.');
   };
 
   const buildFolderGroups = (requirementFolders: EvidenceFolder[], files: UploadedFile[]): FolderGroup[] => [
@@ -409,6 +436,40 @@ export const EvidenceTable = ({
         isOpen={Boolean(previewFile)}
         file={previewFile}
         onClose={() => setPreviewFile(null)}
+      />
+      <PromptDialog
+        isOpen={dialog?.kind === 'create-folder'}
+        title="Crear carpeta"
+        label="Nombre de la carpeta"
+        confirmLabel="Crear carpeta"
+        onCancel={() => setDialog(null)}
+        onConfirm={saveFolder}
+      />
+      <PromptDialog
+        isOpen={dialog?.kind === 'deny-file'}
+        title="Rechazar evidencia"
+        label="Motivo de la observación"
+        confirmLabel="Rechazar"
+        multiline
+        onCancel={() => setDialog(null)}
+        onConfirm={executeFileDenial}
+      />
+      <ConfirmDialog
+        isOpen={dialog?.kind === 'delete-folder'}
+        title="Eliminar carpeta"
+        description={dialog?.kind === 'delete-folder' ? `Se eliminará la carpeta “${dialog.folder.name}”.` : ''}
+        confirmLabel="Eliminar"
+        onCancel={() => setDialog(null)}
+        onConfirm={executeFolderRemoval}
+      />
+      <ConfirmDialog
+        isOpen={dialog?.kind === 'confirm-file'}
+        title="Validar evidencia"
+        description={dialog?.kind === 'confirm-file' ? `Se marcará “${dialog.file.fileName}” como validada.` : ''}
+        confirmLabel="Validar"
+        tone="primary"
+        onCancel={() => setDialog(null)}
+        onConfirm={executeFileConfirmation}
       />
     </section>
   );
