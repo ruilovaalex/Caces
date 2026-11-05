@@ -15,6 +15,7 @@ import { CoordinatorEvidenceEditor } from '../components/coordinator/Coordinator
 import { AssignmentsView } from '../components/assignments/AssignmentsView';
 import { DocenteView } from '../components/docente/DocenteView';
 import { UsersAdminView } from '../components/admin/UsersAdminView';
+import { ApiTasksView } from '../components/assignments/ApiTasksView';
 import { TemplatesView } from '../components/templates/TemplatesView';
 import { LocalDataImportCard } from '../components/layout/LocalDataImportCard';
 
@@ -269,6 +270,10 @@ export default function App() {
     }
   };
 
+  const allIndicators = useMemo(
+    () => mockData.flatMap(yearPeriod => yearPeriod.criteria.flatMap(criterion => criterion.subCriteria.flatMap(subCriterion => subCriterion.indicators))),
+    [mockData],
+  );
   const canAccessAssignments = userRole === 'ADMIN' || canUserAssign(userRole);
   const activeView = selectedIndicator
     ? 'indicator'
@@ -362,7 +367,10 @@ export default function App() {
         />
 
         {userRole === 'DOCENTE' ? (
-          <DocenteView onLogout={logout} />
+          <DocenteView
+            onLogout={logout}
+            tasksSlot={isApiMode ? <ApiTasksView userRole={userRole} periodCode={activePeriodId} periodLabel={activePeriod.label} indicators={allIndicators} /> : undefined}
+          />
         ) : (
           <div className="flex-1 overflow-y-auto p-8 bg-[#f4f6f9]">
             <AnimatePresence mode="wait">
@@ -413,7 +421,9 @@ export default function App() {
 
               {!selectedIndicator && isAssignmentsOpen && canAccessAssignments && !isTemplatesOpen && (
                 <motion.div key="assignments" variants={viewTransition} initial="initial" animate="animate" exit="exit">
-                  {isApiMode && userRole === 'ADMIN'
+                  {isApiMode && userRole === 'COORDINADOR'
+                    ? <ApiTasksView userRole={userRole} periodCode={activePeriodId} periodLabel={activePeriod.label} indicators={allIndicators} />
+                    : isApiMode && userRole === 'ADMIN'
                     ? <UsersAdminView currentUserId={user?.id} />
                     : <AssignmentsView userRole={userRole} mockData={mockData} />}
                 </motion.div>

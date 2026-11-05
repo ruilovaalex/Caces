@@ -264,3 +264,27 @@ export const UsersApi = {
   update: (id: string, data: Partial<{ name: string; role: UserRole; active: boolean; password: string }>) =>
     api.patch<ManagedUser>(`/users/${id}`, data),
 };
+
+export type TaskStatus = 'NUEVA' | 'EN_PROGRESO' | 'ENTREGADA';
+
+export interface TeacherTask {
+  id: string;
+  periodCode: string;
+  assigneeId: string;
+  assigneeName: string;
+  createdByName: string;
+  indicatorCode: string;
+  title: string;
+  evidenceLabel: string;
+  dueDate: string;
+  status: TaskStatus;
+}
+
+export const TasksApi = {
+  teachers: () => api.get<{ id: string; name: string; email: string }[]>('/teachers'),
+  list: (periodCode: string) => api.get<TeacherTask[]>(`${period(periodCode)}/tasks`),
+  create: (periodCode: string, data: { assigneeId: string; indicatorCode: string; title: string; evidenceLabel: string; dueDate: string }) =>
+    api.post<TeacherTask>(`${period(periodCode)}/tasks`, data),
+  changeStatus: (id: string, status: TaskStatus) => api.patch<TeacherTask>(`/tasks/${id}/status`, { status }),
+  remove: (id: string) => api.delete(`/tasks/${id}`),
+};
