@@ -7,6 +7,8 @@ export interface AppConfig {
   corsOrigins: string[];
   storageDriver: 'local';
   storageLocalDir: string;
+  mailDriver: 'console' | 'none';
+  frontendUrl: string;
   maxUploadBytes: number;
 }
 
@@ -39,6 +41,10 @@ export const loadConfig = (env: NodeJS.ProcessEnv = process.env): AppConfig => {
   const storageDriver = env.STORAGE_DRIVER || 'local';
   if (storageDriver !== 'local') errors.push(`STORAGE_DRIVER no soportado: ${storageDriver}`);
 
+  const mailDriver = env.MAIL_DRIVER || (isProduction ? 'none' : 'console');
+  if (mailDriver !== 'console' && mailDriver !== 'none') errors.push(`MAIL_DRIVER no soportado: ${mailDriver}`);
+  if (isProduction && mailDriver === 'console') errors.push('MAIL_DRIVER=console no se permite en produccion (filtraria enlaces de recuperacion en los logs)');
+
   const maxUploadMb = Number(env.MAX_UPLOAD_MB || 20);
   if (!Number.isFinite(maxUploadMb) || maxUploadMb <= 0) errors.push('MAX_UPLOAD_MB debe ser un numero positivo');
 
@@ -51,6 +57,8 @@ export const loadConfig = (env: NodeJS.ProcessEnv = process.env): AppConfig => {
     corsOrigins: (env.CORS_ORIGINS || 'http://localhost:3000').split(',').map(origin => origin.trim()).filter(Boolean),
     storageDriver: 'local',
     storageLocalDir: env.STORAGE_LOCAL_DIR || './storage',
+    mailDriver: mailDriver as 'console' | 'none',
+    frontendUrl: (env.FRONTEND_URL || 'http://localhost:3000').replace(/\/+$/, ''),
     maxUploadBytes: Math.round(maxUploadMb * 1024 * 1024),
   };
 

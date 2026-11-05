@@ -6,7 +6,7 @@ import { IsBoolean, IsEmail, IsIn, IsInt, IsOptional, IsString, Max, MaxLength, 
 import { normalizePage } from '../../../shared/application/pagination';
 import { Actor, Role, ROLES } from '../../../shared/domain/actor';
 import { CurrentActor, Public } from '../../../shared/http/auth';
-import { ChangeOwnPasswordUseCase, LoginUseCase } from '../application/auth.use-cases';
+import { ChangeOwnPasswordUseCase, LoginUseCase, RequestPasswordResetUseCase, ResetPasswordUseCase } from '../application/auth.use-cases';
 import { CreateUserUseCase, ListUsersUseCase, UpdateUserUseCase } from '../application/user-admin.use-cases';
 
 class LoginDto {
@@ -24,6 +24,15 @@ class LoginDto {
 
 class ChangePasswordDto {
   @ApiProperty() @IsString() @MaxLength(200) currentPassword: string;
+  @ApiProperty() @IsString() @MinLength(8) @MaxLength(200) newPassword: string;
+}
+
+class ForgotPasswordDto {
+  @ApiProperty() @IsEmail() @MaxLength(200) email: string;
+}
+
+class ResetPasswordDto {
+  @ApiProperty() @IsString() @MinLength(20) @MaxLength(200) token: string;
   @ApiProperty() @IsString() @MinLength(8) @MaxLength(200) newPassword: string;
 }
 
@@ -52,6 +61,8 @@ export class AuthController {
   constructor(
     private readonly login: LoginUseCase,
     private readonly changePassword: ChangeOwnPasswordUseCase,
+    private readonly requestReset: RequestPasswordResetUseCase,
+    private readonly resetPassword: ResetPasswordUseCase,
   ) {}
 
   @Public()
@@ -60,6 +71,22 @@ export class AuthController {
   @HttpCode(200)
   signIn(@Body() body: LoginDto) {
     return this.login.execute(body.email, body.password);
+  }
+
+  @Public()
+  @Throttle({ default: { limit: 5, ttl: 60_000 } })
+  @Post('forgot-password')
+  @HttpCode(204)
+  async forgot(@Body() body: ForgotPasswordDto) {
+    await this.requestReset.execute(body.email);
+  }
+
+  @Public()
+  @Throttle({ default: { limit: 10, ttl: 60_000 } })
+  @Post('reset-password')
+  @HttpCode(204)
+  async reset(@Body() body: ResetPasswordDto) {
+    await this.resetPassword.execute(body.token, body.newPassword);
   }
 
   @ApiBearerAuth()

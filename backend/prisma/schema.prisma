@@ -67,6 +67,7 @@ model User {
   assessments       IndicatorAssessment[]
   notifications     Notification[]
   auditLogs         AuditLog[]
+  passwordResets    PasswordResetToken[]
 }
 
 // Periodo academico. El codigo coincide con los identificadores que ya usa el frontend
@@ -106,14 +107,14 @@ model SubCriterion {
 }
 
 model Indicator {
-  id             String        @id @default(uuid())
-  code           String        @unique
+  id             String                @id @default(uuid())
+  code           String                @unique
   name           String
   description    String
   type           IndicatorType
   sortOrder      Int
   subCriterionId String
-  subCriterion   SubCriterion  @relation(fields: [subCriterionId], references: [id])
+  subCriterion   SubCriterion          @relation(fields: [subCriterionId], references: [id])
   requirements   Requirement[]
   assessments    IndicatorAssessment[]
 }
@@ -169,12 +170,12 @@ model EvidenceVersion {
 }
 
 model EvidenceReview {
-  id                String          @id @default(uuid())
+  id                String         @id @default(uuid())
   evidenceVersionId String
   status            EvidenceStatus
   comment           String?
   reviewerId        String
-  createdAt         DateTime        @default(now())
+  createdAt         DateTime       @default(now())
 
   evidenceVersion EvidenceVersion @relation(fields: [evidenceVersionId], references: [id])
   reviewer        User            @relation(fields: [reviewerId], references: [id])
@@ -246,4 +247,18 @@ model AuditLog {
   actor User? @relation(fields: [actorId], references: [id])
 
   @@index([entityType, entityId])
+}
+
+// Token de un solo uso para recuperar la contrasena. Solo se guarda el hash (SHA-256) del token enviado por correo.
+model PasswordResetToken {
+  id        String    @id @default(uuid())
+  userId    String
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }

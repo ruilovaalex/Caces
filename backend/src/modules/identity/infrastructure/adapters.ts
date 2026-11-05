@@ -1,10 +1,10 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { compare, hash } from 'bcryptjs';
 import { Page, PageRequest } from '../../../shared/application/pagination';
 import { Role } from '../../../shared/domain/actor';
 import { PrismaService } from '../../../shared/infrastructure/prisma.service';
-import { PasswordHasher, TokenService, UserRepository } from '../domain/ports';
+import { Mailer, PasswordHasher, PasswordResetRepository, TokenService, UserRepository } from '../domain/ports';
 import { User } from '../domain/user';
 
 @Injectable()
@@ -66,5 +66,45 @@ export class JwtTokenService implements TokenService {
     } catch {
       return null;
     }
+  }
+}
+
+@Injectable()
+export class PrismaPasswordResetRepository implements PasswordResetRepository {
+  constructor(private readonly prisma: PrismaService) {}
+
+  async create(data: { userId: string; tokenHash: string; expiresAt: Date }): Promise<void> {
+    await this.prisma.passwordResetToken.create({ data });
+  }
+
+  async consume(tokenHash: string, now: Date): Promise<string | null> {
+    // updateMany con condiciones garantiza un solo uso aunque lleguen solicitudes simultaneas.
+    const result = await this.prisma.passwordResetToken.updateMany({
+      where: { tokenHash, usedAt: null, expiresAt: { gt: now } },
+      data: { usedAt: now },
+    });
+    if (result.count !== 1) return null;
+    const token = await this.prisma.passwordResetToken.findUnique({ where: { tokenHash } });
+    return token?.userId ?? null;
+  }
+
+  async invalidateAllFor(userId: string): Promise<void> {
+    await this.prisma.passwordResetToken.updateMany({ where: { userId, usedAt: null }, data: { usedAt: new Date() } });
+  }
+}
+
+// Solo desarrollo y pruebas: escribe el enlace en el log. En produccion no se permite (ver config).
+@Injectable()
+export class ConsoleMailer implements Mailer {
+  async sendPasswordReset(to: { email: string }, link: string): Promise<void> {
+    Logger.log(`[correo simulado] Recuperacion de clave para ${to.email}: ${link}`, 'ConsoleMailer');
+  }
+}
+
+// Sin proveedor de correo configurado: no se envia nada y se avisa al operador (sin registrar el enlace).
+@Injectable()
+export class DisabledMailer implements Mailer {
+  async sendPasswordReset(to: { email: string }): Promise<void> {
+    Logger.warn(`Se solicito recuperar la clave de ${to.email} pero no hay proveedor de correo configurado (MAIL_DRIVER=none). Un administrador puede restablecerla desde Usuarios.`, 'DisabledMailer');
   }
 }
