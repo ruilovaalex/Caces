@@ -73,12 +73,22 @@ async function seedPeriods() {
 }
 
 async function seedUsers() {
+  const isProduction = process.env.NODE_ENV === 'production';
   const password = process.env.SEED_DEFAULT_PASSWORD;
-  if (!password || password.length < 8) {
-    throw new Error('Define SEED_DEFAULT_PASSWORD (minimo 8 caracteres) para crear los usuarios iniciales.');
+  if (!password || password.length < (isProduction ? 12 : 8)) {
+    throw new Error(`Define SEED_DEFAULT_PASSWORD (minimo ${isProduction ? 12 : 8} caracteres) para crear los usuarios iniciales.`);
+  }
+  let users = DEMO_USERS;
+  if (isProduction) {
+    // En produccion no se crean usuarios de demostracion: solo el administrador inicial indicado.
+    const adminEmail = process.env.SEED_ADMIN_EMAIL?.trim().toLowerCase();
+    if (!adminEmail || !adminEmail.includes('@')) {
+      throw new Error('En produccion define SEED_ADMIN_EMAIL (correo del administrador inicial).');
+    }
+    users = [{ email: adminEmail, name: 'Administrador', role: 'ADMIN' }];
   }
   const passwordHash = await hash(password, 12);
-  for (const user of DEMO_USERS) {
+  for (const user of users) {
     // update vacio: no se sobrescriben contrasenas ni datos de usuarios existentes.
     await prisma.user.upsert({ where: { email: user.email }, update: {}, create: { ...user, passwordHash } });
   }

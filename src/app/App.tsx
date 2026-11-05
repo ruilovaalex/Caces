@@ -29,7 +29,7 @@ import { getIndicatorCurrentStatus, getIndicatorStats, getPresentialStats } from
 import { getIndicatorAssessmentHistory } from '../services/indicatorAssessmentService';
 import { getReadableAllowedFormats, isFileAllowedForRequirement } from '../utils/evidenceFormatUtils';
 import { canUserAssessIndicator, canUserAssign, canUserDelete, canUserUpload, canUserVerifyPresential } from '../utils/permissions';
-import { describeError, isApiMode } from '../services/api/apiClient';
+import { configurationError, describeError, isApiMode } from '../services/api/apiClient';
 import { viewTransition } from '../utils/animations';
 import { getAcademicPeriodsForYear } from '../utils/academicPeriodUtils';
 import { Indicator, IndicatorRating, Requirement, Status, VerificationResult } from '../types';
@@ -306,6 +306,17 @@ export default function App() {
       presential: { verified: presential.verified, total: presential.total },
     };
   }, [allFiles, selectedIndicator, verifications]);
+
+  if (configurationError) {
+    return (
+      <div role="alert" className="flex h-screen items-center justify-center bg-[#0f172a] p-6 text-center">
+        <div className="max-w-md space-y-2 rounded-2xl bg-white p-8">
+          <h1 className="text-sm font-black uppercase tracking-widest text-rose-600">Configuracion incompleta</h1>
+          <p className="text-sm text-slate-600">{configurationError}</p>
+        </div>
+      </div>
+    );
+  }
 
   if (isRestoring) {
     return <div className="flex h-screen items-center justify-center bg-[#0f172a] text-xs font-black uppercase tracking-widest text-slate-400">Recuperando sesion...</div>;

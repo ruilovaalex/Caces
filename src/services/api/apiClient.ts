@@ -4,6 +4,14 @@ const TOKEN_KEY = 'edusudamericano_api_token';
 
 export const isApiMode = API_URL.length > 0;
 
+// El modo local (demostracion, sin contrasena) solo existe si se pide de forma explicita:
+// en desarrollo, o en un build con VITE_ENABLE_DEMO=true. Un build de produccion sin VITE_API_URL
+// no cae al modo local: muestra un error de configuracion.
+export const isDemoMode = !isApiMode && (import.meta.env.DEV || import.meta.env.VITE_ENABLE_DEMO === 'true');
+export const configurationError: string | null = !isApiMode && !isDemoMode
+  ? 'Falta VITE_API_URL: esta compilacion no tiene un servidor configurado y el modo de demostracion no esta habilitado (VITE_ENABLE_DEMO=true).'
+  : null;
+
 export class ApiError extends Error {
   constructor(message: string, readonly status: number, readonly code?: string) {
     super(message);

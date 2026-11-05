@@ -5,9 +5,10 @@
 ## Completado
 - Línea base verificada: frontend `lint` y `build` OK; backend `typecheck` OK; `npm test` 27/27 (BD temporal propia).
 - Configuración de proyecto (`.claude/settings.json` → sonnet), `CLAUDE.md`, plan de finalización.
+- **I1 hecha:** config de producción validada (JWT, CORS https), cabeceras de seguridad, seed de producción solo con admin (`SEED_ADMIN_EMAIL`), demo solo explícita (`VITE_ENABLE_DEMO`) y pantalla de error si falta `VITE_API_URL`. Backend 34/34 pruebas.
 
 ## Pendiente (ver plan, iteraciones I1–I6)
-I1 endurecimiento de producción · I2 usuarios + recuperación de clave · I3 persistencia en servidor
+(I1 completada) · I2 usuarios + recuperación de clave · I3 persistencia en servidor
 (plantillas, carpetas, asignaciones, borradores, docente) · I4 almacenamiento S3 + despliegue · I5 UI/a11y/móvil · I6 verificación final.
 
 ## Bloqueos / intervención del usuario
@@ -15,4 +16,4 @@ I1 endurecimiento de producción · I2 usuarios + recuperación de clave · I3 p
 - Producción necesita de ti: proveedor SMTP, bucket S3, hosting/BD, secretos reales (ver plan §7).
 
 ## Siguiente paso
-I1: validación de configuración de producción y bloqueo del modo demostración en builds de producción.
+I2: administración de usuarios en frontend y recuperación de contraseña.

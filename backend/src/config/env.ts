@@ -22,6 +22,20 @@ export const loadConfig = (env: NodeJS.ProcessEnv = process.env): AppConfig => {
   const jwtSecret = required('JWT_SECRET');
   if (jwtSecret && jwtSecret.length < 32) errors.push('JWT_SECRET debe tener al menos 32 caracteres');
 
+  const isProduction = (env.NODE_ENV || 'development') === 'production';
+  if (isProduction) {
+    if (/(cambia|change|dev-only|example|secret-dev|password)/i.test(jwtSecret) || new Set(jwtSecret).size < 12) {
+      errors.push('JWT_SECRET parece un valor de ejemplo o de baja entropia; genera uno aleatorio para produccion');
+    }
+    const origins = (env.CORS_ORIGINS || '').split(',').map(origin => origin.trim()).filter(Boolean);
+    if (!origins.length) errors.push('Define CORS_ORIGINS con el origen HTTPS del frontend en produccion');
+    for (const origin of origins) {
+      if (origin === '*' || /localhost|127\.0\.0\.1/.test(origin) || !origin.startsWith('https://')) {
+        errors.push(`CORS_ORIGINS no admite "${origin}" en produccion (usa origenes https:// explicitos)`);
+      }
+    }
+  }
+
   const storageDriver = env.STORAGE_DRIVER || 'local';
   if (storageDriver !== 'local') errors.push(`STORAGE_DRIVER no soportado: ${storageDriver}`);
 
