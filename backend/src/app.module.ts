@@ -11,6 +11,7 @@ import { EvidenceModule } from './modules/evidence/evidence.module';
 import { IdentityModule } from './modules/identity/identity.module';
 import { ImportModule } from './modules/import/import.module';
 import { TasksModule } from './modules/tasks/tasks.module';
+import { DraftsModule } from './modules/drafts/drafts.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
 
 @ApiTags('health')
@@ -37,6 +38,7 @@ class HealthController {
     EvaluationModule,
     ImportModule,
     TasksModule,
+    DraftsModule,
   ],
   controllers: [HealthController],
   providers: [

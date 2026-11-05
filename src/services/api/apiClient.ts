@@ -79,6 +79,8 @@ export const api = {
   },
   patch: async <T>(path: string, body: unknown): Promise<T> =>
     (await request(path, { method: 'PATCH', body: JSON.stringify(body) })).json(),
+  put: async <T>(path: string, body: unknown): Promise<T> =>
+    (await request(path, { method: 'PUT', body: JSON.stringify(body) })).json(),
   delete: async (path: string): Promise<void> => {
     await request(path, { method: 'DELETE' });
   },

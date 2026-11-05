@@ -70,6 +70,7 @@ model User {
   passwordResets    PasswordResetToken[]
   assignedTasks     TeacherTask[]            @relation("TaskAssignee")
   createdTasks      TeacherTask[]            @relation("TaskCreator")
+  drafts            EvidenceDraft[]
 }
 
 // Periodo academico. El codigo coincide con los identificadores que ya usa el frontend
@@ -87,6 +88,7 @@ model AcademicPeriod {
   verifications PresentialVerification[]
   assessments   IndicatorAssessment[]
   tasks         TeacherTask[]
+  drafts        EvidenceDraft[]
 }
 
 // Catalogo del modelo CACES. Es comun a todos los periodos: lo que se separa por periodo
@@ -121,6 +123,7 @@ model Indicator {
   requirements   Requirement[]
   assessments    IndicatorAssessment[]
   tasks          TeacherTask[]
+  drafts         EvidenceDraft[]
 }
 
 // El numero de la evidencia se repite entre indicadores ("1".."n"), por eso la clave
@@ -293,4 +296,27 @@ model TeacherTask {
   indicator Indicator      @relation(fields: [indicatorId], references: [id])
 
   @@index([periodId, assigneeId])
+}
+
+// Borrador de una evidencia que prepara el coordinador (secciones de la plantilla). Uno por periodo y evidencia.
+model EvidenceDraft {
+  id                String   @id @default(uuid())
+  periodId          String
+  indicatorId       String
+  requirementNumber Int
+  requirementLabel  String
+  templateId        String
+  sections          Json
+  status            String
+  observations      String?
+  version           Int      @default(1)
+  updatedById       String
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  period    AcademicPeriod @relation(fields: [periodId], references: [id])
+  indicator Indicator      @relation(fields: [indicatorId], references: [id])
+  updatedBy User           @relation(fields: [updatedById], references: [id])
+
+  @@unique([periodId, indicatorId, requirementNumber])
 }

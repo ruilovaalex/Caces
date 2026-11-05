@@ -25,6 +25,7 @@ import { useEvidences } from '../hooks/useEvidences';
 import { useNotifications } from '../hooks/useNotifications';
 import { useFileUpload } from '../hooks/useFileUpload';
 import { useAssignments } from '../hooks/useAssignments';
+import { DraftService, DraftSync } from '../services/draftService';
 import { useEvaluatorRecords } from '../hooks/useEvaluatorRecords';
 
 import { getIndicatorCurrentStatus, getIndicatorStats, getPresentialStats } from '../utils/progressUtils';
@@ -92,6 +93,17 @@ export default function App() {
 
   useAssignments();
 
+
+  // Modo servidor: los borradores del coordinador viven en el servidor; localStorage solo es cache.
+  useEffect(() => {
+    if (!isApiMode) return;
+    if (!isAuthenticated) {
+      DraftService.configurePeriod(null);
+      return;
+    }
+    DraftService.hydrate(activePeriodId, userRole === 'COORDINADOR' || userRole === 'ADMIN').catch(error => window.alert(describeError(error)));
+  }, [activePeriodId, isAuthenticated, userRole]);
+  useEffect(() => DraftSync.onError(message => window.alert(message)), []);
   const { verifications, assessments, registerVerification, registerAssessment, refreshEvaluatorRecords } = useEvaluatorRecords(activePeriodId, isAuthenticated);
 
   // Las notificaciones dirigidas a un perfil solo se muestran a ese perfil.

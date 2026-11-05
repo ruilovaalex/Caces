@@ -1,6 +1,7 @@
 import {
   IndicatorAssessment,
   IndicatorRating,
+  EvidenceDraft,
   Notification,
   PresentialVerification,
   Status,
@@ -287,4 +288,19 @@ export const TasksApi = {
     api.post<TeacherTask>(`${period(periodCode)}/tasks`, data),
   changeStatus: (id: string, status: TaskStatus) => api.patch<TeacherTask>(`/tasks/${id}/status`, { status }),
   remove: (id: string) => api.delete(`/tasks/${id}`),
+};
+
+export const DraftsApi = {
+  list: (periodCode: string) => api.get<EvidenceDraft[]>(`${period(periodCode)}/drafts`),
+  save: (periodCode: string, draft: EvidenceDraft, baseVersion: number) =>
+    api.put<EvidenceDraft>(`${period(periodCode)}/drafts/${encodeURIComponent(draft.indicatorCode)}/${encodeURIComponent(draft.requirementId)}`, {
+      baseVersion,
+      requirementLabel: draft.requirementLabel,
+      templateId: draft.templateId,
+      sections: draft.sections,
+      status: draft.status,
+      observations: draft.observations,
+    }),
+  remove: (periodCode: string, indicatorCode: string, requirementId: string) =>
+    api.delete(`${period(periodCode)}/drafts/${encodeURIComponent(indicatorCode)}/${encodeURIComponent(requirementId)}`),
 };

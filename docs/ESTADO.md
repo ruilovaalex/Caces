@@ -9,6 +9,7 @@
 - **I2 hecha (backend verificado, UI sin verificación visual):** recuperación de clave (`/auth/forgot-password`, `/auth/reset-password`, token SHA-256 de un uso, 1 h, puerto `Mailer` con adaptadores `console`/`none`), pantalla de usuarios para ADMIN (crear, rol, activar, restablecer clave) y flujo de recuperación en el login. Backend 39/39 pruebas; frontend lint+build OK. Falta adaptador SMTP (requiere proveedor).
 - **I3 parcial:** tareas docentes en servidor (modelo `TeacherTask`, `/periods/:p/tasks`, `/teachers`, `/tasks/:id/status`; coordinador asigna, docente avanza solo las suyas, notificaciones) con vista de coordinador y actividades del docente conectadas en modo servidor. Backend 45/45 pruebas.
 - **I4 (código):** adaptador S3 (`STORAGE_DRIVER=s3`), `backend/Dockerfile` (sin construir: no hay Docker), CI en `.github/workflows/ci.yml` (no ejecutada aún) y `docs/DESPLIEGUE.md`. Backend 50/50 pruebas.
+- **I3 borradores:** `EvidenceDraft` en servidor (`/periods/:p/drafts`, solo coordinador escribe, control de versión con 409). El frontend usa localStorage como caché y escribe/lee del servidor en modo servidor. Backend 55/55. El historial de borradores sigue local.
 
 ## Pendiente (ver plan, iteraciones I1–I6)
 (I1, I2 completadas) · I3 persistencia en servidor
