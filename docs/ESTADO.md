@@ -30,4 +30,4 @@ Backend + frontend levantados con BD temporal: login por rol, `/users`, `/teache
 ## Bloqueos de decisión (I3 restante)
 - **Carpetas organizativas, archivos de carpeta y plantillas con archivo:** no se migran todavía. Hay que decidir si los archivos de carpeta/plantilla son un repositorio aparte de las versiones oficiales de evidencia (ya en servidor) y quién los ve. Sin esa decisión se corre el riesgo de duplicar el modelo de evidencias.
 - **Archivos/entregas del docente:** el servidor solo permite al coordinador cargar evidencias oficiales; definir el rol del docente (entrega para revisión del coordinador).
-Avance independiente: I5 (accesibilidad/móvil) en revisión estática.
+I5 iniciado: `Modal` con rol de diálogo, etiqueta, botón cerrar accesible y Escape. Falta auditoría visual/móvil (requiere navegador).
