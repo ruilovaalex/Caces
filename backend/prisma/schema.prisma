@@ -68,6 +68,8 @@ model User {
   notifications     Notification[]
   auditLogs         AuditLog[]
   passwordResets    PasswordResetToken[]
+  assignedTasks     TeacherTask[]            @relation("TaskAssignee")
+  createdTasks      TeacherTask[]            @relation("TaskCreator")
 }
 
 // Periodo academico. El codigo coincide con los identificadores que ya usa el frontend
@@ -84,6 +86,7 @@ model AcademicPeriod {
   evidences     EvidenceVersion[]
   verifications PresentialVerification[]
   assessments   IndicatorAssessment[]
+  tasks         TeacherTask[]
 }
 
 // Catalogo del modelo CACES. Es comun a todos los periodos: lo que se separa por periodo
@@ -117,6 +120,7 @@ model Indicator {
   subCriterion   SubCriterion          @relation(fields: [subCriterionId], references: [id])
   requirements   Requirement[]
   assessments    IndicatorAssessment[]
+  tasks          TeacherTask[]
 }
 
 // El numero de la evidencia se repite entre indicadores ("1".."n"), por eso la clave
@@ -261,4 +265,32 @@ model PasswordResetToken {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+}
+
+enum TaskStatus {
+  NUEVA
+  EN_PROGRESO
+  ENTREGADA
+}
+
+// Tarea que el coordinador asigna a un docente para preparar una evidencia de un indicador, por periodo.
+model TeacherTask {
+  id            String     @id @default(uuid())
+  periodId      String
+  assigneeId    String
+  createdById   String
+  indicatorId   String
+  title         String
+  evidenceLabel String
+  dueDate       DateTime   @db.Date
+  status        TaskStatus @default(NUEVA)
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  period    AcademicPeriod @relation(fields: [periodId], references: [id])
+  assignee  User           @relation("TaskAssignee", fields: [assigneeId], references: [id])
+  createdBy User           @relation("TaskCreator", fields: [createdById], references: [id])
+  indicator Indicator      @relation(fields: [indicatorId], references: [id])
+
+  @@index([periodId, assigneeId])
 }
