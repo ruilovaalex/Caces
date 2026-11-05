@@ -14,6 +14,7 @@ import { EvidenceHistoryModal } from '../components/evidences/EvidenceHistoryMod
 import { CoordinatorEvidenceEditor } from '../components/coordinator/CoordinatorEvidenceEditor';
 import { AssignmentsView } from '../components/assignments/AssignmentsView';
 import { DocenteView } from '../components/docente/DocenteView';
+import { UsersAdminView } from '../components/admin/UsersAdminView';
 import { TemplatesView } from '../components/templates/TemplatesView';
 import { LocalDataImportCard } from '../components/layout/LocalDataImportCard';
 
@@ -412,7 +413,9 @@ export default function App() {
 
               {!selectedIndicator && isAssignmentsOpen && canAccessAssignments && !isTemplatesOpen && (
                 <motion.div key="assignments" variants={viewTransition} initial="initial" animate="animate" exit="exit">
-                  <AssignmentsView userRole={userRole} mockData={mockData} />
+                  {isApiMode && userRole === 'ADMIN'
+                    ? <UsersAdminView currentUserId={user?.id} />
+                    : <AssignmentsView userRole={userRole} mockData={mockData} />}
                 </motion.div>
               )}
 

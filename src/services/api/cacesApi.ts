@@ -153,6 +153,10 @@ export const AuthApi = {
     return { id: result.user.id, email: result.user.email, name: result.user.name, role: result.user.role };
   },
   me: () => api.get<User>('/auth/me'),
+  forgotPassword: (email: string) => api.post<void>('/auth/forgot-password', { email }),
+  resetPassword: (token: string, newPassword: string) => api.post<void>('/auth/reset-password', { token, newPassword }),
+  changePassword: (currentPassword: string, newPassword: string) =>
+    api.post<void>('/auth/change-password', { currentPassword, newPassword }),
   logout: () => tokenStore.clear(),
 };
 
@@ -242,4 +246,21 @@ export const NotificationApi = {
   markRead: (id: string) => api.post(`/notifications/${id}/read`),
   remove: (id: string) => api.delete(`/notifications/${id}`),
   clearMine: () => api.delete('/notifications'),
+};
+
+export interface ManagedUser {
+  id: string;
+  email: string;
+  name: string;
+  role: UserRole;
+  active: boolean;
+}
+
+export const UsersApi = {
+  list: async (): Promise<ManagedUser[]> =>
+    (await api.get<{ items: ManagedUser[] }>('/users?page=1&pageSize=100')).items,
+  create: (data: { email: string; name: string; role: UserRole; password: string }) =>
+    api.post<ManagedUser>('/users', data),
+  update: (id: string, data: Partial<{ name: string; role: UserRole; active: boolean; password: string }>) =>
+    api.patch<ManagedUser>(`/users/${id}`, data),
 };

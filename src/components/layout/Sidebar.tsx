@@ -187,7 +187,7 @@ export const Sidebar = ({
             }`}>
               <ClipboardList className="w-4 h-4" />
             </span>
-            <span className="flex-1 text-left">{userRole === 'ADMIN' ? '3. Roles' : '3. Docentes y tareas'}</span>
+            <span className="flex-1 text-left">{userRole === 'ADMIN' ? '3. Usuarios y roles' : '3. Docentes y tareas'}</span>
             {isAssignmentsActive && (
               <span className="rounded-full bg-[#2563eb] px-2.5 py-1 text-[9px] font-black uppercase tracking-[0.2em] text-white">
                 Actual

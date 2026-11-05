@@ -3,6 +3,8 @@ import { motion } from 'motion/react';
 import { CheckCircle2, GraduationCap, Users } from 'lucide-react';
 import { UserRole } from '../../types';
 import { scaleIn, btnPrimary } from '../../utils/animations';
+import { describeError } from '../../services/api/apiClient';
+import { AuthApi } from '../../services/api/cacesApi';
 
 interface LoginScreenProps {
   onLogin: (role: UserRole) => void;
@@ -12,6 +14,8 @@ interface LoginScreenProps {
 
 export const LoginScreen = ({ onLogin, onCredentialsLogin }: LoginScreenProps) => {
   const [role, setRole] = useState<UserRole>('ADMIN');
+  const [recovery, setRecovery] = useState<'none' | 'forgot' | 'reset'>(() =>
+    onCredentialsLogin && new URLSearchParams(window.location.search).has('reset') ? 'reset' : 'none');
 
   return (
     <div className="min-h-screen bg-[#0f172a] flex items-center justify-center p-4 font-sans overflow-hidden relative">
@@ -47,7 +51,9 @@ export const LoginScreen = ({ onLogin, onCredentialsLogin }: LoginScreenProps) =
             </div>
           </div>
 
-          {onCredentialsLogin ? (
+          {onCredentialsLogin && recovery !== 'none' ? (
+            <PasswordRecovery mode={recovery} onDone={() => { window.history.replaceState({}, '', window.location.pathname); setRecovery('none'); }} />
+          ) : onCredentialsLogin ? (
             <CredentialsForm onSubmit={onCredentialsLogin} />
           ) : (
           <>
@@ -122,7 +128,11 @@ export const LoginScreen = ({ onLogin, onCredentialsLogin }: LoginScreenProps) =
           )}
 
           <div className="pt-4 flex items-center justify-center gap-4 text-[10px] font-black text-[#64748b] uppercase tracking-widest">
-            <span className="hover:text-[#2563eb] cursor-pointer transition-colors">Olvido su clave?</span>
+            {onCredentialsLogin ? (
+              <button type="button" onClick={() => setRecovery('forgot')} className="hover:text-[#2563eb] transition-colors">Olvido su clave?</button>
+            ) : (
+              <span>Olvido su clave?</span>
+            )}
             <div className="w-1 h-1 bg-slate-200 rounded-full" />
             <span className="hover:text-[#2563eb] cursor-pointer transition-colors">Soporte Tecnico</span>
           </div>
@@ -210,6 +220,74 @@ const CredentialsForm = ({ onSubmit }: { onSubmit: (email: string, password: str
       >
         {isSubmitting ? 'Verificando...' : 'Iniciar sesion'}
       </motion.button>
+    </form>
+  );
+};
+
+const PasswordRecovery = ({ mode, onDone }: { mode: 'forgot' | 'reset'; onDone: () => void }) => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirm, setConfirm] = useState('');
+  const [error, setError] = useState<string | null>(null);
+  const [message, setMessage] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    setError(null);
+    if (mode === 'reset' && password !== confirm) {
+      setError('Las contrasenas no coinciden');
+      return;
+    }
+    setIsSubmitting(true);
+    try {
+      if (mode === 'forgot') {
+        await AuthApi.forgotPassword(email.trim());
+        setMessage('Si el correo esta registrado, recibiras un enlace para restablecer la clave. Si no llega, solicita al administrador que la restablezca.');
+      } else {
+        await AuthApi.resetPassword(new URLSearchParams(window.location.search).get('reset') ?? '', password);
+        setMessage('Contrasena actualizada. Ya puedes iniciar sesion.');
+      }
+    } catch (submitError) {
+      setError(describeError(submitError));
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4 text-left">
+      <h2 className="text-center text-sm font-black uppercase tracking-widest text-[#0f172a]">
+        {mode === 'forgot' ? 'Recuperar contrasena' : 'Nueva contrasena'}
+      </h2>
+      {message ? (
+        <p role="status" className="rounded-2xl border border-emerald-100 bg-emerald-50 px-4 py-3 text-xs font-bold text-emerald-700">{message}</p>
+      ) : mode === 'forgot' ? (
+        <div className="space-y-2">
+          <label htmlFor="recovery-email" className="ml-1 text-[10px] font-black uppercase tracking-widest text-[#64748b]">Correo institucional</label>
+          <input id="recovery-email" type="email" required autoComplete="username" value={email} onChange={e => setEmail(e.target.value)} className={inputClass.replace('pl-12', 'pl-4')} />
+        </div>
+      ) : (
+        <>
+          <div className="space-y-2">
+            <label htmlFor="recovery-password" className="ml-1 text-[10px] font-black uppercase tracking-widest text-[#64748b]">Nueva contrasena (min. 8)</label>
+            <input id="recovery-password" type="password" required minLength={8} autoComplete="new-password" value={password} onChange={e => setPassword(e.target.value)} className={inputClass.replace('pl-12', 'pl-4')} />
+          </div>
+          <div className="space-y-2">
+            <label htmlFor="recovery-confirm" className="ml-1 text-[10px] font-black uppercase tracking-widest text-[#64748b]">Confirmar contrasena</label>
+            <input id="recovery-confirm" type="password" required minLength={8} autoComplete="new-password" value={confirm} onChange={e => setConfirm(e.target.value)} className={inputClass.replace('pl-12', 'pl-4')} />
+          </div>
+        </>
+      )}
+      {error && <p role="alert" className="rounded-2xl border border-rose-100 bg-rose-50 px-4 py-3 text-xs font-bold text-rose-600">{error}</p>}
+      {!message && (
+        <button type="submit" disabled={isSubmitting} className="w-full rounded-2xl bg-[#2563eb] py-4 text-xs font-black uppercase tracking-widest text-white hover:bg-blue-700 disabled:opacity-60">
+          {isSubmitting ? 'Enviando...' : mode === 'forgot' ? 'Enviar enlace' : 'Guardar contrasena'}
+        </button>
+      )}
+      <button type="button" onClick={onDone} className="w-full text-center text-[10px] font-black uppercase tracking-widest text-[#64748b] hover:text-[#2563eb]">
+        Volver al inicio de sesion
+      </button>
     </form>
   );
 };
