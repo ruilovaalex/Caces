@@ -6,7 +6,7 @@ const base = {
 };
 
 describe('loadConfig en produccion', () => {
-  const prod = (extra: Record<string, string>) => () => loadConfig({ ...base, NODE_ENV: 'production', ...extra });
+  const prod = (extra: Record<string, string>) => () => loadConfig({ ...base, NODE_ENV: 'production', STORAGE_LOCAL_DIR: '/data', ...extra });
 
   it('acepta una configuracion completa con origenes https', () => {
     expect(prod({ CORS_ORIGINS: 'https://app.ejemplo.ec' })().corsOrigins).toEqual(['https://app.ejemplo.ec']);
