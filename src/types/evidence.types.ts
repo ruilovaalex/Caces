@@ -15,6 +15,9 @@ export interface UploadedFile {
   observation?: string;
   editableNote?: string;
   isCurrentVersion: boolean;
+  // Solo en modo servidor: periodo academico de la version y origen del contenido.
+  periodCode?: string;
+  source?: 'api';
 }
 
 export interface UploadPayload {

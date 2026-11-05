@@ -12,6 +12,7 @@ import {
   FolderPlus,
   History,
   LayoutTemplate,
+  MapPin,
   Plus,
   Trash2,
   Upload,
@@ -19,10 +20,14 @@ import {
   XCircle,
 } from 'lucide-react';
 import { motion } from 'motion/react';
-import { Indicator, Requirement, Status, UploadedFile, UserRole } from '../../types';
+import { Indicator, PresentialVerification, Requirement, Status, UploadedFile, UserRole, VerificationResult } from '../../types';
 import { RepositoryFolderFile, RepositoryFolderService } from '../../services/repositoryFolderService';
-import { canUserUpload } from '../../utils/permissions';
+import { canUserUpload, canUserVerifyPresential } from '../../utils/permissions';
+import { isPresentialRequirement } from '../../utils/progressUtils';
+import { getPresentialStatus, getRequirementVerifications } from '../../services/presentialVerificationService';
 import { EvidenceStatusBadge } from './EvidenceStatusBadge';
+import { PresentialStatusBadge } from './PresentialStatusBadge';
+import { PresentialVerificationModal } from './PresentialVerificationModal';
 import { EvidenceFilePreviewModal } from './EvidenceFilePreviewModal';
 import { EvidenceGuideModal } from './EvidenceGuideModal';
 import { RequirementTemplateManagerModal } from './RequirementTemplateManagerModal';
@@ -37,6 +42,8 @@ interface EvidenceTableProps {
   onOpenEditor: (req: Requirement) => void;
   onOpenHistory: (req: Requirement) => void;
   onReviewStatus: (fileId: string, status: Status, observation?: string) => void;
+  verifications: PresentialVerification[];
+  onRegisterVerification: (req: Requirement, result: VerificationResult, notes: string) => void;
 }
 
 type FolderMap = Record<string, string[]>;
@@ -61,6 +68,8 @@ export const EvidenceTable = ({
   onOpenEditor,
   onOpenHistory,
   onReviewStatus,
+  verifications,
+  onRegisterVerification,
 }: EvidenceTableProps) => {
   const [expandedRequirements, setExpandedRequirements] = useState<Set<string>>(new Set());
   const [folders, setFolders] = useState<FolderMap>(() => readFolders(indicator.code));
@@ -69,15 +78,22 @@ export const EvidenceTable = ({
   const [previewFile, setPreviewFile] = useState<UploadedFile | null>(null);
   const [isTemplateLibraryOpen, setIsTemplateLibraryOpen] = useState(false);
   const [folderFiles, setFolderFiles] = useState<RepositoryFolderFile[]>([]);
+  const [verificationRequirement, setVerificationRequirement] = useState<Requirement | null>(null);
   const canUpload = canUserUpload(userRole);
   const isEvaluator = userRole === 'EVALUADOR';
   const isAdmin = userRole === 'ADMIN';
+  const canVerify = canUserVerifyPresential(userRole);
 
   useEffect(() => {
     setFolders(readFolders(indicator.code));
     setFolderFiles(RepositoryFolderService.getAll().filter(file => file.indicatorCode === indicator.code));
     setExpandedRequirements(new Set());
+    setVerificationRequirement(null);
   }, [indicator.code]);
+
+  useEffect(() => {
+    if (!canVerify) setVerificationRequirement(null);
+  }, [canVerify]);
 
   const fileCount = useMemo(
     () => indicator.requirements.reduce((total, requirement) => total + getRequirementFiles(requirement.id).length, 0),
@@ -85,9 +101,14 @@ export const EvidenceTable = ({
   );
   const visibleRequirements = useMemo(
     () => isEvaluator
-      ? indicator.requirements.filter(requirement => getRequirementFiles(requirement.id).length > 0)
+      ? indicator.requirements.filter(requirement =>
+        getRequirementFiles(requirement.id).length > 0 || isPresentialRequirement(indicator.code, requirement.id))
       : indicator.requirements,
-    [getRequirementFiles, indicator.requirements, isEvaluator],
+    [getRequirementFiles, indicator.code, indicator.requirements, isEvaluator],
+  );
+  const presentialCount = useMemo(
+    () => indicator.requirements.filter(requirement => isPresentialRequirement(indicator.code, requirement.id)).length,
+    [indicator.code, indicator.requirements],
   );
 
   const saveFolders = (nextFolders: FolderMap) => {
@@ -190,6 +211,7 @@ export const EvidenceTable = ({
             {isEvaluator
               ? `${fileCount} archivos cargados por coordinadores o docentes disponibles para revisar.`
               : `${indicator.requirements.length} carpetas de evidencia y ${fileCount} archivos cargados.`}
+            {presentialCount > 0 && ` ${presentialCount} evidencia${presentialCount === 1 ? '' : 's'} se verifica${presentialCount === 1 ? '' : 'n'} en la visita in situ.`}
           </p>
         </div>
 
@@ -212,6 +234,10 @@ export const EvidenceTable = ({
           const isExpanded = expandedRequirements.has(requirement.id);
           const customFolders = folders[requirement.id] || [];
           const requirementFolderFiles = folderFiles.filter(file => file.requirementId === requirement.id);
+          const isPresential = isPresentialRequirement(indicator.code, requirement.id);
+          const verificationHistory = isPresential
+            ? getRequirementVerifications(verifications, indicator.code, requirement.id)
+            : [];
 
           return (
             <article key={requirement.id} className="bg-white">
@@ -241,11 +267,23 @@ export const EvidenceTable = ({
                       <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">
                         Evidencia {index + 1}
                       </span>
-                      <EvidenceStatusBadge status={status} />
+                      {isPresential ? (
+                        <>
+                          <span className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-slate-50 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-slate-500">
+                            <MapPin className="h-3 w-3" />
+                            Visita in situ
+                          </span>
+                          <PresentialStatusBadge status={getPresentialStatus(verificationHistory)} />
+                        </>
+                      ) : (
+                        <EvidenceStatusBadge status={status} />
+                      )}
                     </div>
                     <p className="mt-1 truncate text-sm font-black text-slate-800">{requirement.label}</p>
                     <p className="mt-1 text-xs text-slate-400">
-                      {files.length} archivo{files.length === 1 ? '' : 's'} · Formato {requirement.format}
+                      {isPresential
+                        ? `Verificacion presencial · ${files.length} archivo${files.length === 1 ? '' : 's'} de respaldo opcional`
+                        : `${files.length} archivo${files.length === 1 ? '' : 's'} · Formato ${requirement.format}`}
                     </p>
                   </div>
                 </button>
@@ -279,6 +317,16 @@ export const EvidenceTable = ({
                   >
                     <History className="h-4 w-4" />
                   </button>
+                  {canVerify && isPresential && (
+                    <button
+                      onClick={() => setVerificationRequirement(requirement)}
+                      className="inline-flex h-9 items-center justify-center gap-2 rounded-lg bg-slate-900 px-3 text-[10px] font-black uppercase tracking-widest text-white hover:bg-slate-800"
+                      title="Registrar verificacion presencial"
+                    >
+                      <MapPin className="h-3.5 w-3.5" />
+                      Registrar verificacion
+                    </button>
+                  )}
                   {isEvaluator && currentFile && (
                     <>
                       <button
@@ -340,6 +388,7 @@ export const EvidenceTable = ({
                     {!isEvaluator && <RepositoryAction icon={BookOpen} label="Guia" onClick={() => setGuideRequirement(requirement)} />}
                     {isAdmin && <RepositoryAction icon={LayoutTemplate} label="Plantillas" onClick={() => setTemplateRequirement(requirement)} />}
                     <RepositoryAction icon={History} label="Historial" onClick={() => onOpenHistory(requirement)} />
+                    {canVerify && isPresential && <RepositoryAction icon={MapPin} label="Verificar" onClick={() => setVerificationRequirement(requirement)} primary />}
                     {isEvaluator && <RepositoryAction icon={ClipboardCheck} label="Revisar" onClick={() => onOpenEditor(requirement)} />}
                     {canUpload && <RepositoryAction icon={Upload} label="Subir" onClick={() => onOpenUpload(requirement)} primary />}
                   </div>
@@ -359,10 +408,40 @@ export const EvidenceTable = ({
                     </div>
 
                     <div className="space-y-2">
+                      {isPresential && (
+                        <div className="rounded-lg border border-slate-200 bg-white">
+                          <div className="flex items-center gap-3 border-b border-slate-100 px-4 py-3">
+                            <MapPin className="h-4 w-4 text-slate-500" />
+                            <p className="text-sm font-black text-slate-700">Verificaciones presenciales</p>
+                            <span className="ml-auto text-xs font-bold text-slate-400">{verificationHistory.length}</span>
+                          </div>
+                          {verificationHistory.length > 0 ? (
+                            <div className="divide-y divide-slate-100">
+                              {verificationHistory.map(record => (
+                                <div key={record.id} className="px-4 py-3">
+                                  <div className="flex flex-wrap items-center gap-2">
+                                    <PresentialStatusBadge status={record.result} />
+                                    <span className="text-[10px] text-slate-400">
+                                      {record.verifiedBy} · {new Date(record.verifiedAt).toLocaleString()}
+                                    </span>
+                                  </div>
+                                  <p className="mt-1 text-xs text-slate-600">{record.notes}</p>
+                                </div>
+                              ))}
+                            </div>
+                          ) : (
+                            <div className="flex items-center gap-3 px-4 py-5 text-sm text-slate-400">
+                              <FileClock className="h-4 w-4" />
+                              Pendiente de verificacion por el evaluador en la visita in situ.
+                            </div>
+                          )}
+                        </div>
+                      )}
+
                       <div className="rounded-lg border border-slate-200 bg-white">
                         <div className="flex items-center gap-3 border-b border-slate-100 px-4 py-3">
                           <FolderOpen className={`h-4 w-4 ${files.length > 0 ? 'text-emerald-600' : 'text-blue-600'}`} />
-                          <p className="text-sm font-black text-slate-700">Archivos cargados</p>
+                          <p className="text-sm font-black text-slate-700">{isPresential ? 'Archivos de respaldo (opcional)' : 'Archivos cargados'}</p>
                           <span className="ml-auto text-xs font-bold text-slate-400">{files.length}</span>
                         </div>
 
@@ -581,6 +660,21 @@ export const EvidenceTable = ({
           requirement={templateRequirement}
           currentUserName={currentUserName}
           onClose={() => setTemplateRequirement(null)}
+        />
+      )}
+      {canVerify && (
+        <PresentialVerificationModal
+          isOpen={Boolean(verificationRequirement)}
+          requirement={verificationRequirement}
+          history={verificationRequirement
+            ? getRequirementVerifications(verifications, indicator.code, verificationRequirement.id)
+            : []}
+          onClose={() => setVerificationRequirement(null)}
+          onSave={(result, notes) => {
+            if (!verificationRequirement) return;
+            onRegisterVerification(verificationRequirement, result, notes);
+            setVerificationRequirement(null);
+          }}
         />
       )}
       <EvidenceFilePreviewModal

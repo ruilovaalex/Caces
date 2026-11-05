@@ -1,0 +1,21 @@
+# Base de datos para desarrollo. Uso: docker compose up -d
+# Credenciales solo para desarrollo local; en produccion use variables de entorno seguras.
+services:
+  postgres:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: caces
+      POSTGRES_PASSWORD: caces_dev_password
+      POSTGRES_DB: caces_dev
+    ports:
+      - "5433:5432"
+    volumes:
+      - caces_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U caces -d caces_dev"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  caces_pgdata:

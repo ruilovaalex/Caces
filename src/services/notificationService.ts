@@ -26,6 +26,10 @@ export const NotificationService = {
     StorageService.set(STORAGE_KEY, updated);
   },
 
+  remove: (id: string): void => {
+    StorageService.set(STORAGE_KEY, NotificationService.getAll().filter(n => n.id !== id));
+  },
+
   clearAll: (): void => {
     StorageService.set(STORAGE_KEY, []);
   }

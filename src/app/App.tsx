@@ -7,6 +7,7 @@ import { ChecklistView } from '../components/layout/ChecklistView';
 import { LoginScreen } from '../components/auth/LoginScreen';
 import { IndicatorHeader } from '../components/indicators/IndicatorHeader';
 import { IndicatorContent } from '../components/indicators/IndicatorContent';
+import { IndicatorAssessmentPanel } from '../components/indicators/IndicatorAssessmentPanel';
 import { EvidenceTable } from '../components/evidences/EvidenceTable';
 import { EvidenceUploadModal } from '../components/evidences/EvidenceUploadModal';
 import { EvidenceHistoryModal } from '../components/evidences/EvidenceHistoryModal';
@@ -14,6 +15,7 @@ import { CoordinatorEvidenceEditor } from '../components/coordinator/Coordinator
 import { AssignmentsView } from '../components/assignments/AssignmentsView';
 import { DocenteView } from '../components/docente/DocenteView';
 import { TemplatesView } from '../components/templates/TemplatesView';
+import { LocalDataImportCard } from '../components/layout/LocalDataImportCard';
 
 import { useAuth } from '../hooks/useAuth';
 import { useIndicators } from '../hooks/useIndicators';
@@ -21,16 +23,19 @@ import { useEvidences } from '../hooks/useEvidences';
 import { useNotifications } from '../hooks/useNotifications';
 import { useFileUpload } from '../hooks/useFileUpload';
 import { useAssignments } from '../hooks/useAssignments';
+import { useEvaluatorRecords } from '../hooks/useEvaluatorRecords';
 
-import { getIndicatorCurrentStatus } from '../utils/progressUtils';
+import { getIndicatorCurrentStatus, getIndicatorStats, getPresentialStats } from '../utils/progressUtils';
+import { getIndicatorAssessmentHistory } from '../services/indicatorAssessmentService';
 import { getReadableAllowedFormats, isFileAllowedForRequirement } from '../utils/evidenceFormatUtils';
-import { canUserAssign, canUserDelete, canUserUpload } from '../utils/permissions';
+import { canUserAssessIndicator, canUserAssign, canUserDelete, canUserUpload, canUserVerifyPresential } from '../utils/permissions';
+import { describeError, isApiMode } from '../services/api/apiClient';
 import { viewTransition } from '../utils/animations';
 import { getAcademicPeriodsForYear } from '../utils/academicPeriodUtils';
-import { Indicator, Requirement, Status } from '../types';
+import { Indicator, IndicatorRating, Requirement, Status, VerificationResult } from '../types';
 
 export default function App() {
-  const { isAuthenticated, userRole, login, logout, switchRole, user } = useAuth();
+  const { isAuthenticated, isRestoring, userRole, login, loginWithCredentials, logout, switchRole, user } = useAuth();
   const {
     mockData,
     selectedIndicator,
@@ -51,22 +56,29 @@ export default function App() {
   const [isAssignmentsOpen, setIsAssignmentsOpen] = useState(false);
   const [isTemplatesOpen, setIsTemplatesOpen] = useState(false);
 
+  // Periodo academico activo: las evidencias, verificaciones y valoraciones se consultan por periodo.
+  const academicPeriods = useMemo(() => getAcademicPeriodsForYear(mockData[0].year), [mockData]);
+  const [activePeriodId, setActivePeriodId] = useState(() => academicPeriods[0].id);
+  const activePeriod = academicPeriods.find(period => period.id === activePeriodId) ?? academicPeriods[0];
+
   const {
     allFiles,
     getRequirementFiles,
     uploadFile,
     updateStatus,
-    deleteEvidence
-  } = useEvidences();
+    deleteEvidence,
+    refreshEvidences
+  } = useEvidences(activePeriodId, isAuthenticated);
 
   const {
     notifications,
     showNotifications,
     markAsRead,
     clearAll,
+    remove: removeNotification,
     toggleShow,
     refreshNotifications
-  } = useNotifications();
+  } = useNotifications(isAuthenticated);
 
   const {
     file: uploadFileContent,
@@ -77,6 +89,14 @@ export default function App() {
   } = useFileUpload();
 
   useAssignments();
+
+  const { verifications, assessments, registerVerification, registerAssessment, refreshEvaluatorRecords } = useEvaluatorRecords(activePeriodId, isAuthenticated);
+
+  // Las notificaciones dirigidas a un perfil solo se muestran a ese perfil.
+  const visibleNotifications = useMemo(
+    () => notifications.filter(notification => !notification.targetRole || notification.targetRole === userRole),
+    [notifications, userRole]
+  );
 
   useEffect(() => {
     if (userRole === 'ADMIN') {
@@ -94,10 +114,11 @@ export default function App() {
     }
   }, [setSelectedIndicator, userRole]);
 
-  const handleIndicatorSelect = useCallback((indicator: Indicator) => {
+  const handleIndicatorSelect = useCallback((indicator: Indicator, periodId?: string) => {
     setIsChecklistOpen(false);
     setIsAssignmentsOpen(false);
     setIsTemplatesOpen(false);
+    if (periodId) setActivePeriodId(periodId);
     selectIndicator(indicator);
   }, [selectIndicator]);
 
@@ -111,6 +132,11 @@ export default function App() {
     setActiveRequirement(null);
     setSelectedIndicator(null);
   }, [setSelectedIndicator]);
+
+  // Al cambiar de usuario (o cerrar sesion) no se conservan vistas ni modales del usuario anterior.
+  useEffect(() => {
+    handleGoToStart();
+  }, [handleGoToStart, user?.id]);
 
   const handleOpenTemplates = useCallback(() => {
     if (userRole !== 'COORDINADOR') return;
@@ -151,11 +177,24 @@ export default function App() {
       refreshNotifications();
     } catch (error) {
       console.error(error);
+      window.alert(describeError(error));
     }
   };
 
   const handleReviewUpdate = (evidenceId: string, status: Status, observation?: string) => {
     updateStatus(evidenceId, status, observation);
+    refreshNotifications();
+  };
+
+  const handleRegisterVerification = (requirement: Requirement, result: VerificationResult, notes: string) => {
+    if (!canUserVerifyPresential(userRole) || !selectedIndicator || !user) return;
+    registerVerification(selectedIndicator.code, requirement, result, notes, user.name);
+    refreshNotifications();
+  };
+
+  const handleRegisterAssessment = (rating: IndicatorRating, achievements: string, deficiencies: string) => {
+    if (!canUserAssessIndicator(userRole) || !selectedIndicator || !user) return;
+    registerAssessment(selectedIndicator.code, rating, achievements, deficiencies, user.name);
     refreshNotifications();
   };
 
@@ -222,7 +261,7 @@ export default function App() {
         if (!focusedNodeId) break;
         {
           const node = visibleNodes.find(item => item.id === focusedNodeId);
-          if (node?.type === 'ind') handleIndicatorSelect(node.data);
+          if (node?.type === 'ind') handleIndicatorSelect(node.data, node.id.split('-ind-')[0]);
           else toggleNode(focusedNodeId);
         }
         break;
@@ -258,8 +297,22 @@ export default function App() {
     return null;
   }, [mockData, selectedIndicator]);
 
+  const indicatorSummaries = useMemo(() => {
+    if (!selectedIndicator) return null;
+    const documental = getIndicatorStats(selectedIndicator, allFiles);
+    const presential = getPresentialStats([selectedIndicator], verifications);
+    return {
+      documental: { validated: documental.valid, total: documental.total },
+      presential: { verified: presential.verified, total: presential.total },
+    };
+  }, [allFiles, selectedIndicator, verifications]);
+
+  if (isRestoring) {
+    return <div className="flex h-screen items-center justify-center bg-[#0f172a] text-xs font-black uppercase tracking-widest text-slate-400">Recuperando sesion...</div>;
+  }
+
   if (!isAuthenticated) {
-    return <LoginScreen onLogin={login} />;
+    return <LoginScreen onLogin={login} onCredentialsLogin={isApiMode ? loginWithCredentials : undefined} />;
   }
 
   return (
@@ -275,6 +328,8 @@ export default function App() {
         onSetFocusedNode={setFocusedNodeId}
         onKeyDown={handleKeyDown}
         onSwitchRole={switchRole}
+        activePeriodId={activePeriodId}
+        userName={user?.name}
         activeView={activeView}
         onOpenDashboard={handleGoToStart}
         onOpenTemplates={handleOpenTemplates}
@@ -284,11 +339,12 @@ export default function App() {
       <main className="flex-1 flex flex-col overflow-hidden">
         <Header
           onLogout={logout}
-          notifications={notifications}
+          notifications={visibleNotifications}
           showNotifications={showNotifications}
           onToggleNotifications={toggleShow}
           onMarkAsRead={markAsRead}
           onClearAllNotifications={clearAll}
+          onDeleteNotification={removeNotification}
           userName={user?.name}
           userRole={userRole}
         />
@@ -300,9 +356,24 @@ export default function App() {
             <AnimatePresence mode="wait">
               {!selectedIndicator && !isChecklistOpen && !isTemplatesOpen && (!isAssignmentsOpen || !canAccessAssignments) && (
                 <motion.div key="dashboard" variants={viewTransition} initial="initial" animate="animate" exit="exit">
+                  <div className="max-w-6xl mx-auto mb-6 empty:hidden">
+                    <LocalDataImportCard
+                      userRole={userRole}
+                      periodCode={activePeriodId}
+                      periodLabel={activePeriod.label}
+                      onImported={() => {
+                        void refreshEvidences();
+                        void refreshEvaluatorRecords();
+                      }}
+                    />
+                  </div>
                   <Dashboard
                     mockData={mockData}
                     allFiles={allFiles}
+                    verifications={verifications}
+                    periods={academicPeriods}
+                    activePeriodId={activePeriodId}
+                    onChangePeriod={setActivePeriodId}
                     onIndicatorSelect={handleIndicatorSelect}
                     onViewChecklist={() => setIsChecklistOpen(true)}
                     onOpenCriterionSubCriteria={openCriterionSubCriteria}
@@ -347,7 +418,17 @@ export default function App() {
                 <IndicatorHeader
                   indicator={selectedIndicator}
                   status={getIndicatorCurrentStatus(selectedIndicator, allFiles)}
+                  periodLabel={isApiMode ? activePeriod.label : undefined}
                   onBackToDashboard={handleGoToStart}
+                />
+
+                <IndicatorAssessmentPanel
+                  indicator={selectedIndicator}
+                  history={getIndicatorAssessmentHistory(assessments, selectedIndicator.code)}
+                  canAssess={canUserAssessIndicator(userRole)}
+                  documentalSummary={indicatorSummaries?.documental ?? { validated: 0, total: 0 }}
+                  presentialSummary={indicatorSummaries?.presential ?? { verified: 0, total: 0 }}
+                  onSave={handleRegisterAssessment}
                 />
 
                 <EvidenceTable
@@ -370,6 +451,8 @@ export default function App() {
                     setIsHistoryOpen(true);
                   }}
                   onReviewStatus={handleReviewUpdate}
+                  verifications={verifications}
+                  onRegisterVerification={handleRegisterVerification}
                 />
               </IndicatorContent>
                 </motion.div>

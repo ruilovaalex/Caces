@@ -19,11 +19,14 @@ interface SidebarProps {
   focusedNodeId: string | null;
   userRole: UserRole;
   activeView: 'dashboard' | 'checklist' | 'assignments' | 'templates' | 'indicator';
-  onIndicatorSelect: (ind: Indicator) => void;
+  onIndicatorSelect: (ind: Indicator, periodId: string) => void;
+  activePeriodId?: string;
+  userName?: string;
   onToggleNode: (id: string) => void;
   onSetFocusedNode: (id: string) => void;
   onKeyDown: (e: React.KeyboardEvent) => void;
-  onSwitchRole: (role: UserRole) => void;
+  // Solo en modo local de demostracion; con servidor el rol lo define la cuenta.
+  onSwitchRole?: (role: UserRole) => void;
   onOpenDashboard: () => void;
   onOpenTemplates: () => void;
   onOpenAssignments: () => void;
@@ -37,6 +40,8 @@ export const Sidebar = ({
   userRole,
   activeView,
   onIndicatorSelect,
+  activePeriodId,
+  userName,
   onToggleNode,
   onSetFocusedNode,
   onKeyDown,
@@ -325,10 +330,10 @@ export const Sidebar = ({
                                                               key={indicatorNodeId}
                                                               onClick={() => {
                                                                 onSetFocusedNode(indicatorNodeId);
-                                                                onIndicatorSelect(indicator);
+                                                                onIndicatorSelect(indicator, period.id);
                                                               }}
                                                               className={`w-full flex items-center gap-2 px-3 py-1.5 rounded transition-all text-[11px] font-medium leading-tight text-left outline-none ${
-                                                                selectedIndicator?.code === indicator.code
+                                                                selectedIndicator?.code === indicator.code && (!activePeriodId || activePeriodId === period.id)
                                                                   ? 'tree-item-active shadow-sm'
                                                                   : focusedNodeId === indicatorNodeId
                                                                     ? 'bg-[#dbeafe] ring-1 ring-blue-100'
@@ -378,9 +383,10 @@ export const Sidebar = ({
       ) : null}
 
       <motion.div
-        whileTap={{ scale: 0.98 }}
-        className="p-4 border-t border-[#e2e8f0] bg-[#f4f6f9] cursor-pointer hover:bg-white transition-colors"
+        whileTap={onSwitchRole ? { scale: 0.98 } : undefined}
+        className={`p-4 border-t border-[#e2e8f0] bg-[#f4f6f9] transition-colors ${onSwitchRole ? 'cursor-pointer hover:bg-white' : ''}`}
         onClick={() => {
+          if (!onSwitchRole) return;
           const roles: UserRole[] = ['ADMIN', 'COORDINADOR', 'EVALUADOR', 'DOCENTE'];
           const next = roles[(roles.indexOf(userRole) + 1) % roles.length];
           onSwitchRole(next);
@@ -393,8 +399,8 @@ export const Sidebar = ({
             {roleInitials[userRole]}
           </div>
           <div className="text-[10px]">
-            <p className="font-bold text-[#1e293b] leading-tight">{roleNames[userRole]}</p>
-            <p className="text-[#64748b] font-black uppercase tracking-widest text-[8px] mt-0.5">{userRole} (clic para cambiar)</p>
+            <p className="font-bold text-[#1e293b] leading-tight">{userName || roleNames[userRole]}</p>
+            <p className="text-[#64748b] font-black uppercase tracking-widest text-[8px] mt-0.5">{userRole}{onSwitchRole ? ' (clic para cambiar)' : ''}</p>
           </div>
         </div>
       </motion.div>

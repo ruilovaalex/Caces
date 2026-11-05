@@ -1,0 +1,249 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  ADMIN
+  COORDINADOR
+  EVALUADOR
+  DOCENTE
+}
+
+enum IndicatorType {
+  CUALITATIVO
+  CUANTITATIVO
+}
+
+enum VerificationMode {
+  DOCUMENTAL
+  PRESENCIAL
+}
+
+enum EvidenceStatus {
+  CARGADO
+  VALIDADO
+  OBSERVADO
+  RECHAZADO
+}
+
+enum VerificationResult {
+  VERIFICADA
+  CON_OBSERVACIONES
+}
+
+enum IndicatorRating {
+  SATISFACTORIO
+  CUASI_SATISFACTORIO
+  POCO_SATISFACTORIO
+  DEFICIENTE
+}
+
+enum NotificationType {
+  INFO
+  SUCCESS
+  WARNING
+  ERROR
+}
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  name         String
+  passwordHash String
+  role         UserRole
+  active       Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  uploadedEvidences EvidenceVersion[]        @relation("EvidenceUploader")
+  deletedEvidences  EvidenceVersion[]        @relation("EvidenceDeleter")
+  reviews           EvidenceReview[]
+  verifications     PresentialVerification[]
+  assessments       IndicatorAssessment[]
+  notifications     Notification[]
+  auditLogs         AuditLog[]
+}
+
+// Periodo academico. El codigo coincide con los identificadores que ya usa el frontend
+// (por ejemplo "period-2025-aug-feb").
+model AcademicPeriod {
+  id        String   @id @default(uuid())
+  code      String   @unique
+  label     String
+  year      Int
+  sortOrder Int
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  evidences     EvidenceVersion[]
+  verifications PresentialVerification[]
+  assessments   IndicatorAssessment[]
+}
+
+// Catalogo del modelo CACES. Es comun a todos los periodos: lo que se separa por periodo
+// es el trabajo (evidencias, verificaciones y valoraciones).
+model Criterion {
+  id          String         @id @default(uuid())
+  code        String         @unique
+  name        String
+  sortOrder   Int
+  subCriteria SubCriterion[]
+}
+
+model SubCriterion {
+  id          String      @id @default(uuid())
+  code        String      @unique
+  name        String
+  sortOrder   Int
+  criterionId String
+  criterion   Criterion   @relation(fields: [criterionId], references: [id])
+  indicators  Indicator[]
+}
+
+model Indicator {
+  id             String        @id @default(uuid())
+  code           String        @unique
+  name           String
+  description    String
+  type           IndicatorType
+  sortOrder      Int
+  subCriterionId String
+  subCriterion   SubCriterion  @relation(fields: [subCriterionId], references: [id])
+  requirements   Requirement[]
+  assessments    IndicatorAssessment[]
+}
+
+// El numero de la evidencia se repite entre indicadores ("1".."n"), por eso la clave
+// natural es (indicatorId, number) y la tabla usa un id propio.
+model Requirement {
+  id          String           @id @default(uuid())
+  indicatorId String
+  number      Int
+  label       String
+  description String
+  format      String
+  mode        VerificationMode
+  indicator   Indicator        @relation(fields: [indicatorId], references: [id])
+
+  evidences     EvidenceVersion[]
+  verifications PresentialVerification[]
+
+  @@unique([indicatorId, number])
+}
+
+// Cada carga es una version. Solo una version vigente por (periodo, requerimiento):
+// la migracion crea un indice unico parcial para garantizarlo.
+model EvidenceVersion {
+  id            String         @id @default(uuid())
+  periodId      String
+  requirementId String
+  version       Int
+  isCurrent     Boolean        @default(true)
+  status        EvidenceStatus @default(CARGADO)
+  fileName      String
+  mimeType      String
+  sizeBytes     Int
+  sha256        String
+  storageKey    String         @unique
+  note          String?
+  uploadedById  String
+  uploadedAt    DateTime       @default(now())
+  deletedAt     DateTime?
+  deletedById   String?
+  // Identificador del registro en el navegador cuando la version se importo desde datos locales.
+  legacyId      String?        @unique
+
+  period      AcademicPeriod   @relation(fields: [periodId], references: [id])
+  requirement Requirement      @relation(fields: [requirementId], references: [id])
+  uploadedBy  User             @relation("EvidenceUploader", fields: [uploadedById], references: [id])
+  deletedBy   User?            @relation("EvidenceDeleter", fields: [deletedById], references: [id])
+  reviews     EvidenceReview[]
+
+  @@unique([periodId, requirementId, version])
+  @@index([periodId, requirementId])
+}
+
+model EvidenceReview {
+  id                String          @id @default(uuid())
+  evidenceVersionId String
+  status            EvidenceStatus
+  comment           String?
+  reviewerId        String
+  createdAt         DateTime        @default(now())
+
+  evidenceVersion EvidenceVersion @relation(fields: [evidenceVersionId], references: [id])
+  reviewer        User            @relation(fields: [reviewerId], references: [id])
+
+  @@index([evidenceVersionId])
+}
+
+model PresentialVerification {
+  id            String             @id @default(uuid())
+  periodId      String
+  requirementId String
+  result        VerificationResult
+  notes         String
+  verifiedById  String
+  verifiedAt    DateTime           @default(now())
+  legacyId      String?            @unique
+
+  period      AcademicPeriod @relation(fields: [periodId], references: [id])
+  requirement Requirement    @relation(fields: [requirementId], references: [id])
+  verifiedBy  User           @relation(fields: [verifiedById], references: [id])
+
+  @@index([periodId, requirementId])
+}
+
+model IndicatorAssessment {
+  id           String          @id @default(uuid())
+  periodId     String
+  indicatorId  String
+  rating       IndicatorRating
+  score        Decimal         @db.Decimal(3, 2)
+  achievements String
+  deficiencies String
+  assessedById String
+  assessedAt   DateTime        @default(now())
+  legacyId     String?         @unique
+
+  period     AcademicPeriod @relation(fields: [periodId], references: [id])
+  indicator  Indicator      @relation(fields: [indicatorId], references: [id])
+  assessedBy User           @relation(fields: [assessedById], references: [id])
+
+  @@index([periodId, indicatorId])
+}
+
+model Notification {
+  id          String           @id @default(uuid())
+  recipientId String
+  title       String
+  message     String
+  type        NotificationType
+  link        String?
+  readAt      DateTime?
+  createdAt   DateTime         @default(now())
+
+  recipient User @relation(fields: [recipientId], references: [id], onDelete: Cascade)
+
+  @@index([recipientId, createdAt])
+}
+
+model AuditLog {
+  id         String   @id @default(uuid())
+  actorId    String?
+  action     String
+  entityType String
+  entityId   String
+  periodId   String?
+  metadata   Json?
+  createdAt  DateTime @default(now())
+
+  actor User? @relation(fields: [actorId], references: [id])
+
+  @@index([entityType, entityId])
+}

@@ -1,6 +1,8 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { UserRole, User } from '../types';
 import { NotificationService } from '../services/notificationService';
+import { isApiMode, setUnauthorizedHandler, tokenStore } from '../services/api/apiClient';
+import { AuthApi } from '../services/api/cacesApi';
 
 const buildUserByRole = (role: UserRole): User => ({
   id:
@@ -34,7 +36,37 @@ export const useAuth = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [userRole, setUserRole] = useState<UserRole>('ADMIN');
   const [user, setUser] = useState<User | null>(null);
+  // En modo servidor se intenta recuperar la sesion de la pestana antes de mostrar el login.
+  const [isRestoring, setIsRestoring] = useState(isApiMode && Boolean(tokenStore.get()));
 
+  const applyUser = useCallback((nextUser: User) => {
+    setUser(nextUser);
+    setUserRole(nextUser.role);
+    setIsAuthenticated(true);
+  }, []);
+
+  const logout = useCallback(() => {
+    if (isApiMode) AuthApi.logout();
+    setIsAuthenticated(false);
+    setUser(null);
+  }, []);
+
+  useEffect(() => {
+    if (!isApiMode) return;
+    setUnauthorizedHandler(() => {
+      setIsAuthenticated(false);
+      setUser(null);
+    });
+    if (tokenStore.get()) {
+      AuthApi.me()
+        .then(applyUser)
+        .catch(() => tokenStore.clear())
+        .finally(() => setIsRestoring(false));
+    }
+    return () => setUnauthorizedHandler(null);
+  }, [applyUser]);
+
+  // Modo local (demostracion): se elige un perfil sin contrasena.
   const login = useCallback((role: UserRole) => {
     setUserRole(role);
     setIsAuthenticated(true);
@@ -47,10 +79,10 @@ export const useAuth = () => {
     });
   }, []);
 
-  const logout = useCallback(() => {
-    setIsAuthenticated(false);
-    setUser(null);
-  }, []);
+  // Modo servidor: autenticacion real con correo y contrasena.
+  const loginWithCredentials = useCallback(async (email: string, password: string) => {
+    applyUser(await AuthApi.login(email, password));
+  }, [applyUser]);
 
   const switchRole = useCallback((role: UserRole) => {
     setUserRole(role);
@@ -64,10 +96,13 @@ export const useAuth = () => {
 
   return {
     isAuthenticated,
+    isRestoring,
     userRole,
     user,
     login,
+    loginWithCredentials,
     logout,
-    switchRole
+    // El cambio libre de perfil solo existe en el modo local de demostracion.
+    switchRole: isApiMode ? undefined : switchRole
   };
 };

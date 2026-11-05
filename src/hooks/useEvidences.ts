@@ -2,18 +2,34 @@ import { useState, useEffect, useCallback } from 'react';
 import { UploadedFile, GeneratedDoc, Status, Requirement, Indicator } from '../types';
 import { EvidenceService } from '../services/evidenceService';
 import { NotificationService } from '../services/notificationService';
+import { describeError, isApiMode } from '../services/api/apiClient';
+import { EvidenceApi } from '../services/api/cacesApi';
 
-export const useEvidences = () => {
+// En modo servidor las evidencias se cargan por periodo academico; en modo local se conserva el comportamiento previo.
+export const useEvidences = (periodCode: string, enabled = true) => {
   const [allFiles, setAllFiles] = useState<UploadedFile[]>([]);
   const [generatedDocs, setGeneratedDocs] = useState<GeneratedDoc[]>([]);
 
-  const loadData = useCallback(() => {
-    setAllFiles(EvidenceService.getAll());
+  const loadData = useCallback(async () => {
     setGeneratedDocs(EvidenceService.getAllDocs());
-  }, []);
+    if (!isApiMode) {
+      setAllFiles(EvidenceService.getAll());
+      return;
+    }
+    if (!enabled) {
+      setAllFiles([]);
+      return;
+    }
+    try {
+      setAllFiles(await EvidenceApi.list(periodCode));
+    } catch (error) {
+      console.error(error);
+      setAllFiles([]);
+    }
+  }, [enabled, periodCode]);
 
   useEffect(() => {
-    loadData();
+    void loadData();
   }, [loadData]);
 
   const getRequirementFiles = useCallback((reqId: string, indicatorCode: string) => {
@@ -27,29 +43,38 @@ export const useEvidences = () => {
     userName: string,
     observation?: string
   ) => {
-    try {
-      await EvidenceService.upload(file, {
-        indicatorCode: indicator.code,
-        requirementId: requirement.id,
-        requirementLabel: requirement.label,
-        uploadedBy: userName,
-        observation
-      });
-      loadData();
-      NotificationService.add({
-        title: 'Documento Cargado',
-        message: `Nueva version de ${requirement.label} subida correctamente.`,
-        type: 'success'
-      });
-    } catch (error) {
-      console.error(error);
-      throw error;
+    if (isApiMode) {
+      await EvidenceApi.upload(periodCode, indicator.code, requirement.id, file, observation);
+      await loadData();
+      return;
     }
-  }, [loadData]);
+    await EvidenceService.upload(file, {
+      indicatorCode: indicator.code,
+      requirementId: requirement.id,
+      requirementLabel: requirement.label,
+      uploadedBy: userName,
+      observation
+    });
+    await loadData();
+    NotificationService.add({
+      title: 'Documento Cargado',
+      message: `Nueva version de ${requirement.label} subida correctamente.`,
+      type: 'success'
+    });
+  }, [loadData, periodCode]);
 
-  const updateStatus = useCallback((evidenceId: string, status: Status, observation?: string) => {
+  const updateStatus = useCallback(async (evidenceId: string, status: Status, observation?: string) => {
+    if (isApiMode) {
+      try {
+        await EvidenceApi.review(evidenceId, status, observation);
+      } catch (error) {
+        window.alert(describeError(error));
+      }
+      await loadData();
+      return;
+    }
     EvidenceService.updateStatus(evidenceId, status, observation);
-    loadData();
+    await loadData();
     NotificationService.add({
       title: 'Revision Actualizada',
       message: `La evidencia fue marcada como ${status}.`,
@@ -57,9 +82,18 @@ export const useEvidences = () => {
     });
   }, [loadData]);
 
-  const deleteEvidence = useCallback((id: string) => {
+  const deleteEvidence = useCallback(async (id: string) => {
+    if (isApiMode) {
+      try {
+        await EvidenceApi.remove(id);
+      } catch (error) {
+        window.alert(describeError(error));
+      }
+      await loadData();
+      return;
+    }
     EvidenceService.deleteEvidence(id);
-    loadData();
+    await loadData();
     NotificationService.add({
       title: 'Documento eliminado',
       message: 'La version seleccionada fue retirada del historial de evidencia.',

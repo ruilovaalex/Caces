@@ -7,3 +7,5 @@ export const canUserEditObs = (role: UserRole) => role === 'EVALUADOR';
 export const canUserAssign = (role: UserRole) => role === 'COORDINADOR';
 export const canUserManageRoles = (role: UserRole) => role === 'ADMIN';
 export const canUserManageTeachers = (role: UserRole) => role === 'COORDINADOR';
+export const canUserVerifyPresential = (role: UserRole) => role === 'EVALUADOR';
+export const canUserAssessIndicator = (role: UserRole) => role === 'EVALUADOR';

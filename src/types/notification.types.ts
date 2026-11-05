@@ -1,3 +1,5 @@
+import { UserRole } from './auth.types';
+
 export interface Notification {
   id: string;
   title: string;
@@ -6,4 +8,6 @@ export interface Notification {
   timestamp: string;
   isRead: boolean;
   link?: string;
+  // Sin destinatario la notificacion es visible para todos los perfiles (comportamiento previo).
+  targetRole?: UserRole;
 }

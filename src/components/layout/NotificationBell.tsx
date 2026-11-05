@@ -1,5 +1,5 @@
 import React from 'react';
-import { Bell } from 'lucide-react';
+import { Bell, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Notification } from '../../types';
 import { fadeInUp, staggerContainerFast } from '../../utils/animations';
@@ -10,6 +10,7 @@ interface NotificationBellProps {
   onToggle: () => void;
   onMarkAsRead: (id: string) => void;
   onClearAll: () => void;
+  onDelete?: (id: string) => void;
 }
 
 export const NotificationBell = ({
@@ -17,7 +18,8 @@ export const NotificationBell = ({
   showNotifications,
   onToggle,
   onMarkAsRead,
-  onClearAll
+  onClearAll,
+  onDelete
 }: NotificationBellProps) => {
   return (
     <div className="relative">
@@ -69,11 +71,24 @@ export const NotificationBell = ({
                         n.type === 'warning' ? 'bg-amber-500' : 
                         n.type === 'error' ? 'bg-rose-500' : 'bg-blue-500'
                       }`} />
-                      <div className="space-y-1">
+                      <div className="min-w-0 flex-1 space-y-1">
                         <p className="text-[11px] font-bold text-slate-800 leading-tight">{n.title}</p>
                         <p className="text-[10px] text-slate-500 leading-relaxed">{n.message}</p>
                         <p className="text-[8px] text-slate-400 font-bold uppercase">{n.timestamp}</p>
                       </div>
+                      {onDelete && (
+                        <button
+                          onClick={event => {
+                            event.stopPropagation();
+                            onDelete(n.id);
+                          }}
+                          className="shrink-0 rounded-md p-1 text-slate-300 hover:bg-slate-100 hover:text-slate-600"
+                          title="Eliminar notificacion"
+                          aria-label="Eliminar notificacion"
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      )}
                     </div>
                   </motion.div>
                 ))

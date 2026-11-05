@@ -12,6 +12,7 @@ interface HeaderProps {
   onToggleNotifications: () => void;
   onMarkAsRead: (id: string) => void;
   onClearAllNotifications: () => void;
+  onDeleteNotification?: (id: string) => void;
   userName?: string;
   userRole?: UserRole;
 }
@@ -23,6 +24,7 @@ export const Header = ({
   onToggleNotifications,
   onMarkAsRead,
   onClearAllNotifications,
+  onDeleteNotification,
   userName = 'Usuario',
   userRole = 'ADMIN'
 }: HeaderProps) => {
@@ -65,6 +67,7 @@ export const Header = ({
             onToggle={onToggleNotifications}
             onMarkAsRead={onMarkAsRead}
             onClearAll={onClearAllNotifications}
+            onDelete={onDeleteNotification}
           />
 
           <UserPanel

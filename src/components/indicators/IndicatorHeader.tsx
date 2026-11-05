@@ -6,12 +6,14 @@ import { EvidenceStatusBadge as StatusBadge } from '../evidences/EvidenceStatusB
 interface IndicatorHeaderProps {
   indicator: Indicator;
   status: Status;
+  periodLabel?: string;
   onBackToDashboard: () => void;
 }
 
 export const IndicatorHeader = ({
   indicator,
   status,
+  periodLabel,
   onBackToDashboard
 }: IndicatorHeaderProps) => {
   return (
@@ -36,6 +38,9 @@ export const IndicatorHeader = ({
               Indicador {indicator.code}
             </span>
             <StatusBadge status={status} />
+            {periodLabel && (
+              <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">{periodLabel}</span>
+            )}
           </div>
           <h2 className="mt-1 text-xl font-black leading-tight text-slate-900">
             {indicator.name}

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Download, Eye, FileText, Loader2, Printer } from 'lucide-react';
 import { UploadedFile } from '../../types';
 import { EvidenceService } from '../../services/evidenceService';
+import { EvidenceApi } from '../../services/api/cacesApi';
 import { getDisplayFileType } from '../../utils/evidenceFormatUtils';
 import { Modal } from '../common/Modal';
 import { EvidenceStatusBadge } from './EvidenceStatusBadge';
@@ -30,12 +31,14 @@ export const EvidenceFilePreviewModal = ({
     }
 
     setIsLoading(true);
-    EvidenceService.getFileContent(file.id)
+    const loadContent = file.source === 'api' ? EvidenceApi.content(file.id) : EvidenceService.getFileContent(file.id);
+    loadContent
       .then(blob => {
         if (cancelled || !blob) return;
         activeUrl = URL.createObjectURL(blob);
         setFileUrl(activeUrl);
       })
+      .catch(error => console.error(error))
       .finally(() => {
         if (!cancelled) setIsLoading(false);
       });

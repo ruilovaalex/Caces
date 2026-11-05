@@ -6,9 +6,11 @@ import { scaleIn, btnPrimary } from '../../utils/animations';
 
 interface LoginScreenProps {
   onLogin: (role: UserRole) => void;
+  // Si se recibe, la pantalla pide correo y contrasena reales (modo servidor).
+  onCredentialsLogin?: (email: string, password: string) => Promise<void>;
 }
 
-export const LoginScreen = ({ onLogin }: LoginScreenProps) => {
+export const LoginScreen = ({ onLogin, onCredentialsLogin }: LoginScreenProps) => {
   const [role, setRole] = useState<UserRole>('ADMIN');
 
   return (
@@ -45,6 +47,10 @@ export const LoginScreen = ({ onLogin }: LoginScreenProps) => {
             </div>
           </div>
 
+          {onCredentialsLogin ? (
+            <CredentialsForm onSubmit={onCredentialsLogin} />
+          ) : (
+          <>
           <div className="space-y-4">
             <div className="space-y-2 text-left">
               <label className="text-[10px] font-black text-[#64748b] uppercase tracking-widest ml-1">Perfil de Acceso</label>
@@ -112,6 +118,8 @@ export const LoginScreen = ({ onLogin }: LoginScreenProps) => {
           >
             Iniciar sesion
           </motion.button>
+          </>
+          )}
 
           <div className="pt-4 flex items-center justify-center gap-4 text-[10px] font-black text-[#64748b] uppercase tracking-widest">
             <span className="hover:text-[#2563eb] cursor-pointer transition-colors">Olvido su clave?</span>
@@ -127,5 +135,81 @@ export const LoginScreen = ({ onLogin }: LoginScreenProps) => {
         </div>
       </motion.div>
     </div>
+  );
+};
+
+const inputClass = 'w-full pl-12 pr-4 py-4 bg-[#f8fafc] border border-[#e2e8f0] rounded-2xl text-sm text-[#1e293b] focus:ring-2 focus:ring-[#2563eb] outline-none transition-all';
+
+const CredentialsForm = ({ onSubmit }: { onSubmit: (email: string, password: string) => Promise<void> }) => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    setError(null);
+    setIsSubmitting(true);
+    try {
+      await onSubmit(email.trim(), password);
+    } catch (submitError) {
+      setError(submitError instanceof Error ? submitError.message : 'No se pudo iniciar sesion');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="space-y-2 text-left">
+        <label htmlFor="login-email" className="text-[10px] font-black text-[#64748b] uppercase tracking-widest ml-1">Usuario Institucional</label>
+        <div className="relative">
+          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#94a3b8]">
+            <Users className="w-4 h-4" />
+          </span>
+          <input
+            id="login-email"
+            type="email"
+            autoComplete="username"
+            required
+            value={email}
+            onChange={event => setEmail(event.target.value)}
+            placeholder="usuario@edusudamericano.edu.ec"
+            className={inputClass}
+          />
+        </div>
+      </div>
+
+      <div className="space-y-2 text-left">
+        <label htmlFor="login-password" className="text-[10px] font-black text-[#64748b] uppercase tracking-widest ml-1">Contrasena</label>
+        <div className="relative">
+          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#94a3b8]">
+            <CheckCircle2 className="w-4 h-4" />
+          </span>
+          <input
+            id="login-password"
+            type="password"
+            autoComplete="current-password"
+            required
+            value={password}
+            onChange={event => setPassword(event.target.value)}
+            className={inputClass}
+          />
+        </div>
+      </div>
+
+      {error && (
+        <p role="alert" className="rounded-2xl border border-rose-100 bg-rose-50 px-4 py-3 text-left text-xs font-bold text-rose-600">{error}</p>
+      )}
+
+      <motion.button
+        {...btnPrimary}
+        type="submit"
+        disabled={isSubmitting}
+        className="w-full py-4 bg-[#2563eb] hover:bg-blue-700 text-white rounded-2xl font-black text-xs uppercase tracking-widest transition-all shadow-lg shadow-blue-600/25 active:scale-95 disabled:opacity-60"
+      >
+        {isSubmitting ? 'Verificando...' : 'Iniciar sesion'}
+      </motion.button>
+    </form>
   );
 };
