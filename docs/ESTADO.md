@@ -23,3 +23,11 @@
 
 ## Siguiente paso
 I3 restante: plantillas (con archivo), carpetas organizativas, borradores (EvidenceDraft) y archivos/entregas del docente en servidor; luego I4–I6.
+
+## Verificación en ejecución (2026-11-05)
+Backend + frontend levantados con BD temporal: login por rol, `/users`, `/teachers`, creación de tarea por coordinador y lectura por docente, `forgot-password` (204 sin revelar correo) y cabeceras de seguridad comprobados con peticiones reales. No hay herramientas de navegador en esta sesión: **la UI no se ha visto renderizada**.
+
+## Bloqueos de decisión (I3 restante)
+- **Carpetas organizativas, archivos de carpeta y plantillas con archivo:** no se migran todavía. Hay que decidir si los archivos de carpeta/plantilla son un repositorio aparte de las versiones oficiales de evidencia (ya en servidor) y quién los ve. Sin esa decisión se corre el riesgo de duplicar el modelo de evidencias.
+- **Archivos/entregas del docente:** el servidor solo permite al coordinador cargar evidencias oficiales; definir el rol del docente (entrega para revisión del coordinador).
+Avance independiente: I5 (accesibilidad/móvil) en revisión estática.
