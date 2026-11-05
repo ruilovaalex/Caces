@@ -14,6 +14,8 @@
 (plantillas, carpetas, asignaciones, borradores, docente) · I4 almacenamiento S3 + despliegue · I5 UI/a11y/móvil · I6 verificación final.
 
 ## Bloqueos / intervención del usuario
+- Push de los 2 últimos commits (tareas docentes) rechazado por GitHub con `fatal error in commit_refs_rules` (sin rulesets visibles; el primer push sí funcionó). Reintentar `git push origin feature/finalizacion`.
+- UI nueva (usuarios, recuperación, tareas) compila pero no se verificó visualmente en navegador.
 - Sin credenciales del PostgreSQL local (puerto 5432): las pruebas usan un clúster temporal en el puerto 5440 (fuera del repo).
 - Producción necesita de ti: proveedor SMTP, bucket S3, hosting/BD, secretos reales (ver plan §7).
 
