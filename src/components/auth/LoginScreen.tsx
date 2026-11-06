@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'motion/react';
 import { CheckCircle2, GraduationCap, Users } from 'lucide-react';
 import { UserRole } from '../../types';
@@ -16,6 +16,19 @@ export const LoginScreen = ({ onLogin, onCredentialsLogin }: LoginScreenProps) =
   const [role, setRole] = useState<UserRole>('ADMIN');
   const [recovery, setRecovery] = useState<'none' | 'forgot' | 'reset'>(() =>
     onCredentialsLogin && new URLSearchParams(window.location.search).has('reset') ? 'reset' : 'none');
+  // Sin proveedor de correo, la clave la restablece el administrador: no se ofrece un formulario que nunca enviaria nada.
+  // Mientras no se sepa (servidor despertando), se muestra la indicacion del administrador.
+  const [recoveryByEmail, setRecoveryByEmail] = useState(false);
+
+  useEffect(() => {
+    if (!onCredentialsLogin) return;
+    let active = true;
+    // Esta consulta tambien despierta el servidor mientras la persona escribe sus datos.
+    AuthApi.options()
+      .then(options => { if (active) setRecoveryByEmail(options.passwordRecovery === 'email'); })
+      .catch(() => { /* se mantiene la indicacion del administrador */ });
+    return () => { active = false; };
+  }, [onCredentialsLogin]);
 
   return (
     <div className="min-h-screen bg-[#0f172a] flex items-center justify-center p-4 font-sans overflow-hidden relative">
@@ -129,7 +142,11 @@ export const LoginScreen = ({ onLogin, onCredentialsLogin }: LoginScreenProps) =
 
           <div className="pt-4 flex items-center justify-center gap-4 text-[10px] font-black text-[#64748b] uppercase tracking-widest">
             {onCredentialsLogin ? (
-              <button type="button" onClick={() => setRecovery('forgot')} className="hover:text-[#2563eb] transition-colors">Olvido su clave?</button>
+              recoveryByEmail ? (
+                <button type="button" onClick={() => setRecovery('forgot')} className="hover:text-[#2563eb] transition-colors">¿Olvidó su clave?</button>
+              ) : (
+                <span className="text-center normal-case tracking-normal font-bold">¿Olvidó su clave? Pida al administrador que la restablezca desde Usuarios y roles.</span>
+              )
             ) : (
               <span className="text-center normal-case tracking-normal text-amber-700">Modo demostracion: elige un perfil, no se pide contrasena y los datos quedan solo en este navegador.</span>
             )}
@@ -153,6 +170,14 @@ const CredentialsForm = ({ onSubmit }: { onSubmit: (email: string, password: str
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSlow, setIsSlow] = useState(false);
+
+  // Si la respuesta tarda, lo mas probable es que el servidor gratuito este despertando: se avisa en vez de parecer colgado.
+  useEffect(() => {
+    if (!isSubmitting) { setIsSlow(false); return; }
+    const timer = setTimeout(() => setIsSlow(true), 4000);
+    return () => clearTimeout(timer);
+  }, [isSubmitting]);
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -208,6 +233,12 @@ const CredentialsForm = ({ onSubmit }: { onSubmit: (email: string, password: str
 
       {error && (
         <p role="alert" className="rounded-2xl border border-rose-100 bg-rose-50 px-4 py-3 text-left text-xs font-bold text-rose-600">{error}</p>
+      )}
+
+      {isSlow && (
+        <p role="status" className="rounded-2xl border border-blue-100 bg-blue-50 px-4 py-3 text-left text-xs font-bold text-blue-700">
+          Activando el servidor. La primera conexión del día puede tardar hasta un minuto; no cierres la página.
+        </p>
       )}
 
       <motion.button
@@ -268,12 +299,12 @@ const PasswordRecovery = ({ mode, onDone }: { mode: 'forgot' | 'reset'; onDone: 
       ) : (
         <>
           <div className="space-y-2">
-            <label htmlFor="recovery-password" className="ml-1 text-[10px] font-black uppercase tracking-widest text-[#64748b]">Nueva contrasena (min. 8)</label>
-            <input id="recovery-password" type="password" required minLength={8} autoComplete="new-password" value={password} onChange={e => setPassword(e.target.value)} className={inputClass.replace('pl-12', 'pl-4')} />
+            <label htmlFor="recovery-password" className="ml-1 text-[10px] font-black uppercase tracking-widest text-[#64748b]">Nueva contraseña (mín. 12)</label>
+            <input id="recovery-password" type="password" required minLength={12} autoComplete="new-password" value={password} onChange={e => setPassword(e.target.value)} className={inputClass.replace('pl-12', 'pl-4')} />
           </div>
           <div className="space-y-2">
             <label htmlFor="recovery-confirm" className="ml-1 text-[10px] font-black uppercase tracking-widest text-[#64748b]">Confirmar contrasena</label>
-            <input id="recovery-confirm" type="password" required minLength={8} autoComplete="new-password" value={confirm} onChange={e => setConfirm(e.target.value)} className={inputClass.replace('pl-12', 'pl-4')} />
+            <input id="recovery-confirm" type="password" required minLength={12} autoComplete="new-password" value={confirm} onChange={e => setConfirm(e.target.value)} className={inputClass.replace('pl-12', 'pl-4')} />
           </div>
         </>
       )}

@@ -154,6 +154,8 @@ export const AuthApi = {
     return { id: result.user.id, email: result.user.email, name: result.user.name, role: result.user.role };
   },
   me: () => api.get<User>('/auth/me'),
+  // Publico: indica si la recuperacion de clave es por correo o la hace el administrador.
+  options: () => api.get<{ passwordRecovery: 'email' | 'admin'; minPasswordLength: number }>('/auth/options'),
   forgotPassword: (email: string) => api.post<void>('/auth/forgot-password', { email }),
   resetPassword: (token: string, newPassword: string) => api.post<void>('/auth/reset-password', { token, newPassword }),
   changePassword: (currentPassword: string, newPassword: string) =>
