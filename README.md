@@ -54,7 +54,7 @@ Reglas que garantiza la base de datos:
 
 ## Instalacion en Windows
 
-Requisitos: **Node.js 22** y **PostgreSQL 16 o superior** (instalado, o Docker Desktop).
+Requisitos: **Node.js 24** y **PostgreSQL 16 o superior** (instalado, o Docker Desktop).
 
 ### 1. Base de datos
 
