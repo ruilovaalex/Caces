@@ -91,6 +91,21 @@ describe('API CACES (integracion)', () => {
       expect((await login('temporal@edusudamericano.edu.ec')).status).toBe(401);
     });
 
+    it('publica las opciones del inicio de sesion sin requerir sesion', async () => {
+      const response = await http.get('/api/auth/options');
+      expect(response.status).toBe(200);
+      expect(['email', 'admin']).toContain(response.body.passwordRecovery);
+      expect(response.body.minPasswordLength).toBe(12);
+    });
+
+    it('exige claves de al menos 12 caracteres al crear o restablecer usuarios', async () => {
+      const created = await http.post('/api/users').set(auth('admin'))
+        .send({ email: 'clave-corta@edusudamericano.edu.ec', name: 'Clave Corta', role: 'DOCENTE', password: 'Corta.12345' });
+      expect(created.status).toBe(400);
+      const reset = await http.patch(`/api/users/${ids.coord2}`).set(auth('admin')).send({ password: 'Corta.12345' });
+      expect(reset.status).toBe(400);
+    });
+
     it('rechaza campos no permitidos en la entrada', async () => {
       const response = await http.post('/api/auth/login').send({ email: 'a@b.ec', password: 'x', role: 'ADMIN' });
       expect(response.status).toBe(400);
