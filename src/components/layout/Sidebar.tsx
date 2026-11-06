@@ -79,7 +79,7 @@ export const Sidebar = ({
       initial={{ x: -300, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
       transition={{ duration: 0.4, ease: 'easeOut' }}
-      className="w-80 bg-white border-r border-[#e2e8f0] flex flex-col shadow-sm"
+      className="h-full w-80 max-w-[85vw] bg-white border-r border-[#e2e8f0] flex flex-col shadow-sm"
     >
       <div className="h-16 border-b border-white/10 flex items-center gap-3 bg-[#1e2d4a] px-6">
         <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#2563eb] shadow-lg shadow-blue-600/20">

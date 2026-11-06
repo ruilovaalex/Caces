@@ -131,10 +131,8 @@ export const LoginScreen = ({ onLogin, onCredentialsLogin }: LoginScreenProps) =
             {onCredentialsLogin ? (
               <button type="button" onClick={() => setRecovery('forgot')} className="hover:text-[#2563eb] transition-colors">Olvido su clave?</button>
             ) : (
-              <span>Olvido su clave?</span>
+              <span className="text-center normal-case tracking-normal text-amber-700">Modo demostracion: elige un perfil, no se pide contrasena y los datos quedan solo en este navegador.</span>
             )}
-            <div className="w-1 h-1 bg-slate-200 rounded-full" />
-            <span className="hover:text-[#2563eb] cursor-pointer transition-colors">Soporte Tecnico</span>
           </div>
         </div>
 

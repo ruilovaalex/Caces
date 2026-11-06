@@ -32,7 +32,7 @@ import { getIndicatorCurrentStatus, getIndicatorStats, getPresentialStats } from
 import { getIndicatorAssessmentHistory } from '../services/indicatorAssessmentService';
 import { getReadableAllowedFormats, isFileAllowedForRequirement } from '../utils/evidenceFormatUtils';
 import { canUserAssessIndicator, canUserAssign, canUserDelete, canUserUpload, canUserVerifyPresential } from '../utils/permissions';
-import { configurationError, describeError, isApiMode } from '../services/api/apiClient';
+import { configurationError, describeError, isApiMode, isDemoMode } from '../services/api/apiClient';
 import { viewTransition } from '../utils/animations';
 import { getAcademicPeriodsForYear } from '../utils/academicPeriodUtils';
 import { Indicator, IndicatorRating, Requirement, Status, VerificationResult } from '../types';
@@ -58,6 +58,9 @@ export default function App() {
   const [isChecklistOpen, setIsChecklistOpen] = useState(false);
   const [isAssignmentsOpen, setIsAssignmentsOpen] = useState(false);
   const [isTemplatesOpen, setIsTemplatesOpen] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  // El menu lateral es un cajon en pantallas pequenas: se cierra al cambiar de seccion.
+  useEffect(() => { setIsMenuOpen(false); }, [selectedIndicator?.code, isTemplatesOpen, isAssignmentsOpen, isChecklistOpen]);
 
   // Periodo academico activo: las evidencias, verificaciones y valoraciones se consultan por periodo.
   const academicPeriods = useMemo(() => getAcademicPeriodsForYear(mockData[0].year), [mockData]);
@@ -296,6 +299,15 @@ export default function App() {
       : isChecklistOpen
         ? 'checklist'
         : 'dashboard';
+  const sectionTitle = activeView === 'indicator' && selectedIndicator
+    ? `Indicador ${selectedIndicator.code}`
+    : activeView === 'templates'
+      ? 'Crear: plantillas'
+      : activeView === 'assignments'
+        ? (userRole === 'ADMIN' ? 'Usuarios y roles' : 'Docentes y tareas')
+        : activeView === 'checklist'
+          ? 'Todos los requerimientos'
+          : 'Repositorio CACES 2025';
   const selectedIndicatorContext = useMemo(() => {
     if (!selectedIndicator) return null;
 
@@ -346,6 +358,8 @@ export default function App() {
 
   return (
     <div className="flex h-screen bg-[#f4f6f9] font-sans text-slate-800">
+      {isMenuOpen && <div className="fixed inset-0 z-30 bg-slate-900/50 lg:hidden" onClick={() => setIsMenuOpen(false)} aria-hidden />}
+      <div className={`fixed inset-y-0 left-0 z-40 transition-transform duration-200 lg:static lg:z-auto lg:translate-x-0 ${isMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
       <Sidebar
         mockData={mockData}
         selectedIndicator={selectedIndicator}
@@ -364,6 +378,7 @@ export default function App() {
         onOpenTemplates={handleOpenTemplates}
         onOpenAssignments={handleOpenAssignments}
       />
+      </div>
 
       <main className="flex-1 flex flex-col overflow-hidden">
         <Header
@@ -376,15 +391,22 @@ export default function App() {
           onDeleteNotification={removeNotification}
           userName={user?.name}
           userRole={userRole}
+          title={sectionTitle}
+          trail={[activePeriod.label, ...(activeView === 'indicator' ? [selectedIndicatorContext?.criterionName, selectedIndicatorContext?.subCriterionName] : [])].filter(Boolean).join(' › ')}
+          onToggleMenu={() => setIsMenuOpen(open => !open)}
         />
-
+        {isDemoMode && (
+          <p role="note" className="shrink-0 bg-amber-50 px-4 py-2 text-center text-[11px] font-bold text-amber-800">
+            Modo demostracion: los datos se guardan solo en este navegador y no se comparten con otras personas.
+          </p>
+        )}
         {userRole === 'DOCENTE' ? (
           <DocenteView
             onLogout={logout}
             tasksSlot={isApiMode ? <ApiTasksView userRole={userRole} periodCode={activePeriodId} periodLabel={activePeriod.label} indicators={allIndicators} /> : undefined}
           />
         ) : (
-          <div className="flex-1 overflow-y-auto p-8 bg-[#f4f6f9]">
+          <div className="flex-1 overflow-y-auto p-4 md:p-8 bg-[#f4f6f9]">
             <AnimatePresence mode="wait">
               {!selectedIndicator && !isChecklistOpen && !isTemplatesOpen && (!isAssignmentsOpen || !canAccessAssignments) && (
                 <motion.div key="dashboard" variants={viewTransition} initial="initial" animate="animate" exit="exit">
@@ -411,6 +433,7 @@ export default function App() {
                     onOpenCriterionSubCriteria={openCriterionSubCriteria}
                     onOpenAssignments={handleOpenAssignments}
                     canManageAssignments={canUserAssign(userRole)}
+                    userRole={userRole}
                   />
                 </motion.div>
               )}
