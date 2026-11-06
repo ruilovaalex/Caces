@@ -56,13 +56,13 @@ export const EvidencePolicy = {
   // Cada coordinador solo puede retirar versiones que el mismo cargo.
   assertCanDelete(actor: Actor, version: EvidenceVersion) {
     if (actor.role !== 'COORDINADOR') throw new ForbiddenError('Solo el coordinador puede retirar versiones');
-    if (version.uploadedById !== actor.id) throw new ForbiddenError('Solo puedes retirar versiones que cargaste tu');
+    if (version.uploadedById !== actor.id) throw new ForbiddenError('Solo puedes retirar versiones que cargaste tú');
   },
 };
 
 export const assertReviewDecision = (status: ReviewDecision, comment?: string | null) => {
   if ((status === 'OBSERVADO' || status === 'RECHAZADO') && !comment?.trim()) {
-    throw new ValidationError('Indica el motivo para que el coordinador sepa que corregir');
+    throw new ValidationError('Indica el motivo para que el coordinador sepa qué corregir');
   }
 };
 

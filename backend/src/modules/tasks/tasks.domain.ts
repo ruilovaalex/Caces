@@ -58,7 +58,7 @@ export const TaskPolicy = {
 };
 
 export const assertTaskInput = (input: { title: string; evidenceLabel: string; dueDate: string }) => {
-  if (!input.title.trim()) throw new ValidationError('El titulo de la tarea es obligatorio');
+  if (!input.title.trim()) throw new ValidationError('El título de la tarea es obligatorio');
   if (!input.evidenceLabel.trim()) throw new ValidationError('Indica la evidencia que debe entregar el docente');
-  if (Number.isNaN(Date.parse(`${input.dueDate}T00:00:00Z`))) throw new ValidationError('Fecha limite invalida');
+  if (Number.isNaN(Date.parse(`${input.dueDate}T00:00:00Z`))) throw new ValidationError('Fecha límite inválida');
 };

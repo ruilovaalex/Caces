@@ -88,7 +88,7 @@ export class EvidenceUseCases {
     if (options.notify !== false) {
       await this.notifier.toRoles(['EVALUADOR'], {
         title: 'Nueva evidencia para revisar',
-        message: `${period.label} · Indicador ${requirement.indicatorCode}, evidencia ${requirement.number}: version ${version.version} de ${validated.fileName}.`,
+        message: `${period.label} · Indicador ${requirement.indicatorCode}, evidencia ${requirement.number}: versión ${version.version} de ${validated.fileName}.`,
         type: 'INFO',
       });
     }

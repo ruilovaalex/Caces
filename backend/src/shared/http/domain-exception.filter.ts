@@ -1,6 +1,7 @@
 import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus, Logger } from '@nestjs/common';
 import { Response } from 'express';
 import { DomainError } from '../domain/errors';
+import { translateHttpMessage, translateValidationMessage } from './error-messages';
 
 const STATUS_BY_CODE: Record<string, number> = {
   NOT_FOUND: HttpStatus.NOT_FOUND,
@@ -10,7 +11,7 @@ const STATUS_BY_CODE: Record<string, number> = {
   UNAUTHORIZED: HttpStatus.UNAUTHORIZED,
 };
 
-// Formato unico de error: { statusCode, code, message, details? }
+// Formato único de error: { statusCode, code, message, details? }
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
   private readonly logger = new Logger('Errors');
@@ -28,8 +29,10 @@ export class AllExceptionsFilter implements ExceptionFilter {
       const statusCode = exception.getStatus();
       const body = exception.getResponse() as string | { message?: string | string[] };
       const rawMessage = typeof body === 'string' ? body : body.message;
-      const message = Array.isArray(rawMessage) ? 'Datos de entrada invalidos' : rawMessage || exception.message;
-      const details = Array.isArray(rawMessage) ? rawMessage : undefined;
+      const message = Array.isArray(rawMessage)
+        ? 'Datos de entrada inválidos'
+        : translateHttpMessage(statusCode, rawMessage || exception.message);
+      const details = Array.isArray(rawMessage) ? rawMessage.map(translateValidationMessage) : undefined;
       const code = statusCode === 400 ? 'VALIDATION_ERROR'
         : statusCode === 401 ? 'UNAUTHORIZED'
         : statusCode === 403 ? 'FORBIDDEN'

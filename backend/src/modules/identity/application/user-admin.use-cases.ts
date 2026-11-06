@@ -12,7 +12,7 @@ const assertAdmin = (actor: Actor) => {
 
 const assertPassword = (password: string) => {
   if (password.length < MIN_PASSWORD_LENGTH) {
-    throw new ValidationError(`La contrasena debe tener al menos ${MIN_PASSWORD_LENGTH} caracteres`);
+    throw new ValidationError(`La contraseña debe tener al menos ${MIN_PASSWORD_LENGTH} caracteres`);
   }
 };
 

@@ -54,7 +54,7 @@ describe('S3FileStorage', () => {
   });
 
   it('rechaza claves peligrosas y traduce archivos ausentes', async () => {
-    await expect(storage.put('../x', Buffer.from('x'))).rejects.toThrow(/invalida/);
-    await expect(storage.open('falta/x')).rejects.toThrow(/no esta disponible/);
+    await expect(storage.put('../x', Buffer.from('x'))).rejects.toThrow(/inválida/);
+    await expect(storage.open('falta/x')).rejects.toThrow(/no está disponible/);
   });
 });

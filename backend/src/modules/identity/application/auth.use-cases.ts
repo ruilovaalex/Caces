@@ -6,7 +6,7 @@ import { UnauthorizedError, ValidationError } from '../../../shared/domain/error
 import { MAILER, Mailer, PASSWORD_HASHER, PASSWORD_RESET_REPOSITORY, PasswordHasher, PasswordResetRepository, TOKEN_SERVICE, TokenService, USER_REPOSITORY, UserRepository } from '../domain/ports';
 import { MIN_PASSWORD_LENGTH, normalizeEmail, PublicUser, toActor, toPublicUser } from '../domain/user';
 
-const INVALID_CREDENTIALS = 'Correo o contrasena incorrectos';
+const INVALID_CREDENTIALS = 'Correo o contraseña incorrectos';
 
 @Injectable()
 export class LoginUseCase {
@@ -38,9 +38,9 @@ export class AuthenticateTokenUseCase {
   // Se consulta el usuario en cada solicitud: un cambio de rol o una desactivacion aplican de inmediato.
   async execute(token: string): Promise<Actor> {
     const payload = await this.tokens.verify(token);
-    if (!payload) throw new UnauthorizedError('Sesion invalida o expirada');
+    if (!payload) throw new UnauthorizedError('Sesión inválida o expirada');
     const user = await this.users.findById(payload.userId);
-    if (!user || !user.active) throw new UnauthorizedError('Sesion invalida o expirada');
+    if (!user || !user.active) throw new UnauthorizedError('Sesión inválida o expirada');
     return toActor(user);
   }
 }
@@ -55,10 +55,10 @@ export class ChangeOwnPasswordUseCase {
   async execute(actor: Actor, currentPassword: string, newPassword: string): Promise<void> {
     const user = await this.users.findById(actor.id);
     if (!user || !(await this.hasher.verify(currentPassword, user.passwordHash))) {
-      throw new ValidationError('La contrasena actual no es correcta');
+      throw new ValidationError('La contraseña actual no es correcta');
     }
     if (newPassword.length < MIN_PASSWORD_LENGTH) {
-      throw new ValidationError(`La nueva contrasena debe tener al menos ${MIN_PASSWORD_LENGTH} caracteres`);
+      throw new ValidationError(`La nueva contraseña debe tener al menos ${MIN_PASSWORD_LENGTH} caracteres`);
     }
     await this.users.update(user.id, { passwordHash: await this.hasher.hash(newPassword) });
   }
@@ -101,11 +101,11 @@ export class ResetPasswordUseCase {
 
   async execute(token: string, newPassword: string): Promise<void> {
     if (newPassword.length < MIN_PASSWORD_LENGTH) {
-      throw new ValidationError(`La nueva contrasena debe tener al menos ${MIN_PASSWORD_LENGTH} caracteres`);
+      throw new ValidationError(`La nueva contraseña debe tener al menos ${MIN_PASSWORD_LENGTH} caracteres`);
     }
     const userId = await this.resets.consume(hashToken(token), new Date());
     const user = userId ? await this.users.findById(userId) : null;
-    if (!user || !user.active) throw new ValidationError('El enlace de recuperacion no es valido o ya expiro');
+    if (!user || !user.active) throw new ValidationError('El enlace de recuperación no es válido o ya expiró');
     await this.users.update(user.id, { passwordHash: await this.hasher.hash(newPassword) });
     await this.resets.invalidateAllFor(user.id);
   }
