@@ -27,13 +27,13 @@ const steps = {
     label: 'Paso 3',
     title: 'Evidencia',
     detail: 'Prepara el documento, revisa el formato y sube la versión final.',
-    next: 'Cuando este cargada, pasa a revisión.',
+    next: 'Cuando esté cargada, pasa a revisión.',
     icon: UploadCloud
   },
   review: {
     label: 'Paso 4',
-    title: 'Revision',
-    detail: 'Evalua pertinencia, completitud y soporte documental.',
+    title: 'Revisión',
+    detail: 'Evalúa pertinencia, completitud y soporte documental.',
     next: 'Valida, observa o rechaza la evidencia.',
     icon: ClipboardCheck
   }

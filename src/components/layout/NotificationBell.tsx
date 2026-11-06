@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Bell, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Notification } from '../../types';
@@ -21,13 +21,35 @@ export const NotificationBell = ({
   onClearAll,
   onDelete
 }: NotificationBellProps) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const unread = notifications.filter(n => !n.isRead).length;
+
+  // El panel se cierra con Escape o al hacer clic fuera, como cualquier menú desplegable.
+  useEffect(() => {
+    if (!showNotifications) return;
+    const onKey = (event: KeyboardEvent) => { if (event.key === 'Escape') onToggle(); };
+    const onPointer = (event: PointerEvent) => {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) onToggle();
+    };
+    document.addEventListener('keydown', onKey);
+    document.addEventListener('pointerdown', onPointer);
+    return () => {
+      document.removeEventListener('keydown', onKey);
+      document.removeEventListener('pointerdown', onPointer);
+    };
+  }, [showNotifications, onToggle]);
+
   return (
-    <div className="relative">
+    <div className="relative" ref={containerRef}>
       <button 
+        type="button"
         onClick={onToggle}
+        aria-label={unread ? `Notificaciones (${unread} sin leer)` : 'Notificaciones'}
+        aria-expanded={showNotifications}
+        aria-haspopup="dialog"
         className={`relative flex h-9 w-9 items-center justify-center rounded-full transition-colors ${showNotifications ? 'bg-white text-[#2563eb]' : 'text-[#aac4e8] hover:bg-white/10 hover:text-white'}`}
       >
-        <Bell className="h-[18px] w-[18px]" />
+        <Bell className="h-[18px] w-[18px]" aria-hidden />
         {notifications.some(n => !n.isRead) && (
           <span className="absolute right-2 top-2 h-2 w-2 rounded-full border-2 border-[#1e2d4a] bg-rose-500 animate-pulse" />
         )}
@@ -39,7 +61,9 @@ export const NotificationBell = ({
             initial={{ opacity: 0, y: 10, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 10, scale: 0.95 }}
-            className="absolute right-0 mt-4 w-80 bg-white rounded-3xl shadow-2xl border border-slate-100 z-50 overflow-hidden"
+            role="dialog"
+            aria-label="Notificaciones"
+            className="absolute right-0 mt-4 w-[min(20rem,calc(100vw-2rem))] bg-white rounded-3xl shadow-2xl border border-slate-100 z-50 overflow-hidden"
           >
             <div className="p-4 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
               <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Notificaciones</span>
