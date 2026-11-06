@@ -1,0 +1,44 @@
+# Blueprint de Render para el backend. Crear en: Render > New > Blueprint > repositorio ruilovaalex/Caces.
+# Genera costos mensuales (servicio web, PostgreSQL y disco): revisa los planes antes de aprobar.
+services:
+  - type: web
+    name: caces-api
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    plan: starter            # el disco persistente requiere un plan de pago
+    healthCheckPath: /api/health
+    preDeployCommand: npx prisma migrate deploy
+    disk:
+      name: caces-storage
+      mountPath: /data
+      sizeGB: 5
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: caces-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true   # Render genera un valor aleatorio largo
+      - key: CORS_ORIGINS
+        value: https://caces.vercel.app
+      - key: FRONTEND_URL
+        value: https://caces.vercel.app
+      - key: STORAGE_DRIVER
+        value: local
+      - key: STORAGE_LOCAL_DIR
+        value: /data/storage
+      - key: MAIL_DRIVER
+        value: none
+      # Solo para el primer seed (ver docs/DESPLIEGUE.md); se pueden eliminar despues.
+      - key: SEED_ADMIN_EMAIL
+        sync: false           # lo escribes tu en el panel de Render
+      - key: SEED_DEFAULT_PASSWORD
+        sync: false
+
+databases:
+  - name: caces-db
+    plan: basic-256mb
+    postgresMajorVersion: "16"

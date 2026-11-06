@@ -18,7 +18,10 @@
 | `MAIL_DRIVER=none` | Aún no hay adaptador SMTP: el administrador restablece claves desde Usuarios |
 | `SEED_ADMIN_EMAIL`, `SEED_DEFAULT_PASSWORD` (≥12) | Solo para el primer seed; cambiar la clave después |
 
-## Pasos
+## Opción rápida: Render (render.yaml)
+El archivo `render.yaml` crea el servicio web (Docker), PostgreSQL 16 y un disco de 5 GB. Render pide `SEED_ADMIN_EMAIL` y `SEED_DEFAULT_PASSWORD` al crear el blueprint. Tras el primer despliegue: abre la Shell del servicio y ejecuta `npx tsx prisma/seed.ts` una vez. La URL pública (`https://caces-api.onrender.com` o similar) va en `VITE_API_URL` de Vercel.
+
+## Pasos manuales
 1. `docker build -t caces-backend backend/`
 2. Migrar: `docker run --rm --env-file <env> caces-backend npx prisma migrate deploy`
 3. Primer seed (catálogo, periodos y administrador): `docker run --rm --env-file <env> caces-backend npx tsx prisma/seed.ts`
