@@ -1,6 +1,6 @@
 export type VerificationResult = 'Verificada' | 'Con observaciones';
 
-export type PresentialStatus = 'Pendiente de verificacion' | VerificationResult;
+export type PresentialStatus = 'Pendiente de verificación' | VerificationResult;
 
 export interface PresentialVerification {
   id: string;

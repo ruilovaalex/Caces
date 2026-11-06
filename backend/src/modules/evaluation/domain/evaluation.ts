@@ -42,7 +42,7 @@ export interface IndicatorAssessment {
 
 export const EvaluationPolicy = {
   assertCanView(actor: Actor) {
-    if (actor.role === 'DOCENTE') throw new ForbiddenError('No tienes acceso a los resultados de evaluacion');
+    if (actor.role === 'DOCENTE') throw new ForbiddenError('No tienes acceso a los resultados de evaluación');
   },
 
   assertIsEvaluator(actor: Actor) {
@@ -51,17 +51,17 @@ export const EvaluationPolicy = {
 };
 
 export const assertVerificationInput = (mode: string, notes: string) => {
-  if (mode !== 'PRESENCIAL') throw new ValidationError('Esta evidencia es documental: se revisa con sus archivos, no con una verificacion presencial');
-  if (!notes.trim()) throw new ValidationError('Describe lo que se comprobo en la visita');
+  if (mode !== 'PRESENCIAL') throw new ValidationError('Esta evidencia es documental: se revisa con sus archivos, no con una verificación presencial');
+  if (!notes.trim()) throw new ValidationError('Describe lo que se comprobó en la visita');
 };
 
 export const assertAssessmentInput = (indicatorType: string, rating: IndicatorRating, achievements: string, deficiencies: string) => {
   if (indicatorType !== 'CUALITATIVO') {
-    throw new ValidationError('Los indicadores cuantitativos se obtienen con su formula de calculo; no admiten valoracion cualitativa');
+    throw new ValidationError('Los indicadores cuantitativos se obtienen con su fórmula de cálculo; no admiten valoración cualitativa');
   }
   if (!achievements.trim()) throw new ValidationError('Registra los logros identificados');
   if (rating !== 'SATISFACTORIO' && !deficiencies.trim()) {
-    throw new ValidationError('Registra las deficiencias que sustentan esta valoracion');
+    throw new ValidationError('Registra las deficiencias que sustentan esta valoración');
   }
 };
 

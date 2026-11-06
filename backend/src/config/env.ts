@@ -30,13 +30,13 @@ export const loadConfig = (env: NodeJS.ProcessEnv = process.env): AppConfig => {
   const isProduction = (env.NODE_ENV || 'development') === 'production';
   if (isProduction) {
     if (/(cambia|change|dev-only|example|secret-dev|password)/i.test(jwtSecret) || new Set(jwtSecret).size < 12) {
-      errors.push('JWT_SECRET parece un valor de ejemplo o de baja entropia; genera uno aleatorio para produccion');
+      errors.push('JWT_SECRET parece un valor de ejemplo o de baja entropía; genera uno aleatorio para producción');
     }
     const origins = (env.CORS_ORIGINS || '').split(',').map(origin => origin.trim()).filter(Boolean);
-    if (!origins.length) errors.push('Define CORS_ORIGINS con el origen HTTPS del frontend en produccion');
+    if (!origins.length) errors.push('Define CORS_ORIGINS con el origen HTTPS del frontend en producción');
     for (const origin of origins) {
       if (origin === '*' || /localhost|127\.0\.0\.1/.test(origin) || !origin.startsWith('https://')) {
-        errors.push(`CORS_ORIGINS no admite "${origin}" en produccion (usa origenes https:// explicitos)`);
+        errors.push(`CORS_ORIGINS no admite "${origin}" en producción (usa orígenes https:// explícitos)`);
       }
     }
   }
@@ -48,18 +48,18 @@ export const loadConfig = (env: NodeJS.ProcessEnv = process.env): AppConfig => {
     if (!env.S3_REGION) errors.push('Falta la variable de entorno S3_REGION');
   }
   if (isProduction && storageDriver === 'local' && !env.STORAGE_LOCAL_DIR) {
-    errors.push('En produccion define STORAGE_LOCAL_DIR (volumen persistente) o usa STORAGE_DRIVER=s3');
+    errors.push('En producción define STORAGE_LOCAL_DIR (volumen persistente) o usa STORAGE_DRIVER=s3');
   }
 
   const mailDriver = env.MAIL_DRIVER || (isProduction ? 'none' : 'console');
   if (mailDriver !== 'console' && mailDriver !== 'none') errors.push(`MAIL_DRIVER no soportado: ${mailDriver}`);
-  if (isProduction && mailDriver === 'console') errors.push('MAIL_DRIVER=console no se permite en produccion (filtraria enlaces de recuperacion en los logs)');
+  if (isProduction && mailDriver === 'console') errors.push('MAIL_DRIVER=console no se permite en producción (filtraría enlaces de recuperación en los logs)');
 
   const maxUploadMb = Number(env.MAX_UPLOAD_MB || 20);
-  if (!Number.isFinite(maxUploadMb) || maxUploadMb <= 0) errors.push('MAX_UPLOAD_MB debe ser un numero positivo');
+  if (!Number.isFinite(maxUploadMb) || maxUploadMb <= 0) errors.push('MAX_UPLOAD_MB debe ser un número positivo');
 
   const clientIpHeader = env.CLIENT_IP_HEADER?.trim().toLowerCase() || undefined;
-  if (clientIpHeader && !/^[a-z0-9-]+$/.test(clientIpHeader)) errors.push('CLIENT_IP_HEADER debe ser un nombre de cabecera HTTP valido');
+  if (clientIpHeader && !/^[a-z0-9-]+$/.test(clientIpHeader)) errors.push('CLIENT_IP_HEADER debe ser un nombre de cabecera HTTP válido');
 
   const config: AppConfig = {
     nodeEnv: env.NODE_ENV || 'development',
@@ -79,7 +79,7 @@ export const loadConfig = (env: NodeJS.ProcessEnv = process.env): AppConfig => {
     clientIpHeader,
   };
 
-  if (errors.length) throw new Error(`Configuracion invalida:\n- ${errors.join('\n- ')}`);
+  if (errors.length) throw new Error(`Configuración inválida:\n- ${errors.join('\n- ')}`);
   return config;
 };
 

@@ -59,7 +59,7 @@ export class MyNotificationsUseCases {
   // Una notificacion ajena se trata como inexistente para no revelar que existe.
   private async findOwn(actor: Actor, id: string) {
     const notification = await this.notifications.findById(id);
-    if (!notification || notification.recipientId !== actor.id) throw new NotFoundError('Notificacion no encontrada');
+    if (!notification || notification.recipientId !== actor.id) throw new NotFoundError('Notificación no encontrada');
     return notification;
   }
 }

@@ -66,7 +66,7 @@ export class VerificationUseCases {
     });
     if (input.result === 'CON_OBSERVACIONES' && !input.legacyId) {
       await this.notifier.toRoles(['COORDINADOR'], {
-        title: 'Verificacion presencial con observaciones',
+        title: 'Verificación presencial con observaciones',
         message: `${period.label} · Indicador ${requirement.indicatorCode}, evidencia ${requirement.number}: ${record.notes}`,
         type: 'WARNING',
       });

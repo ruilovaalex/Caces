@@ -31,7 +31,7 @@ export class AuthGuard implements CanActivate {
     const request = context.switchToHttp().getRequest<AuthenticatedRequest>();
     const header = request.headers.authorization || '';
     const [scheme, token] = header.split(' ');
-    if (scheme !== 'Bearer' || !token) throw new UnauthorizedError('Debes iniciar sesion');
+    if (scheme !== 'Bearer' || !token) throw new UnauthorizedError('Debes iniciar sesión');
 
     request.actor = await this.authenticator.execute(token);
     return true;
@@ -40,6 +40,6 @@ export class AuthGuard implements CanActivate {
 
 export const CurrentActor = createParamDecorator((_data: unknown, context: ExecutionContext): Actor => {
   const actor = context.switchToHttp().getRequest<AuthenticatedRequest>().actor;
-  if (!actor) throw new UnauthorizedError('Debes iniciar sesion');
+  if (!actor) throw new UnauthorizedError('Debes iniciar sesión');
   return actor;
 });

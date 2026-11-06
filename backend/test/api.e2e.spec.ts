@@ -110,6 +110,9 @@ describe('API CACES (integracion)', () => {
       const response = await http.post('/api/auth/login').send({ email: 'a@b.ec', password: 'x', role: 'ADMIN' });
       expect(response.status).toBe(400);
       expect(response.body.code).toBe('VALIDATION_ERROR');
+      expect(response.body.message).toBe('Datos de entrada inválidos');
+      expect(response.body.details).toContain('El campo «rol» no está permitido');
+      expect((await http.get('/api/ruta-inexistente')).body.message).toBe('Recurso no encontrado');
     });
   });
 
@@ -238,8 +241,8 @@ describe('API CACES (integracion)', () => {
       const p1 = (await http.get(`/api/periods/${P1}/verifications`).set(auth('coord'))).body;
       expect(p1.map((v: any) => v.result)).toEqual(['VERIFICADA', 'CON_OBSERVACIONES']);
       expect((await http.get(`/api/periods/${P2}/verifications`).set(auth('coord'))).body).toHaveLength(0);
-      expect((await notificationsOf('coord')).some(n => n.title === 'Verificacion presencial con observaciones')).toBe(true);
-      expect((await notificationsOf('coord2')).some(n => n.title === 'Verificacion presencial con observaciones')).toBe(true);
+      expect((await notificationsOf('coord')).some(n => n.title === 'Verificación presencial con observaciones')).toBe(true);
+      expect((await notificationsOf('coord2')).some(n => n.title === 'Verificación presencial con observaciones')).toBe(true);
     });
 
     it('la valoracion es independiente del estado de los archivos', async () => {

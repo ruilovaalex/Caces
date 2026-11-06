@@ -22,6 +22,24 @@ const STATUS_STYLE: Record<TaskStatus, string> = {
   ENTREGADA: 'bg-emerald-100 text-emerald-700',
 };
 
+// Nombres cortos de los criterios CACES 2024 para agrupar la lista de indicadores.
+const CRITERION_LABEL: Record<string, string> = {
+  '1': '1. Organización',
+  '2': '2. Infraestructura',
+  '3': '3. Profesores',
+  '4': '4. Docencia',
+  '5': '5. Investigación, desarrollo e innovación',
+  '6': '6. Vinculación con la sociedad',
+};
+const groupByCriterion = <T extends { code: string }>(items: T[]) => {
+  const groups = new Map<string, T[]>();
+  for (const item of items) {
+    const criterion = item.code.split('.')[0];
+    groups.set(criterion, [...(groups.get(criterion) ?? []), item]);
+  }
+  return [...groups.entries()];
+};
+
 const field = 'w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#2563eb]';
 const label = 'text-[10px] font-black uppercase tracking-widest text-slate-500';
 
@@ -94,7 +112,7 @@ export const ApiTasksView = ({ userRole, periodCode, periodLabel, indicators }: 
           <h1 id="tasks-title" className="text-xl font-black text-[#1e2d4a]">{isCoordinator ? 'Docentes y tareas' : 'Mis actividades'}</h1>
           <p className="text-sm text-slate-500">
             {periodLabel ? `Periodo ${periodLabel}. ` : ''}
-            {isCoordinator ? 'Asigna tareas a docentes activos; las cuentas de docente las crea el administrador.' : 'Tareas que el coordinador te asigno.'}
+            {isCoordinator ? 'Asigna tareas a docentes activos; las cuentas de docente las crea el administrador.' : 'Tareas que el coordinador te asignó.'}
           </p>
         </div>
       </header>
@@ -108,6 +126,13 @@ export const ApiTasksView = ({ userRole, periodCode, periodLabel, indicators }: 
         )}
       </div>
 
+      {isCoordinator && !isLoading && !error && teachers.length === 0 && (
+        <p role="status" className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+          <span className="font-black">Todavía no hay docentes activos.</span>{' '}
+          Para asignar tareas, pide al administrador que cree las cuentas de docente en «Usuarios y roles». Aparecerán aquí automáticamente.
+        </p>
+      )}
+
       {isCoordinator && (
         <form onSubmit={handleCreate} className="grid gap-4 rounded-3xl border border-slate-200 bg-white p-5 sm:grid-cols-2 lg:grid-cols-3">
           <div className="space-y-1">
@@ -120,15 +145,19 @@ export const ApiTasksView = ({ userRole, periodCode, periodLabel, indicators }: 
           <div className="space-y-1">
             <label htmlFor="task-indicator" className={label}>Indicador</label>
             <select id="task-indicator" required className={field} value={form.indicatorCode} onChange={e => setForm({ ...form, indicatorCode: e.target.value })}>
-              {indicators.map(indicator => <option key={indicator.code} value={indicator.code}>{indicator.code} - {indicator.name}</option>)}
+              {groupByCriterion(indicators).map(([criterion, items]) => (
+                <optgroup key={criterion} label={CRITERION_LABEL[criterion] ?? `Criterio ${criterion}`}>
+                  {items.map(indicator => <option key={indicator.code} value={indicator.code}>{indicator.code} - {indicator.name}</option>)}
+                </optgroup>
+              ))}
             </select>
           </div>
           <div className="space-y-1">
-            <label htmlFor="task-due" className={label}>Fecha limite</label>
+            <label htmlFor="task-due" className={label}>Fecha límite</label>
             <input id="task-due" type="date" required className={field} value={form.dueDate} onChange={e => setForm({ ...form, dueDate: e.target.value })} />
           </div>
           <div className="space-y-1">
-            <label htmlFor="task-title" className={label}>Titulo</label>
+            <label htmlFor="task-title" className={label}>Título</label>
             <input id="task-title" required minLength={2} maxLength={200} className={field} value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} />
           </div>
           <div className="space-y-1">
@@ -148,7 +177,7 @@ export const ApiTasksView = ({ userRole, periodCode, periodLabel, indicators }: 
         {isLoading && <li className="rounded-2xl border border-slate-200 bg-white p-6 text-center text-sm text-slate-500">Cargando tareas...</li>}
         {!isLoading && !error && tasks.length === 0 && (
           <li className="rounded-2xl border border-slate-200 bg-white p-6 text-center text-sm text-slate-500">
-            {isCoordinator ? 'Aun no hay tareas en este periodo.' : 'No tienes tareas asignadas en este periodo.'}
+            {isCoordinator ? 'Aún no hay tareas en este periodo.' : 'No tienes tareas asignadas en este periodo.'}
           </li>
         )}
         {tasks.map(task => {

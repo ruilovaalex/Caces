@@ -15,11 +15,11 @@ export const EvidenceVersionHistory = ({ files, onDeleteFile }: EvidenceVersionH
       <table className="w-full min-w-[900px] text-left">
         <thead>
           <tr className="bg-slate-50/50 border-b border-slate-100 text-[9px] font-black text-slate-400 uppercase tracking-widest">
-            <th className="px-4 py-4">Version</th>
+            <th className="px-4 py-4">Versión</th>
             <th className="px-4 py-4">Fecha</th>
             <th className="px-4 py-4">Estado</th>
             <th className="px-4 py-4">Tipo</th>
-            <th className="px-4 py-4">Tamano</th>
+            <th className="px-4 py-4">Tamaño</th>
             <th className="px-4 py-4">Subido por</th>
             <th className="px-4 py-4 text-right">Archivo</th>
             {onDeleteFile && <th className="px-4 py-4 text-right">Eliminar</th>}

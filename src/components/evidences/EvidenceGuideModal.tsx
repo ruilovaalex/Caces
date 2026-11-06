@@ -70,7 +70,7 @@ export const EvidenceGuideModal = ({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Guia para subir la evidencia" maxWidth="max-w-3xl">
+    <Modal isOpen={isOpen} onClose={onClose} title="Guía para subir la evidencia" maxWidth="max-w-3xl">
       <div className="space-y-6 border-t border-slate-100 bg-white p-7">
         <div className="rounded-lg border border-blue-100 bg-blue-50 p-5">
           <p className="text-[10px] font-black uppercase tracking-widest text-blue-600">
@@ -86,7 +86,7 @@ export const EvidenceGuideModal = ({
         <section>
           <div className="mb-3 flex items-center gap-2">
             <FileCheck2 className="h-4 w-4 text-blue-600" />
-            <h4 className="text-xs font-black uppercase tracking-widest text-slate-700">Que debe preparar</h4>
+            <h4 className="text-xs font-black uppercase tracking-widest text-slate-700">Qué debe preparar</h4>
           </div>
           <p className="rounded-lg border border-slate-200 bg-slate-50 p-4 text-sm font-semibold leading-relaxed text-slate-700">
             {guide.focus}
@@ -96,7 +96,7 @@ export const EvidenceGuideModal = ({
         <section>
           <div className="mb-3 flex items-center gap-2">
             <ListChecks className="h-4 w-4 text-emerald-600" />
-            <h4 className="text-xs font-black uppercase tracking-widest text-slate-700">Contenido minimo</h4>
+            <h4 className="text-xs font-black uppercase tracking-widest text-slate-700">Contenido mínimo</h4>
           </div>
           <div className="space-y-2">
             {guide.checks.map(item => (

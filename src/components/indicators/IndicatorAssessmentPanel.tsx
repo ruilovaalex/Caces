@@ -39,7 +39,7 @@ export const IndicatorAssessmentPanel = ({
       <section className="border-b border-slate-200 bg-white px-6 py-4">
         <p className="text-xs text-slate-500">
           <span className="font-black text-slate-700">Indicador cuantitativo.</span>{' '}
-          Su resultado se obtiene con la formula de calculo del modelo; no se registra valoracion cualitativa.
+          Su resultado se obtiene con la fórmula de cálculo del modelo; no se registra valoración cualitativa.
         </p>
       </section>
     );
@@ -66,11 +66,11 @@ export const IndicatorAssessmentPanel = ({
         <div className="flex items-start gap-3">
           <Scale className="mt-0.5 h-5 w-5 text-slate-500" />
           <div>
-            <h3 className="text-base font-black text-slate-900">Valoracion del indicador</h3>
+            <h3 className="text-base font-black text-slate-900">Valoración del indicador</h3>
             <p className="mt-1 text-xs text-slate-500">
               Referencia para el evaluador: {documentalSummary.validated} de {documentalSummary.total} evidencias documentales validadas
               {presentialSummary.total > 0 && ` · ${presentialSummary.verified} de ${presentialSummary.total} verificaciones presenciales`}.
-              La valoracion no se calcula a partir de estos datos.
+              La valoración no se calcula a partir de estos datos.
             </p>
           </div>
         </div>
@@ -79,7 +79,7 @@ export const IndicatorAssessmentPanel = ({
             onClick={() => setIsEditing(true)}
             className="inline-flex h-10 shrink-0 items-center justify-center gap-2 rounded-lg bg-slate-900 px-4 text-xs font-black uppercase tracking-widest text-white hover:bg-slate-800"
           >
-            {current ? 'Registrar nueva valoracion' : 'Valorar indicador'}
+            {current ? 'Registrar nueva valoración' : 'Valorar indicador'}
           </button>
         )}
       </div>
@@ -115,7 +115,7 @@ export const IndicatorAssessmentPanel = ({
           )}
         </div>
       ) : (
-        !isEditing && <p className="mt-4 text-xs font-bold text-slate-400">Sin valoracion registrada.</p>
+        !isEditing && <p className="mt-4 text-xs font-bold text-slate-400">Sin valoración registrada.</p>
       )}
 
       {canAssess && isEditing && (
@@ -142,7 +142,7 @@ export const IndicatorAssessmentPanel = ({
           <textarea
             value={deficiencies}
             onChange={event => setDeficiencies(event.target.value)}
-            placeholder={needsDeficiencies ? 'Deficiencias identificadas (obligatorio para esta valoracion)' : 'Deficiencias identificadas (opcional)'}
+            placeholder={needsDeficiencies ? 'Deficiencias identificadas (obligatorio para esta valoración)' : 'Deficiencias identificadas (opcional)'}
             className="w-full rounded-lg border border-slate-200 bg-white p-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 min-h-[80px] resize-none"
           />
           <div className="flex justify-end gap-2">
@@ -157,7 +157,7 @@ export const IndicatorAssessmentPanel = ({
               disabled={!canSave}
               className="rounded-lg bg-slate-900 px-4 py-2 text-xs font-black uppercase tracking-widest text-white hover:bg-slate-800 disabled:opacity-50"
             >
-              Guardar valoracion
+              Guardar valoración
             </button>
           </div>
         </div>

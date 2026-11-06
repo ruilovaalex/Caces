@@ -37,9 +37,9 @@ export const assertSections = (sections: unknown): Section[] => {
     const section = raw as Record<string, unknown>;
     const fields = ['id', 'title', 'instruction', 'placeholder', 'content'] as const;
     for (const field of fields) {
-      if (typeof section?.[field] !== 'string') throw new ValidationError(`Seccion invalida: falta ${field}`);
+      if (typeof section?.[field] !== 'string') throw new ValidationError(`Sección inválida: falta ${field}`);
     }
-    if ((section.content as string).length > MAX_CONTENT) throw new ValidationError('El contenido de una seccion es demasiado largo');
+    if ((section.content as string).length > MAX_CONTENT) throw new ValidationError('El contenido de una sección es demasiado largo');
     return Object.fromEntries(fields.map(field => [field, (section[field] as string).slice(0, MAX_CONTENT)])) as unknown as Section;
   });
 };
@@ -91,7 +91,7 @@ export class DraftUseCases {
     },
   ) {
     DraftPolicy.assertCanEdit(actor);
-    if (!DRAFT_STATUSES.includes(input.status)) throw new ValidationError('Estado de borrador invalido');
+    if (!DRAFT_STATUSES.includes(input.status)) throw new ValidationError('Estado de borrador inválido');
     const sections = assertSections(input.sections);
     const period = await resolveWritablePeriod(this.catalog, input.periodCode);
     const requirement = await resolveRequirement(this.catalog, input.indicatorCode, input.requirementNumber);
@@ -104,7 +104,7 @@ export class DraftUseCases {
     // Control optimista: la version guardada debe coincidir con la que el cliente vio por ultima vez.
     const existing = await this.prisma.evidenceDraft.findUnique({ where, select: { version: true } });
     if ((existing?.version ?? 0) !== input.baseVersion) {
-      throw new ConflictError('El borrador fue modificado por otra persona. Recarga para ver la version vigente.');
+      throw new ConflictError('El borrador fue modificado por otra persona. Recarga para ver la versión vigente.');
     }
     const saved = existing
       ? await this.prisma.evidenceDraft.update({ where, data: { ...data, version: { increment: 1 } }, select: draftSelect })
@@ -159,7 +159,7 @@ class DraftsController {
     @Param('requirementNumber', new ParseIntPipe()) requirementNumber: number,
     @Body() body: SaveDraftDto,
   ) {
-    if (!/^\d\.\d\.\d$/.test(indicatorCode)) throw new ValidationError('Codigo de indicador invalido');
+    if (!/^\d\.\d\.\d$/.test(indicatorCode)) throw new ValidationError('Código de indicador inválido');
     return this.useCases.save(actor, { periodCode, indicatorCode, requirementNumber, ...body });
   }
 

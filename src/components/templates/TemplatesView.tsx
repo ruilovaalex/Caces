@@ -140,19 +140,19 @@ export const TemplatesView = ({ userRole, currentUserName }: TemplatesViewProps)
           <div className="max-w-3xl">
             <div className="inline-flex items-center gap-2 rounded-full border border-blue-100 bg-blue-50 px-4 py-2 text-[10px] font-black uppercase tracking-[0.24em] text-blue-700">
               <Blocks className="h-3.5 w-3.5" />
-              Centro de creacion
+              Centro de creación
             </div>
             <h1 className="mt-4 text-3xl font-black tracking-tight text-slate-900">
               Plantillas
             </h1>
             <p className="mt-3 max-w-2xl text-sm leading-relaxed text-slate-500">
-              Aqui encuentras las plantillas base y los formatos publicados por administracion, organizados por criterio CACES
-              para que todos trabajen con una referencia comun.
+              Aquí encuentras las plantillas base y los formatos publicados por administración, organizados por criterio CACES
+              para que todos trabajen con una referencia común.
             </p>
           </div>
 
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-            <MetricCard label="Mas usadas" value="4" accent="text-amber-600" />
+            <MetricCard label="Más usadas" value="4" accent="text-amber-600" />
             <MetricCard label="Base" value={String(TEMPLATES.length)} accent="text-blue-600" />
             <MetricCard label="Publicadas" value={String(customTemplates.length)} accent="text-emerald-600" />
             <MetricCard label="Criterios" value={String(TEMPLATE_CATEGORIES.length)} accent="text-violet-600" />
@@ -189,7 +189,7 @@ export const TemplatesView = ({ userRole, currentUserName }: TemplatesViewProps)
         <section className="space-y-4">
           <div className="flex items-center gap-2">
             <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
-            <h2 className="text-xs font-black uppercase tracking-[0.24em] text-slate-500">Plantillas mas utilizadas</h2>
+            <h2 className="text-xs font-black uppercase tracking-[0.24em] text-slate-500">Plantillas más utilizadas</h2>
           </div>
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
             {featuredTemplates.map(template => (
@@ -267,7 +267,7 @@ export const TemplatesView = ({ userRole, currentUserName }: TemplatesViewProps)
           ) : (
             <div className="mt-6 rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50 p-12 text-center">
               <p className="text-sm font-bold text-slate-500">No se encontraron plantillas con esos filtros.</p>
-              <p className="mt-2 text-xs text-slate-400">Prueba con otro criterio o limpia la busqueda.</p>
+              <p className="mt-2 text-xs text-slate-400">Prueba con otro criterio o limpia la búsqueda.</p>
             </div>
           )}
         </section>

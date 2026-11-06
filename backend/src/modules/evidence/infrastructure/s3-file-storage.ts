@@ -38,7 +38,7 @@ export class S3FileStorage implements FileStorage {
       if (!result.Body) throw new Error('empty');
       return result.Body as Readable;
     } catch {
-      throw new NotFoundError('El archivo de la evidencia no esta disponible en el almacenamiento');
+      throw new NotFoundError('El archivo de la evidencia no está disponible en el almacenamiento');
     }
   }
 
@@ -48,7 +48,7 @@ export class S3FileStorage implements FileStorage {
 
   private objectKey(key: string): string {
     if (!/^[A-Za-z0-9._-]+(\/[A-Za-z0-9._-]+)*$/.test(key) || key.includes('..')) {
-      throw new Error(`Clave de almacenamiento invalida: ${key}`);
+      throw new Error(`Clave de almacenamiento inválida: ${key}`);
     }
     return `${this.prefix}${key}`;
   }

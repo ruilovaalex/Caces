@@ -4,6 +4,7 @@ import { motion } from 'motion/react';
 import { TopBar } from './TopBar';
 import { UserPanel } from './UserPanel';
 import { NotificationBell } from './NotificationBell';
+import { ROLE_LABEL } from '../../utils/permissions';
 import { Notification, UserRole } from '../../types';
 
 interface HeaderProps {
@@ -36,14 +37,7 @@ export const Header = ({
   trail,
   onToggleMenu
 }: HeaderProps) => {
-  const roleLabel =
-    userRole === 'ADMIN'
-      ? 'Administrador'
-      : userRole === 'COORDINADOR'
-        ? 'Coordinacion Academica'
-        : userRole === 'DOCENTE'
-          ? 'Docente Adjunto'
-          : 'Evaluacion Externa';
+  const roleLabel = ROLE_LABEL[userRole];
 
   return (
     <TopBar>
@@ -55,7 +49,7 @@ export const Header = ({
       >
         <div className="flex min-w-0 items-center gap-3">
           {onToggleMenu && (
-            <button type="button" onClick={onToggleMenu} aria-label="Abrir menu de navegacion" className="-ml-2 rounded-lg p-2 text-white hover:bg-white/10 lg:hidden">
+            <button type="button" onClick={onToggleMenu} aria-label="Abrir menú de navegación" className="-ml-2 rounded-lg p-2 text-white hover:bg-white/10 lg:hidden">
               <Menu className="h-5 w-5" aria-hidden />
             </button>
           )}
@@ -68,10 +62,10 @@ export const Header = ({
             <div className="w-1.5 h-1.5 bg-[#22c55e] rounded-full animate-pulse" />
             <span className="whitespace-nowrap text-[9px] font-black text-[#aac4e8] uppercase tracking-widest">
               {userRole === 'EVALUADOR'
-                ? 'Modo de revision activa'
+                ? 'Modo de revisión activa'
                 : userRole === 'ADMIN'
-                    ? 'Gestion de roles'
-                    : 'Gestion de acreditacion'}
+                    ? 'Gestión de roles'
+                    : 'Gestión de acreditación'}
             </span>
           </div>
         </div>

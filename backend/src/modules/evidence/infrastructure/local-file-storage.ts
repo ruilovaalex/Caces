@@ -30,7 +30,7 @@ export class LocalFileStorage implements FileStorage {
     try {
       await stat(target);
     } catch {
-      throw new NotFoundError('El archivo de la evidencia no esta disponible en el almacenamiento');
+      throw new NotFoundError('El archivo de la evidencia no está disponible en el almacenamiento');
     }
     return createReadStream(target);
   }
@@ -42,7 +42,7 @@ export class LocalFileStorage implements FileStorage {
   // Defensa adicional: una clave nunca puede apuntar fuera de la carpeta raiz.
   private resolveKey(key: string): string {
     if (!/^[A-Za-z0-9._-]+(\/[A-Za-z0-9._-]+)*$/.test(key) || key.includes('..')) {
-      throw new Error(`Clave de almacenamiento invalida: ${key}`);
+      throw new Error(`Clave de almacenamiento inválida: ${key}`);
     }
     const target = resolve(this.root, key);
     if (!target.startsWith(this.root + sep)) throw new Error(`Clave fuera del almacenamiento: ${key}`);

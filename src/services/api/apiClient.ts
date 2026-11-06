@@ -9,7 +9,7 @@ export const isApiMode = API_URL.length > 0;
 // no cae al modo local: muestra un error de configuracion.
 export const isDemoMode = !isApiMode && (import.meta.env.DEV || import.meta.env.VITE_ENABLE_DEMO === 'true');
 export const configurationError: string | null = !isApiMode && !isDemoMode
-  ? 'Falta VITE_API_URL: esta compilacion no tiene un servidor configurado y el modo de demostracion no esta habilitado (VITE_ENABLE_DEMO=true).'
+  ? 'Falta VITE_API_URL: esta compilación no tiene un servidor configurado y el modo de demostración no está habilitado (VITE_ENABLE_DEMO=true).'
   : null;
 
 export class ApiError extends Error {
@@ -102,4 +102,4 @@ export const api = {
 };
 
 export const describeError = (error: unknown) =>
-  error instanceof Error ? error.message : 'Ocurrio un error inesperado';
+  error instanceof Error ? error.message : 'Ocurrió un error inesperado';

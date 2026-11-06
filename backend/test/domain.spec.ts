@@ -20,8 +20,8 @@ describe('Reglas de archivos', () => {
 
   it('rechaza extension no permitida, archivo vacio, exceso de tamano y contenido falso', () => {
     expect(() => validateEvidenceFile({ originalName: 'foto.png', size: PNG.length, content: PNG }, 'PDF', 1024)).toThrow(ValidationError);
-    expect(() => validateEvidenceFile({ originalName: 'a.pdf', size: 0, content: Buffer.alloc(0) }, 'PDF', 1024)).toThrow('vacio');
-    expect(() => validateEvidenceFile({ originalName: 'a.pdf', size: 5000, content: PDF }, 'PDF', 1024)).toThrow('maximo');
+    expect(() => validateEvidenceFile({ originalName: 'a.pdf', size: 0, content: Buffer.alloc(0) }, 'PDF', 1024)).toThrow('vacío');
+    expect(() => validateEvidenceFile({ originalName: 'a.pdf', size: 5000, content: PDF }, 'PDF', 1024)).toThrow('máximo');
     expect(() => validateEvidenceFile({ originalName: 'virus.pdf', size: PNG.length, content: PNG }, 'PDF', 1024)).toThrow('no corresponde');
   });
 

@@ -118,7 +118,7 @@ export const Dashboard = ({
     <div className="max-w-6xl mx-auto space-y-8">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <label htmlFor="dashboard-period" className="text-[10px] font-black text-[#64748b] uppercase tracking-widest">
-          Periodo academico
+          Periodo académico
         </label>
         <select
           id="dashboard-period"
@@ -144,7 +144,7 @@ export const Dashboard = ({
             : <ArrowRight className="mt-0.5 h-5 w-5 shrink-0 text-[#2563eb]" aria-hidden />}
           <div className="min-w-0">
             <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">
-              {nextAction.tone === 'done' ? 'Todo al dia' : 'Tu siguiente paso'}
+              {nextAction.tone === 'done' ? 'Todo al día' : 'Tu siguiente paso'}
             </p>
             <h3 id="next-action-title" className="text-base font-black text-slate-800">{nextAction.title}</h3>
             <p className="mt-0.5 text-sm text-slate-600">{nextAction.detail}</p>
@@ -315,7 +315,7 @@ export const Dashboard = ({
           <div className="p-6 border-b border-[#f1f5f9] flex items-center justify-between bg-white">
             <div className="flex items-center gap-3">
               <AlertCircle className="w-5 h-5 text-amber-500" />
-              <h3 className="text-sm font-black text-slate-800 uppercase tracking-tight">Atención Requerida: Evidencias Pendientes</h3>
+              <h3 className="text-sm font-black text-slate-800 uppercase tracking-tight">Atención requerida: evidencias pendientes</h3>
             </div>
             <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
               {pendingIndicators.length} de {allIndicators.length} indicadores
@@ -351,10 +351,10 @@ export const Dashboard = ({
                      </p>
                      <div className="flex flex-wrap gap-2 mt-1">
                        {toCorrect.slice(0, 1).map(r => (
-                         <span key={`c-${r.id}`} className="max-w-[260px] truncate text-[9px] font-bold text-[#dc2626] uppercase bg-red-50 px-1.5 py-0.5 rounded italic">Corregir: {r.label}</span>
+                         <span key={`c-${r.id}`} title={r.label} className="max-w-[320px] truncate rounded bg-red-50 px-2 py-0.5 text-[11px] font-semibold text-[#dc2626]">Corregir: {r.label}</span>
                        ))}
                        {missing.slice(0, 2 - Math.min(1, toCorrect.length)).map(r => (
-                         <span key={r.id} className="max-w-[260px] truncate text-[9px] font-bold text-slate-400 uppercase bg-slate-50 px-1.5 py-0.5 rounded italic">Falta: {r.label}</span>
+                         <span key={r.id} title={r.label} className="max-w-[320px] truncate rounded bg-slate-50 px-2 py-0.5 text-[11px] font-medium text-slate-500">Falta: {r.label}</span>
                        ))}
                      </div>
                   </div>

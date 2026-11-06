@@ -77,19 +77,19 @@ export interface ValidatedFile {
 
 export const validateEvidenceFile = (file: IncomingFile, format: string, maxBytes: number): ValidatedFile => {
   const fileName = sanitizeFileName(file.originalName);
-  if (!fileName) throw new ValidationError('El archivo no tiene un nombre valido');
+  if (!fileName) throw new ValidationError('El archivo no tiene un nombre válido');
 
   const extension = getExtension(fileName);
   const allowed = getAllowedExtensions(format);
   if (!allowed.includes(extension)) {
     throw new ValidationError(`Formato no permitido. Para esta evidencia solo se acepta: ${allowed.map(e => e.toUpperCase()).join(', ')}`);
   }
-  if (file.size <= 0 || file.content.length === 0) throw new ValidationError('El archivo esta vacio');
-  if (file.size > maxBytes) throw new ValidationError(`El archivo supera el maximo de ${Math.round(maxBytes / 1024 / 1024)} MB`);
+  if (file.size <= 0 || file.content.length === 0) throw new ValidationError('El archivo está vacío');
+  if (file.size > maxBytes) throw new ValidationError(`El archivo supera el máximo de ${Math.round(maxBytes / 1024 / 1024)} MB`);
 
   const signatures = SIGNATURES[extension] || [];
   const matches = signatures.some(signature => signature.every((byte, index) => file.content[index] === byte));
-  if (!matches) throw new ValidationError('El contenido del archivo no corresponde a su extension');
+  if (!matches) throw new ValidationError('El contenido del archivo no corresponde a su extensión');
 
   return { fileName, extension, mimeType: MIME_BY_EXTENSION[extension], size: file.size };
 };

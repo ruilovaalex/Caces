@@ -64,7 +64,7 @@ export const RequirementTemplateManagerModal = ({
 
   const handleCreate = async () => {
     if (!form.label.trim() || !form.description.trim() || !form.file) {
-      window.alert('Completa nombre, descripcion y archivo del formato.');
+      window.alert('Completa nombre, descripción y archivo del formato.');
       return;
     }
 
@@ -101,7 +101,7 @@ export const RequirementTemplateManagerModal = ({
   const handleSaveEdit = async () => {
     if (!editingTemplate) return;
     if (!editingForm.label.trim() || !editingForm.description.trim()) {
-      window.alert('Completa nombre y descripcion antes de guardar.');
+      window.alert('Completa nombre y descripción antes de guardar.');
       return;
     }
 
@@ -150,7 +150,7 @@ export const RequirementTemplateManagerModal = ({
           <p className="text-[10px] font-black uppercase tracking-widest text-blue-600">{criterionLabel}</p>
           <h3 className="mt-2 text-lg font-black text-slate-900">{requirement.label}</h3>
           <p className="mt-2 text-sm leading-relaxed text-slate-600">
-            Publica aqui formatos especificos para esta evidencia. Los coordinadores podran descargarlos y reutilizarlos.
+            Publica aquí formatos específicos para esta evidencia. Los coordinadores podrán descargarlos y reutilizarlos.
           </p>
         </div>
 
@@ -174,12 +174,12 @@ export const RequirementTemplateManagerModal = ({
                   className="h-11 w-full rounded-xl border border-slate-200 bg-white px-4 text-sm outline-none focus:border-blue-400"
                 />
               </Field>
-              <Field label="Descripcion">
+              <Field label="Descripción">
                 <textarea
                   value={form.description}
                   onChange={event => setForm(current => ({ ...current, description: event.target.value }))}
                   rows={4}
-                  placeholder="Explica cuando se usa este formato y que debe completar el coordinador."
+                  placeholder="Explica cuándo se usa este formato y qué debe completar el coordinador."
                   className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-blue-400"
                 />
               </Field>
@@ -266,8 +266,8 @@ export const RequirementTemplateManagerModal = ({
               </div>
             ) : (
               <div className="mt-5 rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50 p-10 text-center">
-                <p className="text-sm font-bold text-slate-500">Aun no hay plantillas publicadas para esta evidencia.</p>
-                <p className="mt-2 text-xs text-slate-400">Sube una base aqui y luego otros coordinadores podran usarla.</p>
+                <p className="text-sm font-bold text-slate-500">Aún no hay plantillas publicadas para esta evidencia.</p>
+                <p className="mt-2 text-xs text-slate-400">Sube una base aquí y luego otros coordinadores podrán usarla.</p>
               </div>
             )}
           </section>
@@ -295,7 +295,7 @@ export const RequirementTemplateManagerModal = ({
                 className="h-11 w-full rounded-xl border border-slate-200 bg-white px-4 text-sm outline-none focus:border-blue-400"
               />
             </Field>
-            <Field label="Descripcion">
+            <Field label="Descripción">
               <textarea
                 value={editingForm.description}
                 onChange={event => setEditingForm(current => ({ ...current, description: event.target.value }))}

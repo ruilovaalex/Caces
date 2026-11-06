@@ -13,27 +13,27 @@ const steps = {
     label: 'Paso 1',
     title: 'Repositorio',
     detail: 'Busca el indicador dentro del modelo CACES.',
-    next: 'Abre un indicador o crea una asignacion.',
+    next: 'Abre un indicador o crea una asignación.',
     icon: FolderTree
   },
   assignments: {
     label: 'Paso 2',
     title: 'Asignaciones',
-    detail: 'Define quien prepara cada evidencia y para que fecha.',
+    detail: 'Define quién prepara cada evidencia y para qué fecha.',
     next: 'Abre la evidencia asignada para prepararla.',
     icon: ClipboardList
   },
   evidence: {
     label: 'Paso 3',
     title: 'Evidencia',
-    detail: 'Prepara el documento, revisa el formato y sube la version final.',
-    next: 'Cuando este cargada, pasa a revision.',
+    detail: 'Prepara el documento, revisa el formato y sube la versión final.',
+    next: 'Cuando esté cargada, pasa a revisión.',
     icon: UploadCloud
   },
   review: {
     label: 'Paso 4',
-    title: 'Revision',
-    detail: 'Evalua pertinencia, completitud y soporte documental.',
+    title: 'Revisión',
+    detail: 'Evalúa pertinencia, completitud y soporte documental.',
     next: 'Valida, observa o rechaza la evidencia.',
     icon: ClipboardCheck
   }

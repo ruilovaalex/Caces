@@ -38,4 +38,4 @@ export const getRequirementVerifications = (
   .sort((a, b) => b.verifiedAt.localeCompare(a.verifiedAt));
 
 export const getPresentialStatus = (history: PresentialVerification[]): PresentialStatus =>
-  history[0]?.result || 'Pendiente de verificacion';
+  history[0]?.result || 'Pendiente de verificación';

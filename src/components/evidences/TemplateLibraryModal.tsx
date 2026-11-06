@@ -110,7 +110,7 @@ export const TemplateLibraryModal = ({
           <section>
             <div className="mb-3 flex items-center gap-2">
               <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
-              <h3 className="text-xs font-black uppercase tracking-widest text-slate-700">Plantillas mas utilizadas</h3>
+              <h3 className="text-xs font-black uppercase tracking-widest text-slate-700">Plantillas más utilizadas</h3>
             </div>
             <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
               {featuredTemplates.map(template => (

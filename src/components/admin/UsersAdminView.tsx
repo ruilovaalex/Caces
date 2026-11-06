@@ -68,7 +68,7 @@ export const UsersAdminView = ({ currentUserId }: UsersAdminViewProps) => {
     try {
       await UsersApi.create({ ...form, name: form.name.trim(), email: form.email.trim() });
       setForm({ name: '', email: '', role: 'DOCENTE', password: '' });
-      setNotice('Usuario creado. Comunica la contrasena inicial por un canal seguro.');
+      setNotice('Usuario creado. Comunica la contraseña inicial por un canal seguro.');
       await load();
     } catch (createError) {
       setError(describeError(createError));
@@ -79,7 +79,7 @@ export const UsersAdminView = ({ currentUserId }: UsersAdminViewProps) => {
 
   const handleReset = async (event: React.FormEvent, id: string) => {
     event.preventDefault();
-    await run(id, () => UsersApi.update(id, { password: resetPassword }), 'Contrasena restablecida.');
+    await run(id, () => UsersApi.update(id, { password: resetPassword }), 'Contraseña restablecida.');
     setResetTarget(null);
     setResetPassword('');
   };
@@ -88,7 +88,7 @@ export const UsersAdminView = ({ currentUserId }: UsersAdminViewProps) => {
     <section className="mx-auto max-w-6xl space-y-6" aria-labelledby="users-title">
       <header>
         <h1 id="users-title" className="text-xl font-black text-[#1e2d4a]">Usuarios y roles</h1>
-        <p className="text-sm text-slate-500">Solo el administrador crea cuentas, cambia roles, desactiva usuarios y restablece contrasenas.</p>
+        <p className="text-sm text-slate-500">Solo el administrador crea cuentas, cambia roles, desactiva usuarios y restablece contraseñas.</p>
       </header>
 
       <div aria-live="polite" className="space-y-2">
@@ -145,7 +145,7 @@ export const UsersAdminView = ({ currentUserId }: UsersAdminViewProps) => {
               return (
                 <tr key={user.id} className="border-b border-slate-50 align-top last:border-0">
                   <td className="px-4 py-3">
-                    <p className="font-bold text-slate-800">{user.name}{isSelf && <span className="ml-2 text-[10px] font-black uppercase text-slate-400">(tu)</span>}</p>
+                    <p className="font-bold text-slate-800">{user.name}{isSelf && <span className="ml-2 text-[10px] font-black uppercase text-slate-400">(tú)</span>}</p>
                     <p className="text-xs text-slate-500">{user.email}</p>
                   </td>
                   <td className="px-4 py-3">
@@ -175,8 +175,8 @@ export const UsersAdminView = ({ currentUserId }: UsersAdminViewProps) => {
                   <td className="px-4 py-3">
                     {resetTarget === user.id ? (
                       <form onSubmit={event => void handleReset(event, user.id)} className="flex flex-wrap items-center gap-2">
-                        <label htmlFor={`reset-${user.id}`} className="sr-only">Nueva contrasena de {user.name}</label>
-                        <input id={`reset-${user.id}`} type="password" autoComplete="new-password" required minLength={12} maxLength={200} placeholder="Nueva contrasena" className={`${field} w-44`} value={resetPassword} onChange={e => setResetPassword(e.target.value)} />
+                        <label htmlFor={`reset-${user.id}`} className="sr-only">Nueva contraseña de {user.name}</label>
+                        <input id={`reset-${user.id}`} type="password" autoComplete="new-password" required minLength={12} maxLength={200} placeholder="Nueva contraseña" className={`${field} w-44`} value={resetPassword} onChange={e => setResetPassword(e.target.value)} />
                         <button type="submit" disabled={isBusy} className="rounded-xl bg-[#2563eb] px-3 py-2 text-xs font-black uppercase text-white disabled:opacity-60">Guardar</button>
                         <button type="button" onClick={() => { setResetTarget(null); setResetPassword(''); }} className="rounded-xl px-3 py-2 text-xs font-black uppercase text-slate-500 hover:bg-slate-100">Cancelar</button>
                       </form>

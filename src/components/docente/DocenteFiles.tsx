@@ -16,7 +16,7 @@ export const DocenteFiles = ({ onOpenUploadModal }: DocenteFilesProps) => {
   const files = [
     { id: '1', name: 'Syllabus_Biologia_2024.pdf', type: 'PDF', date: '01/06/2026', status: 'Validado', specialBadge: '' },
     { id: '2', name: 'Acta_Reunion_Marzo.docx', type: 'DOCX', date: '28/05/2026', status: 'Observado', observation: 'Falta firma del director', specialBadge: '' },
-    { id: '3', name: 'Titutlo_Maestria.pdf', type: 'PDF', date: '20/05/2026', status: 'Pendiente', specialBadge: '' },
+    { id: '3', name: 'Titulo_Maestria.pdf', type: 'PDF', date: '20/05/2026', status: 'Pendiente', specialBadge: '' },
     { id: '4', name: 'Informe_2025.pdf', type: 'PDF', date: '25/05/2026', status: 'Pendiente', specialBadge: 'Borrador manual' },
     { id: '5', name: 'Scan_Mayo_2025.pdf', type: 'PDF', date: '26/05/2026', status: 'Pendiente', specialBadge: 'Escaneado' }
   ];
@@ -80,7 +80,7 @@ export const DocenteFiles = ({ onOpenUploadModal }: DocenteFilesProps) => {
         className="flex flex-col md:flex-row justify-between items-start md:items-end gap-5"
       >
         <div>
-          <h2 className="text-3xl font-black text-slate-800 tracking-tight leading-tight">Mis Archivos</h2>
+          <h2 className="text-3xl font-black text-slate-800 tracking-tight leading-tight">Mis archivos</h2>
           <p className="text-xs font-bold uppercase tracking-widest text-slate-400 mt-2">
             {files.length} documentos · {files.filter(f => f.status === 'Validado').length} validado · {files.filter(f => f.status === 'Observado').length} observado
           </p>
@@ -201,7 +201,7 @@ export const DocenteFiles = ({ onOpenUploadModal }: DocenteFilesProps) => {
                         <Eye className="w-4 h-4" /> Ver
                       </motion.button>
                       <motion.button whileHover={hoverScale} whileTap={tapScale} className="flex items-center justify-center gap-2 py-3.5 text-[10px] font-black text-slate-500 hover:text-blue-600 hover:bg-white transition-colors uppercase tracking-widest">
-                        <Download className="w-4 h-4" /> Bajar
+                        <Download className="w-4 h-4" /> Descargar
                       </motion.button>
                       {file.status === 'Observado' ? (
                         <motion.button whileHover={hoverScale} whileTap={tapScale} onClick={onOpenUploadModal} className="flex items-center justify-center gap-2 py-3.5 text-[10px] font-black text-rose-600 hover:text-rose-700 hover:bg-rose-100 transition-colors uppercase tracking-widest">

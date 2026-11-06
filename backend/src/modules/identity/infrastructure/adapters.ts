@@ -97,7 +97,7 @@ export class PrismaPasswordResetRepository implements PasswordResetRepository {
 @Injectable()
 export class ConsoleMailer implements Mailer {
   async sendPasswordReset(to: { email: string }, link: string): Promise<void> {
-    Logger.log(`[correo simulado] Recuperacion de clave para ${to.email}: ${link}`, 'ConsoleMailer');
+    Logger.log(`[correo simulado] Recuperación de clave para ${to.email}: ${link}`, 'ConsoleMailer');
   }
 }
 
@@ -105,6 +105,6 @@ export class ConsoleMailer implements Mailer {
 @Injectable()
 export class DisabledMailer implements Mailer {
   async sendPasswordReset(to: { email: string }): Promise<void> {
-    Logger.warn(`Se solicito recuperar la clave de ${to.email} pero no hay proveedor de correo configurado (MAIL_DRIVER=none). Un administrador puede restablecerla desde Usuarios.`, 'DisabledMailer');
+    Logger.warn(`Se solicitó recuperar la clave de ${to.email} pero no hay proveedor de correo configurado (MAIL_DRIVER=none). Un administrador puede restablecerla desde Usuarios.`, 'DisabledMailer');
   }
 }

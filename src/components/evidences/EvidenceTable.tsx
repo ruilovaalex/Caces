@@ -204,7 +204,7 @@ export const EvidenceTable = ({
               ? <ClipboardCheck className="h-5 w-5 text-amber-600" />
               : <FolderOpen className="h-5 w-5 text-blue-600" />}
             <h3 className="text-base font-black text-slate-900">
-              {isEvaluator ? 'Bandeja de revision' : 'Repositorio de evidencias'}
+              {isEvaluator ? 'Bandeja de revisión' : 'Repositorio de evidencias'}
             </h3>
           </div>
           <p className="mt-1 text-sm text-slate-500">
@@ -282,7 +282,7 @@ export const EvidenceTable = ({
                     <p className="mt-1 truncate text-sm font-black text-slate-800">{requirement.label}</p>
                     <p className="mt-1 text-xs text-slate-400">
                       {isPresential
-                        ? `Verificacion presencial · ${files.length} archivo${files.length === 1 ? '' : 's'} de respaldo opcional`
+                        ? `Verificación presencial · ${files.length} archivo${files.length === 1 ? '' : 's'} de respaldo opcional`
                         : `${files.length} archivo${files.length === 1 ? '' : 's'} · Formato ${requirement.format}`}
                     </p>
                   </div>
@@ -292,39 +292,42 @@ export const EvidenceTable = ({
                   {!isEvaluator && (
                     <button
                       onClick={() => setGuideRequirement(requirement)}
-                      className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-emerald-50 hover:text-emerald-700"
-                      title="Ver guia de carga"
-                      aria-label="Ver guia de carga"
+                      className="inline-flex h-9 min-w-9 items-center justify-center gap-1.5 rounded-lg px-2.5 text-slate-500 transition-colors hover:bg-emerald-50 hover:text-emerald-700"
+                      title="Ver guía de carga"
+                      aria-label="Ver guía de carga"
                     >
                       <BookOpen className="h-4 w-4" />
+                      <span className="hidden text-[10px] font-black uppercase tracking-widest xl:inline">Guía</span>
                     </button>
                   )}
                   {isAdmin && (
                     <button
                       onClick={() => setTemplateRequirement(requirement)}
-                      className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-blue-600 transition-colors hover:bg-blue-50 hover:text-blue-700"
+                      className="inline-flex h-9 min-w-9 items-center justify-center gap-1.5 rounded-lg px-2.5 text-blue-600 transition-colors hover:bg-blue-50 hover:text-blue-700"
                       title="Gestionar plantillas de esta evidencia"
                       aria-label="Gestionar plantillas de esta evidencia"
                     >
                       <LayoutTemplate className="h-4 w-4" />
+                      <span className="hidden text-[10px] font-black uppercase tracking-widest xl:inline">Plantillas</span>
                     </button>
                   )}
                   <button
                     onClick={() => onOpenHistory(requirement)}
-                    className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-slate-200 hover:text-slate-800"
+                    className="inline-flex h-9 min-w-9 items-center justify-center gap-1.5 rounded-lg px-2.5 text-slate-500 transition-colors hover:bg-slate-200 hover:text-slate-800"
                     title="Ver historial"
                     aria-label="Ver historial"
                   >
                     <History className="h-4 w-4" />
+                    <span className="hidden text-[10px] font-black uppercase tracking-widest xl:inline">Historial</span>
                   </button>
                   {canVerify && isPresential && (
                     <button
                       onClick={() => setVerificationRequirement(requirement)}
                       className="inline-flex h-9 items-center justify-center gap-2 rounded-lg bg-slate-900 px-3 text-[10px] font-black uppercase tracking-widest text-white hover:bg-slate-800"
-                      title="Registrar verificacion presencial"
+                      title="Registrar verificación presencial"
                     >
                       <MapPin className="h-3.5 w-3.5" />
-                      Registrar verificacion
+                      Registrar verificación
                     </button>
                   )}
                   {isEvaluator && currentFile && (
@@ -357,22 +360,24 @@ export const EvidenceTable = ({
                       </button>
                       <button
                         onClick={() => onOpenEditor(requirement)}
-                        className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-amber-600 transition-colors hover:bg-amber-50"
-                        title="Revision detallada y observaciones"
-                        aria-label="Revision detallada y observaciones"
+                        className="inline-flex h-9 min-w-9 items-center justify-center gap-1.5 rounded-lg px-2.5 text-amber-600 transition-colors hover:bg-amber-50"
+                        title="Revisión detallada y observaciones"
+                        aria-label="Revisión detallada y observaciones"
                       >
                         <ClipboardCheck className="h-4 w-4" />
+                        <span className="hidden text-[10px] font-black uppercase tracking-widest xl:inline">Revisar</span>
                       </button>
                     </>
                   )}
                   {canUpload && (
                     <button
                       onClick={() => onOpenUpload(requirement)}
-                      className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-blue-600 text-white transition-colors hover:bg-blue-700"
+                      className="inline-flex h-9 min-w-9 items-center justify-center gap-1.5 rounded-lg px-2.5 bg-blue-600 text-white transition-colors hover:bg-blue-700"
                       title="Subir archivo"
                       aria-label="Subir archivo"
                     >
                       <Upload className="h-4 w-4" />
+                      <span className="hidden text-[10px] font-black uppercase tracking-widest xl:inline">Subir</span>
                     </button>
                   )}
                 </div>
@@ -385,7 +390,7 @@ export const EvidenceTable = ({
                   className="border-t border-slate-100 bg-slate-50 px-6 py-5"
                 >
                   <div className="mb-4 flex flex-wrap gap-2 sm:hidden">
-                    {!isEvaluator && <RepositoryAction icon={BookOpen} label="Guia" onClick={() => setGuideRequirement(requirement)} />}
+                    {!isEvaluator && <RepositoryAction icon={BookOpen} label="Guía" onClick={() => setGuideRequirement(requirement)} />}
                     {isAdmin && <RepositoryAction icon={LayoutTemplate} label="Plantillas" onClick={() => setTemplateRequirement(requirement)} />}
                     <RepositoryAction icon={History} label="Historial" onClick={() => onOpenHistory(requirement)} />
                     {canVerify && isPresential && <RepositoryAction icon={MapPin} label="Verificar" onClick={() => setVerificationRequirement(requirement)} primary />}
@@ -432,7 +437,7 @@ export const EvidenceTable = ({
                           ) : (
                             <div className="flex items-center gap-3 px-4 py-5 text-sm text-slate-400">
                               <FileClock className="h-4 w-4" />
-                              Pendiente de verificacion por el evaluador en la visita in situ.
+                              Pendiente de verificación por el evaluador en la visita in situ.
                             </div>
                           )}
                         </div>
@@ -507,7 +512,7 @@ export const EvidenceTable = ({
                         ) : (
                           <div className="flex items-center gap-3 px-4 py-5 text-sm text-slate-400">
                             <FileClock className="h-4 w-4" />
-                            Todavia no hay archivos en esta evidencia.
+                            Todavía no hay archivos en esta evidencia.
                           </div>
                         )}
                       </div>
@@ -518,7 +523,7 @@ export const EvidenceTable = ({
                             <div>
                               <p className="text-sm font-black text-slate-800">Plantillas de esta evidencia</p>
                               <p className="mt-1 text-xs text-slate-500">
-                                Publica formatos especificos para que los coordinadores los descarguen desde esta misma evidencia.
+                                Publica formatos específicos para que los coordinadores los descarguen desde esta misma evidencia.
                               </p>
                             </div>
                             <button
@@ -604,7 +609,7 @@ export const EvidenceTable = ({
                               ) : (
                                 <div className="flex items-center gap-3 px-4 py-5 text-sm text-slate-400">
                                   <FileClock className="h-4 w-4" />
-                                  Todavia no hay archivos en esta carpeta.
+                                  Todavía no hay archivos en esta carpeta.
                                 </div>
                               )}
                             </div>
@@ -633,7 +638,7 @@ export const EvidenceTable = ({
             <FileClock className="mx-auto h-10 w-10 text-slate-300" />
             <p className="mt-3 text-sm font-black text-slate-600">No hay archivos para revisar en este indicador.</p>
             <p className="mt-1 text-xs text-slate-400">
-              Las evidencias apareceran aqui cuando un coordinador o docente cargue documentos.
+              Las evidencias aparecerán aquí cuando un coordinador o docente cargue documentos.
             </p>
           </div>
         )}

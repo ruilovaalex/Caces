@@ -37,12 +37,12 @@ export const DocenteProfile = ({ onLogout }: DocenteProfileProps) => {
   };
 
   const profileFields = [
-    { key: 'name', label: 'Nombre Completo', Icon: User, type: 'text' },
-    { key: 'email', label: 'Correo Institucional', Icon: Mail, type: 'email' },
+    { key: 'name', label: 'Nombre completo', Icon: User, type: 'text' },
+    { key: 'email', label: 'Correo institucional', Icon: Mail, type: 'email' },
     { key: 'phone', label: 'Teléfono', Icon: Phone, type: 'tel' },
     { key: 'department', label: 'Departamento', Icon: BookOpen, type: 'text' },
-    { key: 'period', label: 'Período Académico', Icon: Calendar, type: 'select', options: ['2025', '2024'] },
-    { key: 'degree', label: 'Título Académico', Icon: GraduationCap, type: 'text' },
+    { key: 'period', label: 'Periodo académico', Icon: Calendar, type: 'select', options: ['2025', '2024'] },
+    { key: 'degree', label: 'Título académico', Icon: GraduationCap, type: 'text' },
   ] as const;
 
   return (
@@ -52,7 +52,7 @@ export const DocenteProfile = ({ onLogout }: DocenteProfileProps) => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3, ease: 'easeOut' }}
       >
-        <h2 className="text-2xl font-black text-slate-800 tracking-tight leading-tight">Mi Perfil</h2>
+        <h2 className="text-2xl font-black text-slate-800 tracking-tight leading-tight">Mi perfil</h2>
         <p className="text-xs font-bold uppercase tracking-widest text-slate-400 mt-1">Configuración y estadísticas</p>
       </motion.div>
 
@@ -78,7 +78,7 @@ export const DocenteProfile = ({ onLogout }: DocenteProfileProps) => {
               <User className="w-10 h-10" />
             </motion.div>
             <h3 className="text-lg font-black text-slate-800">{profile.name}</h3>
-            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">Docente Adjunto</p>
+            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">Docente</p>
             
             <div className="mt-6 pt-6 border-t border-slate-100 space-y-3">
               <motion.button
@@ -88,7 +88,7 @@ export const DocenteProfile = ({ onLogout }: DocenteProfileProps) => {
                 className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-blue-200 bg-blue-50 text-xs font-black uppercase tracking-widest text-blue-700 hover:bg-blue-100 transition-colors"
               >
                 {isEditing ? <CheckCircle2 className="w-4 h-4" /> : <Edit3 className="w-4 h-4" />}
-                {isEditing ? 'Guardar Cambios' : 'Editar Perfil'}
+                {isEditing ? 'Guardar cambios' : 'Editar perfil'}
               </motion.button>
               <motion.button
                 whileHover={hoverScale}
@@ -97,7 +97,7 @@ export const DocenteProfile = ({ onLogout }: DocenteProfileProps) => {
                 className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-rose-200 bg-rose-50 text-xs font-black uppercase tracking-widest text-rose-700 hover:bg-rose-100 transition-colors"
               >
                 <LogOut className="w-4 h-4" />
-                Cerrar Sesión
+                Cerrar sesión
               </motion.button>
             </div>
           </motion.div>
@@ -107,10 +107,10 @@ export const DocenteProfile = ({ onLogout }: DocenteProfileProps) => {
             transition={{ ...easeOut, delay: 0.15 }}
             className="premium-card bg-white p-6 rounded-lg"
           >
-            <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-4">Resumen de Actividad</h4>
+            <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-4">Resumen de actividad</h4>
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-slate-600">Archivos Subidos</span>
+                <span className="text-xs font-bold text-slate-600">Archivos subidos</span>
                 <span className="px-2 py-0.5 rounded text-[10px] font-black bg-blue-100 text-blue-700">{stats.uploaded}</span>
               </div>
               <div className="flex items-center justify-between">
@@ -153,7 +153,7 @@ export const DocenteProfile = ({ onLogout }: DocenteProfileProps) => {
               )}
             </AnimatePresence>
 
-            <h3 className="text-sm font-black text-slate-800 uppercase tracking-tight mb-6">Información Personal y Académica</h3>
+            <h3 className="text-sm font-black text-slate-800 uppercase tracking-tight mb-6">Información personal y académica</h3>
             
             <div className="space-y-5">
               <motion.div
@@ -235,7 +235,7 @@ export const DocenteProfile = ({ onLogout }: DocenteProfileProps) => {
                       onClick={handleSave}
                       className="flex items-center gap-2 px-6 py-2.5 bg-blue-600 text-white rounded-xl font-black text-xs uppercase tracking-widest shadow-lg shadow-blue-200 hover:bg-blue-700 transition-all"
                     >
-                      Guardar y Finalizar
+                      Guardar y finalizar
                     </motion.button>
                   </motion.div>
                 )}

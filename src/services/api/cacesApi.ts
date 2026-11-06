@@ -181,7 +181,7 @@ export const EvidenceApi = {
 
   review: (evidenceId: string, status: Status, comment?: string) => {
     const apiStatus = STATUS_TO_API[status];
-    if (!apiStatus) throw new Error(`Estado de revision no valido: ${status}`);
+    if (!apiStatus) throw new Error(`Estado de revisión no válido: ${status}`);
     return api.post<ApiEvidence>(`/evidences/${evidenceId}/reviews`, { status: apiStatus, comment: comment?.trim() || undefined });
   },
 

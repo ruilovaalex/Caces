@@ -35,7 +35,7 @@ export const DocenteUploadModal = ({ isOpen, onClose }: DocenteUploadModalProps)
                   <Upload className="w-5 h-5" />
                 </div>
                 <div>
-                  <h2 className="font-black text-slate-800 tracking-tight text-lg">Nueva Evidencia</h2>
+                  <h2 className="font-black text-slate-800 tracking-tight text-lg">Nueva evidencia</h2>
                   <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">Gestión documental docente</p>
                 </div>
               </div>
@@ -93,7 +93,7 @@ export const DocenteUploadModal = ({ isOpen, onClose }: DocenteUploadModalProps)
                   {activeTab === 'scan' ? (
                     <div className="py-8 text-center bg-amber-50 rounded-xl border border-amber-100">
                       <Smartphone className="w-12 h-12 text-amber-500 mx-auto mb-3" />
-                      <h3 className="text-sm font-black text-amber-900 uppercase tracking-tight">Escaneo Móvil</h3>
+                      <h3 className="text-sm font-black text-amber-900 uppercase tracking-tight">Escaneo móvil</h3>
                       <p className="text-xs text-amber-700 mt-2 max-w-sm mx-auto">
                         Por favor, abre la aplicación móvil institucional en tu teléfono para escanear y enviar documentos directamente a esta tarea.
                       </p>
@@ -102,7 +102,7 @@ export const DocenteUploadModal = ({ isOpen, onClose }: DocenteUploadModalProps)
                     <>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-1.5">
-                          <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Tipo de Documento</label>
+                          <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Tipo de documento</label>
                           <select className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-300">
                             <option>Académico</option>
                             <option>Título / Certificado</option>
@@ -112,7 +112,7 @@ export const DocenteUploadModal = ({ isOpen, onClose }: DocenteUploadModalProps)
                           </select>
                         </div>
                         <div className="space-y-1.5">
-                          <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Período</label>
+                          <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Periodo</label>
                           <select className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-300">
                             <option>2025</option>
                             <option>2024</option>
@@ -123,11 +123,11 @@ export const DocenteUploadModal = ({ isOpen, onClose }: DocenteUploadModalProps)
 
                       <div className="space-y-1.5">
                         <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Nombre del documento</label>
-                        <input type="text" placeholder="Ej: Certificado de capacitación pedagogía" className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-300" />
+                        <input type="text" placeholder="Ej.: Certificado de capacitación en pedagogía" className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-300" />
                       </div>
 
                       <div className="space-y-1.5">
-                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Descripción (Opcional)</label>
+                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Descripción (opcional)</label>
                         <textarea placeholder="Detalles extra del documento..." rows={3} className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-300 resize-none"></textarea>
                       </div>
 
@@ -135,7 +135,7 @@ export const DocenteUploadModal = ({ isOpen, onClose }: DocenteUploadModalProps)
                         <div className="mt-4 border-2 border-dashed border-slate-200 rounded-xl p-8 text-center hover:bg-slate-50 hover:border-blue-300 transition-all cursor-pointer">
                           <FileText className="w-8 h-8 text-slate-400 mx-auto mb-2" />
                           <p className="text-sm font-bold text-slate-700">Arrastra tu archivo aquí o haz clic para explorar</p>
-                          <p className="text-xs text-slate-500 mt-1">Soporta PDF, DOCX, JPG (Max 10MB)</p>
+                          <p className="text-xs text-slate-500 mt-1">Soporta PDF, DOCX, JPG (máx. 10 MB)</p>
                         </div>
                       )}
                       

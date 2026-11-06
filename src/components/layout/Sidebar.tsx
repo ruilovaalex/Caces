@@ -10,6 +10,7 @@ import {
 import { AnimatePresence, motion } from 'motion/react';
 import { Indicator, UserRole, YearPeriod } from '../../types';
 import { getAcademicPeriodsForYear } from '../../utils/academicPeriodUtils';
+import { ROLE_LABEL } from '../../utils/permissions';
 import { fadeInRight, slideDown, staggerContainerFast } from '../../utils/animations';
 
 interface SidebarProps {
@@ -57,8 +58,8 @@ export const Sidebar = ({
 
   const roleNames: Record<UserRole, string> = {
     ADMIN: 'Admin Sudamericano',
-    COORDINADOR: 'Coord. Academico',
-    EVALUADOR: 'Evaluador Externo',
+    COORDINADOR: 'Coord. Académico',
+    EVALUADOR: 'Evaluador externo',
     DOCENTE: 'Prof. Pablo Mora',
   };
 
@@ -87,7 +88,7 @@ export const Sidebar = ({
         </div>
         <div>
           <h1 className="font-bold text-base tracking-tight text-white leading-none">CACES</h1>
-          <span className="text-[9px] text-[#aac4e8] font-bold uppercase tracking-[0.2em]">Acreditacion</span>
+          <span className="text-[9px] text-[#aac4e8] font-bold uppercase tracking-[0.2em]">Acreditación</span>
         </div>
       </div>
 
@@ -205,7 +206,7 @@ export const Sidebar = ({
           aria-label="Explorador de indicadores"
         >
           <div className="text-[10px] font-bold text-[#94a3b8] uppercase tracking-widest px-2 mb-4">
-            Gestion de periodos
+            Gestión de periodos
           </div>
 
           {mockData.map((yearPeriod) => {
@@ -374,9 +375,9 @@ export const Sidebar = ({
       ) : userRole === 'DOCENTE' ? (
         <div className="flex-1 p-4">
           <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
-            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Docente Adjunto</p>
+            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Docente</p>
             <p className="mt-2 text-sm font-bold leading-relaxed text-slate-700">
-              Navega por tus actividades y archivos usando el menu superior.
+              Navega por tus actividades y archivos usando el menú superior.
             </p>
           </div>
         </div>
@@ -400,7 +401,7 @@ export const Sidebar = ({
           </div>
           <div className="text-[10px]">
             <p className="font-bold text-[#1e293b] leading-tight">{userName || roleNames[userRole]}</p>
-            <p className="text-[#64748b] font-black uppercase tracking-widest text-[8px] mt-0.5">{userRole}{onSwitchRole ? ' (clic para cambiar)' : ''}</p>
+            <p className="text-[#64748b] font-black uppercase tracking-widest text-[8px] mt-0.5">{ROLE_LABEL[userRole]}{onSwitchRole ? ' (clic para cambiar)' : ''}</p>
           </div>
         </div>
       </motion.div>

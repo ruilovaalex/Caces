@@ -59,7 +59,7 @@ export const LoginScreen = ({ onLogin, onCredentialsLogin }: LoginScreenProps) =
             <div>
               <h1 className="text-3xl font-black text-[#0f172a] tracking-tight">EduSudamericano</h1>
               <p className="text-[10px] font-black text-[#2563eb] uppercase tracking-[0.25em] mt-1">
-                Gestion de Acreditacion CACES
+                Gestión de acreditación CACES
               </p>
             </div>
           </div>
@@ -72,7 +72,7 @@ export const LoginScreen = ({ onLogin, onCredentialsLogin }: LoginScreenProps) =
           <>
           <div className="space-y-4">
             <div className="space-y-2 text-left">
-              <label className="text-[10px] font-black text-[#64748b] uppercase tracking-widest ml-1">Perfil de Acceso</label>
+              <label className="text-[10px] font-black text-[#64748b] uppercase tracking-widest ml-1">Perfil de acceso</label>
               <div className="grid grid-cols-2 gap-2">
                 {(['ADMIN', 'COORDINADOR', 'EVALUADOR', 'DOCENTE'] as UserRole[]).map(r => (
                   <motion.button
@@ -92,7 +92,7 @@ export const LoginScreen = ({ onLogin, onCredentialsLogin }: LoginScreenProps) =
             </div>
 
             <div className="space-y-2 text-left">
-              <label className="text-[10px] font-black text-[#64748b] uppercase tracking-widest ml-1">Usuario Institucional</label>
+              <label className="text-[10px] font-black text-[#64748b] uppercase tracking-widest ml-1">Usuario institucional</label>
               <div className="relative">
                 <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#94a3b8]">
                   <Users className="w-4 h-4" />
@@ -115,7 +115,7 @@ export const LoginScreen = ({ onLogin, onCredentialsLogin }: LoginScreenProps) =
             </div>
 
             <div className="space-y-2 text-left">
-              <label className="text-[10px] font-black text-[#64748b] uppercase tracking-widest ml-1">Contrasena</label>
+              <label className="text-[10px] font-black text-[#64748b] uppercase tracking-widest ml-1">Contraseña</label>
               <div className="relative">
                 <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#94a3b8]">
                   <CheckCircle2 className="w-4 h-4" />
@@ -135,7 +135,7 @@ export const LoginScreen = ({ onLogin, onCredentialsLogin }: LoginScreenProps) =
             onClick={() => onLogin(role)}
             className="w-full py-4 bg-[#2563eb] hover:bg-blue-700 text-white rounded-2xl font-black text-xs uppercase tracking-widest transition-all shadow-lg shadow-blue-600/25 active:scale-95"
           >
-            Iniciar sesion
+            Iniciar sesión
           </motion.button>
           </>
           )}
@@ -148,7 +148,7 @@ export const LoginScreen = ({ onLogin, onCredentialsLogin }: LoginScreenProps) =
                 <span className="text-center normal-case tracking-normal font-bold">¿Olvidó su clave? Pida al administrador que la restablezca desde Usuarios y roles.</span>
               )
             ) : (
-              <span className="text-center normal-case tracking-normal text-amber-700">Modo demostracion: elige un perfil, no se pide contrasena y los datos quedan solo en este navegador.</span>
+              <span className="text-center normal-case tracking-normal text-amber-700">Modo demostración: elige un perfil, no se pide contraseña y los datos quedan solo en este navegador.</span>
             )}
           </div>
         </div>
@@ -186,7 +186,7 @@ const CredentialsForm = ({ onSubmit }: { onSubmit: (email: string, password: str
     try {
       await onSubmit(email.trim(), password);
     } catch (submitError) {
-      setError(submitError instanceof Error ? submitError.message : 'No se pudo iniciar sesion');
+      setError(submitError instanceof Error ? submitError.message : 'No se pudo iniciar sesión');
     } finally {
       setIsSubmitting(false);
     }
@@ -195,7 +195,7 @@ const CredentialsForm = ({ onSubmit }: { onSubmit: (email: string, password: str
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="space-y-2 text-left">
-        <label htmlFor="login-email" className="text-[10px] font-black text-[#64748b] uppercase tracking-widest ml-1">Usuario Institucional</label>
+        <label htmlFor="login-email" className="text-[10px] font-black text-[#64748b] uppercase tracking-widest ml-1">Usuario institucional</label>
         <div className="relative">
           <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#94a3b8]">
             <Users className="w-4 h-4" />
@@ -214,7 +214,7 @@ const CredentialsForm = ({ onSubmit }: { onSubmit: (email: string, password: str
       </div>
 
       <div className="space-y-2 text-left">
-        <label htmlFor="login-password" className="text-[10px] font-black text-[#64748b] uppercase tracking-widest ml-1">Contrasena</label>
+        <label htmlFor="login-password" className="text-[10px] font-black text-[#64748b] uppercase tracking-widest ml-1">Contraseña</label>
         <div className="relative">
           <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#94a3b8]">
             <CheckCircle2 className="w-4 h-4" />
@@ -247,7 +247,7 @@ const CredentialsForm = ({ onSubmit }: { onSubmit: (email: string, password: str
         disabled={isSubmitting}
         className="w-full py-4 bg-[#2563eb] hover:bg-blue-700 text-white rounded-2xl font-black text-xs uppercase tracking-widest transition-all shadow-lg shadow-blue-600/25 active:scale-95 disabled:opacity-60"
       >
-        {isSubmitting ? 'Verificando...' : 'Iniciar sesion'}
+        {isSubmitting ? 'Verificando...' : 'Iniciar sesión'}
       </motion.button>
     </form>
   );
@@ -265,17 +265,17 @@ const PasswordRecovery = ({ mode, onDone }: { mode: 'forgot' | 'reset'; onDone: 
     event.preventDefault();
     setError(null);
     if (mode === 'reset' && password !== confirm) {
-      setError('Las contrasenas no coinciden');
+      setError('Las contraseñas no coinciden');
       return;
     }
     setIsSubmitting(true);
     try {
       if (mode === 'forgot') {
         await AuthApi.forgotPassword(email.trim());
-        setMessage('Si el correo esta registrado, recibiras un enlace para restablecer la clave. Si no llega, solicita al administrador que la restablezca.');
+        setMessage('Si el correo está registrado, recibirás un enlace para restablecer la clave. Si no llega, solicita al administrador que la restablezca.');
       } else {
         await AuthApi.resetPassword(new URLSearchParams(window.location.search).get('reset') ?? '', password);
-        setMessage('Contrasena actualizada. Ya puedes iniciar sesion.');
+        setMessage('Contraseña actualizada. Ya puedes iniciar sesión.');
       }
     } catch (submitError) {
       setError(describeError(submitError));
@@ -287,7 +287,7 @@ const PasswordRecovery = ({ mode, onDone }: { mode: 'forgot' | 'reset'; onDone: 
   return (
     <form onSubmit={handleSubmit} className="space-y-4 text-left">
       <h2 className="text-center text-sm font-black uppercase tracking-widest text-[#0f172a]">
-        {mode === 'forgot' ? 'Recuperar contrasena' : 'Nueva contrasena'}
+        {mode === 'forgot' ? 'Recuperar contraseña' : 'Nueva contraseña'}
       </h2>
       {message ? (
         <p role="status" className="rounded-2xl border border-emerald-100 bg-emerald-50 px-4 py-3 text-xs font-bold text-emerald-700">{message}</p>
@@ -303,7 +303,7 @@ const PasswordRecovery = ({ mode, onDone }: { mode: 'forgot' | 'reset'; onDone: 
             <input id="recovery-password" type="password" required minLength={12} autoComplete="new-password" value={password} onChange={e => setPassword(e.target.value)} className={inputClass.replace('pl-12', 'pl-4')} />
           </div>
           <div className="space-y-2">
-            <label htmlFor="recovery-confirm" className="ml-1 text-[10px] font-black uppercase tracking-widest text-[#64748b]">Confirmar contrasena</label>
+            <label htmlFor="recovery-confirm" className="ml-1 text-[10px] font-black uppercase tracking-widest text-[#64748b]">Confirmar contraseña</label>
             <input id="recovery-confirm" type="password" required minLength={12} autoComplete="new-password" value={confirm} onChange={e => setConfirm(e.target.value)} className={inputClass.replace('pl-12', 'pl-4')} />
           </div>
         </>
@@ -311,11 +311,11 @@ const PasswordRecovery = ({ mode, onDone }: { mode: 'forgot' | 'reset'; onDone: 
       {error && <p role="alert" className="rounded-2xl border border-rose-100 bg-rose-50 px-4 py-3 text-xs font-bold text-rose-600">{error}</p>}
       {!message && (
         <button type="submit" disabled={isSubmitting} className="w-full rounded-2xl bg-[#2563eb] py-4 text-xs font-black uppercase tracking-widest text-white hover:bg-blue-700 disabled:opacity-60">
-          {isSubmitting ? 'Enviando...' : mode === 'forgot' ? 'Enviar enlace' : 'Guardar contrasena'}
+          {isSubmitting ? 'Enviando...' : mode === 'forgot' ? 'Enviar enlace' : 'Guardar contraseña'}
         </button>
       )}
       <button type="button" onClick={onDone} className="w-full text-center text-[10px] font-black uppercase tracking-widest text-[#64748b] hover:text-[#2563eb]">
-        Volver al inicio de sesion
+        Volver al inicio de sesión
       </button>
     </form>
   );

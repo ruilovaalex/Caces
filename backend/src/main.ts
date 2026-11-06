@@ -13,7 +13,7 @@ async function main() {
   configureApp(app, config);
   app.enableShutdownHooks();
   await app.listen(config.port);
-  Logger.log(`API en http://localhost:${config.port}/api · documentacion en /api/docs`, 'Bootstrap');
+  Logger.log(`API en http://localhost:${config.port}/api · documentación en /api/docs`, 'Bootstrap');
 }
 
 void main();

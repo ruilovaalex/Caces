@@ -22,7 +22,7 @@ const RESULT_OPTIONS: { value: VerificationResult; label: string; hint: string; 
   {
     value: 'Con observaciones',
     label: 'Con observaciones',
-    hint: 'Hay aspectos que corregir. Se notificara al coordinador.',
+    hint: 'Hay aspectos que corregir. Se notificará al coordinador.',
     icon: AlertTriangle,
     active: 'border-amber-300 bg-amber-50 text-amber-700',
   },
@@ -49,13 +49,13 @@ export const PresentialVerificationModal = ({
   const canSave = Boolean(result) && notes.trim().length > 0;
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Registrar verificacion">
+    <Modal isOpen={isOpen} onClose={onClose} title="Registrar verificación">
       <div className="p-8 border-t border-slate-50 space-y-6">
         <p className="text-slate-400 text-sm font-medium -mt-4">{requirement.label}</p>
 
         {history.length > 0 && (
           <p className="rounded-2xl bg-slate-50 px-4 py-3 text-xs font-bold text-slate-500">
-            Ultimo registro: {history[0].result} por {history[0].verifiedBy} el {new Date(history[0].verifiedAt).toLocaleString()}.
+            Último registro: {history[0].result} por {history[0].verifiedBy} el {new Date(history[0].verifiedAt).toLocaleString()}.
             El nuevo registro se agregara al historial.
           </p>
         )}
@@ -85,11 +85,11 @@ export const PresentialVerificationModal = ({
         </div>
 
         <div className="space-y-3">
-          <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Que se comprobo</label>
+          <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Qué se comprobó</label>
           <textarea
             value={notes}
             onChange={event => setNotes(event.target.value)}
-            placeholder="Ej: Se entrevisto al responsable de planificacion y a dos coordinadores de carrera..."
+            placeholder="Ej.: Se entrevistó al responsable de planificación y a dos coordinadores de carrera..."
             className="w-full bg-slate-50 border border-slate-100 rounded-2xl p-4 text-sm focus:ring-2 focus:ring-blue-500/20 focus:outline-none min-h-[120px] resize-none"
           />
         </div>

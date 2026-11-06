@@ -21,7 +21,7 @@ export const IndicatorAssessmentService = {
 
   register: (payload: AssessmentPayload): IndicatorAssessment => {
     const scale = INDICATOR_RATING_SCALE.find(item => item.value === payload.rating);
-    if (!scale) throw new Error(`Valoracion no reconocida: ${payload.rating}`);
+    if (!scale) throw new Error(`Valoración no reconocida: ${payload.rating}`);
 
     const record: IndicatorAssessment = {
       ...payload,

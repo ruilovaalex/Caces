@@ -112,8 +112,8 @@ export const EvidenceFilePreviewModal = ({
               </h3>
               <p className="mt-2 text-sm leading-relaxed text-slate-500">
                 {fileUrl
-                  ? 'Descarga el documento para abrirlo con su aplicacion correspondiente.'
-                  : 'Este documento fue cargado antes de habilitar el almacenamiento del archivo real. Vuelve a subir una nueva version para visualizarla aqui.'}
+                  ? 'Descarga el documento para abrirlo con su aplicación correspondiente.'
+                  : 'Este documento fue cargado antes de habilitar el almacenamiento del archivo real. Vuelve a subir una nueva versión para visualizarla aquí.'}
               </p>
             </div>
           )}
@@ -121,7 +121,7 @@ export const EvidenceFilePreviewModal = ({
 
         {file.observation && (
           <div className="mt-4 rounded-lg border border-amber-100 bg-amber-50 p-4">
-            <p className="text-[10px] font-black uppercase tracking-widest text-amber-700">Observacion</p>
+            <p className="text-[10px] font-black uppercase tracking-widest text-amber-700">Observación</p>
             <p className="mt-2 text-sm leading-relaxed text-amber-900">{file.observation}</p>
           </div>
         )}
