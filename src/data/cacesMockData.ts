@@ -86,7 +86,7 @@ export const MOCK_DATA: YearPeriod[] = [
           },
           {
             id: "1.2",
-            name: "1.2 SUBRITERIO GESTIÓN SOCIAL",
+            name: "1.2 SUBCRITERIO GESTIÓN SOCIAL",
             indicators: [
               {
                 code: "1.2.1",
