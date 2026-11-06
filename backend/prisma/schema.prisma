@@ -67,6 +67,10 @@ model User {
   assessments       IndicatorAssessment[]
   notifications     Notification[]
   auditLogs         AuditLog[]
+  passwordResets    PasswordResetToken[]
+  assignedTasks     TeacherTask[]            @relation("TaskAssignee")
+  createdTasks      TeacherTask[]            @relation("TaskCreator")
+  drafts            EvidenceDraft[]
 }
 
 // Periodo academico. El codigo coincide con los identificadores que ya usa el frontend
@@ -83,6 +87,8 @@ model AcademicPeriod {
   evidences     EvidenceVersion[]
   verifications PresentialVerification[]
   assessments   IndicatorAssessment[]
+  tasks         TeacherTask[]
+  drafts        EvidenceDraft[]
 }
 
 // Catalogo del modelo CACES. Es comun a todos los periodos: lo que se separa por periodo
@@ -106,16 +112,18 @@ model SubCriterion {
 }
 
 model Indicator {
-  id             String        @id @default(uuid())
-  code           String        @unique
+  id             String                @id @default(uuid())
+  code           String                @unique
   name           String
   description    String
   type           IndicatorType
   sortOrder      Int
   subCriterionId String
-  subCriterion   SubCriterion  @relation(fields: [subCriterionId], references: [id])
+  subCriterion   SubCriterion          @relation(fields: [subCriterionId], references: [id])
   requirements   Requirement[]
   assessments    IndicatorAssessment[]
+  tasks          TeacherTask[]
+  drafts         EvidenceDraft[]
 }
 
 // El numero de la evidencia se repite entre indicadores ("1".."n"), por eso la clave
@@ -169,12 +177,12 @@ model EvidenceVersion {
 }
 
 model EvidenceReview {
-  id                String          @id @default(uuid())
+  id                String         @id @default(uuid())
   evidenceVersionId String
   status            EvidenceStatus
   comment           String?
   reviewerId        String
-  createdAt         DateTime        @default(now())
+  createdAt         DateTime       @default(now())
 
   evidenceVersion EvidenceVersion @relation(fields: [evidenceVersionId], references: [id])
   reviewer        User            @relation(fields: [reviewerId], references: [id])
@@ -246,4 +254,69 @@ model AuditLog {
   actor User? @relation(fields: [actorId], references: [id])
 
   @@index([entityType, entityId])
+}
+
+// Token de un solo uso para recuperar la contrasena. Solo se guarda el hash (SHA-256) del token enviado por correo.
+model PasswordResetToken {
+  id        String    @id @default(uuid())
+  userId    String
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+enum TaskStatus {
+  NUEVA
+  EN_PROGRESO
+  ENTREGADA
+}
+
+// Tarea que el coordinador asigna a un docente para preparar una evidencia de un indicador, por periodo.
+model TeacherTask {
+  id            String     @id @default(uuid())
+  periodId      String
+  assigneeId    String
+  createdById   String
+  indicatorId   String
+  title         String
+  evidenceLabel String
+  dueDate       DateTime   @db.Date
+  status        TaskStatus @default(NUEVA)
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  period    AcademicPeriod @relation(fields: [periodId], references: [id])
+  assignee  User           @relation("TaskAssignee", fields: [assigneeId], references: [id])
+  createdBy User           @relation("TaskCreator", fields: [createdById], references: [id])
+  indicator Indicator      @relation(fields: [indicatorId], references: [id])
+
+  @@index([periodId, assigneeId])
+}
+
+// Borrador de una evidencia que prepara el coordinador (secciones de la plantilla). Uno por periodo y evidencia.
+model EvidenceDraft {
+  id                String   @id @default(uuid())
+  periodId          String
+  indicatorId       String
+  requirementNumber Int
+  requirementLabel  String
+  templateId        String
+  sections          Json
+  status            String
+  observations      String?
+  version           Int      @default(1)
+  updatedById       String
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  period    AcademicPeriod @relation(fields: [periodId], references: [id])
+  indicator Indicator      @relation(fields: [indicatorId], references: [id])
+  updatedBy User           @relation(fields: [updatedById], references: [id])
+
+  @@unique([periodId, indicatorId, requirementNumber])
 }

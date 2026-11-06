@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useId } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { X } from 'lucide-react';
 
@@ -19,6 +19,18 @@ export const Modal = ({
   maxWidth = 'max-w-lg',
   zIndex = 100
 }: ModalProps) => {
+  const titleId = useId();
+
+  // Escape cierra el dialogo.
+  useEffect(() => {
+    if (!isOpen) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [isOpen, onClose]);
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -37,15 +49,20 @@ export const Modal = ({
             initial={{ scale: 0.95, opacity: 0, y: 20 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.95, opacity: 0, y: 20 }}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby={titleId}
             className={`relative w-full ${maxWidth} bg-white rounded-[40px] shadow-2xl overflow-hidden border border-slate-100 flex flex-col max-h-[90vh]`}
           >
             <div className="p-8 border-b border-slate-50 flex justify-between items-center bg-white z-10">
-              <h3 className="text-2xl font-black text-slate-800 tracking-tight">{title}</h3>
+              <h3 id={titleId} className="text-2xl font-black text-slate-800 tracking-tight">{title}</h3>
               <button 
+                type="button"
+                aria-label="Cerrar"
                 onClick={onClose}
                 className="p-2 hover:bg-slate-100 rounded-xl transition-colors"
               >
-                <X className="w-6 h-6 text-slate-300" />
+                <X className="w-6 h-6 text-slate-500" aria-hidden />
               </button>
             </div>
             <div className="flex-1 overflow-y-auto">

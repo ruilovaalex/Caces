@@ -1,7 +1,8 @@
-import React, { useMemo, useState, useEffect } from 'react';
-import { Folder, ChevronRight, AlertCircle, MapPin } from 'lucide-react';
+import React, { useMemo, useState, useEffect, useRef } from 'react';
+import { Folder, ChevronRight, AlertCircle, MapPin, ArrowRight, CheckCircle2 } from 'lucide-react';
 import { motion } from 'motion/react';
-import { YearPeriod, UploadedFile, Indicator, PresentialVerification } from '../../types';
+import { YearPeriod, UploadedFile, Indicator, PresentialVerification, UserRole } from '../../types';
+import { getNextAction } from '../../utils/nextAction';
 import { AcademicPeriodOption } from '../../utils/academicPeriodUtils';
 import {
   calculateIndicatorProgress,
@@ -26,6 +27,7 @@ interface DashboardProps {
   onOpenCriterionSubCriteria: (year: number, criterionId: string) => void;
   onOpenAssignments: () => void;
   canManageAssignments: boolean;
+  userRole: UserRole;
 }
 
 export const Dashboard = ({
@@ -38,8 +40,9 @@ export const Dashboard = ({
   onIndicatorSelect,
   onViewChecklist,
   onOpenCriterionSubCriteria,
-  onOpenAssignments: _onOpenAssignments,
-  canManageAssignments: _canManageAssignments
+  onOpenAssignments,
+  canManageAssignments: _canManageAssignments,
+  userRole
 }: DashboardProps) => {
   const allIndicators = useMemo(
     () => mockData[0].criteria.flatMap(criterion => criterion.subCriteria.flatMap(subCriterion => subCriterion.indicators)),
@@ -95,6 +98,17 @@ export const Dashboard = ({
     return progressBySubCriterion;
   }, [allFiles, mockData]);
 
+  const nextAction = useMemo(
+    () => getNextAction(userRole, allIndicators, allFiles, presentialStats.total - presentialStats.verified),
+    [userRole, allIndicators, allFiles, presentialStats]
+  );
+  const [openCriterionId, setOpenCriterionId] = useState<string | null>(null);
+  const criterionPanelRef = useRef<HTMLDivElement>(null);
+  const openCriterion = mockData[0].criteria.find(criterion => criterion.id === openCriterionId) ?? null;
+  useEffect(() => {
+    if (openCriterionId) criterionPanelRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, [openCriterionId]);
+
   const totalCount = useCountUp(dashboardStats.totalEvidences);
   const loadedCount = useCountUp(dashboardStats.loaded);
   const validCount = useCountUp(dashboardStats.validated);
@@ -118,6 +132,35 @@ export const Dashboard = ({
         </select>
       </div>
 
+      <section
+        aria-labelledby="next-action-title"
+        className={`flex flex-wrap items-center justify-between gap-4 rounded-lg border p-5 ${
+          nextAction.tone === 'done' ? 'border-emerald-200 bg-emerald-50' : 'border-blue-200 bg-blue-50'
+        }`}
+      >
+        <div className="flex min-w-0 items-start gap-3">
+          {nextAction.tone === 'done'
+            ? <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-emerald-600" aria-hidden />
+            : <ArrowRight className="mt-0.5 h-5 w-5 shrink-0 text-[#2563eb]" aria-hidden />}
+          <div className="min-w-0">
+            <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">
+              {nextAction.tone === 'done' ? 'Todo al dia' : 'Tu siguiente paso'}
+            </p>
+            <h3 id="next-action-title" className="text-base font-black text-slate-800">{nextAction.title}</h3>
+            <p className="mt-0.5 text-sm text-slate-600">{nextAction.detail}</p>
+          </div>
+        </div>
+        {nextAction.cta && nextAction.target !== 'none' && (
+          <button
+            type="button"
+            onClick={() => (nextAction.target === 'indicator' && nextAction.indicator ? onIndicatorSelect(nextAction.indicator) : onOpenAssignments())}
+            className="rounded-xl bg-[#2563eb] px-5 py-3 text-xs font-black uppercase tracking-widest text-white shadow-md shadow-blue-600/20 hover:bg-blue-700"
+          >
+            {nextAction.cta}
+          </button>
+        )}
+      </section>
+
       <motion.div 
         variants={staggerContainer}
         initial="initial"
@@ -126,10 +169,11 @@ export const Dashboard = ({
         className="grid grid-cols-1 md:grid-cols-4 gap-4"
       >
         <motion.div variants={fadeInUp} className="premium-card bg-white p-5 rounded-lg border-l-4 border-l-[#2563eb] space-y-2">
-          <span className="text-[9px] font-black text-[#64748b] uppercase tracking-widest leading-none">Total Evidencias</span>
+          <span className="text-[9px] font-black text-[#64748b] uppercase tracking-widest leading-none">Evidencias documentales</span>
           <h3 className="text-2xl font-black text-[#0f172a]">
             {totalCount}
           </h3>
+          <p className="text-[10px] font-bold text-slate-400">+ {presentialStats.total} presenciales (visita in situ)</p>
         </motion.div>
         <motion.div variants={fadeInUp} className="premium-card bg-white p-5 rounded-lg border-l-4 border-l-[#2563eb] space-y-2">
           <span className="text-[9px] font-black text-[#64748b] uppercase tracking-widest leading-none">Cargadas</span>
@@ -193,8 +237,9 @@ export const Dashboard = ({
               whileHover={hoverCardLift}
               type="button"
               key={crit.id} 
-              onClick={() => onOpenCriterionSubCriteria(mockData[0].year, crit.id)}
-              className="premium-card bg-white p-6 rounded-lg border border-[#e2e8f0] hover:border-[#2563eb] transition-all cursor-pointer group text-left"
+              onClick={() => { setOpenCriterionId(crit.id); onOpenCriterionSubCriteria(mockData[0].year, crit.id); }}
+              aria-pressed={openCriterionId === crit.id}
+              className={`premium-card bg-white p-6 rounded-lg border hover:border-[#2563eb] transition-all cursor-pointer group text-left flex flex-col justify-start h-full ${openCriterionId === crit.id ? 'border-[#2563eb] ring-2 ring-blue-200' : 'border-[#e2e8f0]'}`}
             >
               <div className="flex justify-between items-start mb-4">
                 <div className="p-3 bg-[#2563eb] rounded-lg text-white transition-all">
@@ -231,6 +276,40 @@ export const Dashboard = ({
             </motion.button>
           ))}
         </motion.div>
+
+        {openCriterion ? (
+          <div ref={criterionPanelRef} className="premium-card scroll-mt-4 rounded-lg border border-[#2563eb] bg-white" aria-live="polite">
+            <div className="flex items-center justify-between gap-3 border-b border-[#f1f5f9] p-5">
+              <h3 className="text-sm font-black uppercase tracking-tight text-slate-800">Indicadores de {openCriterion.name}</h3>
+              <button type="button" onClick={() => setOpenCriterionId(null)} className="text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-slate-800">
+                Cerrar
+              </button>
+            </div>
+            {openCriterion.subCriteria.map(sub => (
+              <div key={sub.id} className="border-b border-[#f1f5f9] last:border-0">
+                <p className="bg-slate-50 px-5 py-2 text-[10px] font-black uppercase tracking-widest text-slate-500">{sub.name}</p>
+                <ul>
+                  {sub.indicators.map(ind => {
+                    const progress = calculateIndicatorProgress(ind, allFiles);
+                    return (
+                      <li key={ind.code}>
+                        <button type="button" onClick={() => onIndicatorSelect(ind)} className="flex w-full items-center justify-between gap-3 px-5 py-3 text-left hover:bg-slate-50">
+                          <span className="min-w-0 text-sm font-bold text-slate-700"><span className="mr-2 text-slate-400">{ind.code}</span>{ind.name}</span>
+                          <span className="flex shrink-0 items-center gap-2 text-[10px] font-black uppercase tracking-widest text-[#2563eb]">
+                            {progress === null ? 'Presencial' : `${progress}%`}
+                            <ChevronRight className="h-4 w-4" aria-hidden />
+                          </span>
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-xs font-bold text-slate-500">Selecciona un criterio para ver sus indicadores y abrir uno.</p>
+        )}
 
         <div className="premium-card bg-white rounded-lg border border-[#e2e8f0] overflow-hidden">
           <div className="p-6 border-b border-[#f1f5f9] flex items-center justify-between bg-white">

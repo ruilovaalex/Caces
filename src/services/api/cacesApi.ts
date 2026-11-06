@@ -1,6 +1,7 @@
 import {
   IndicatorAssessment,
   IndicatorRating,
+  EvidenceDraft,
   Notification,
   PresentialVerification,
   Status,
@@ -153,6 +154,10 @@ export const AuthApi = {
     return { id: result.user.id, email: result.user.email, name: result.user.name, role: result.user.role };
   },
   me: () => api.get<User>('/auth/me'),
+  forgotPassword: (email: string) => api.post<void>('/auth/forgot-password', { email }),
+  resetPassword: (token: string, newPassword: string) => api.post<void>('/auth/reset-password', { token, newPassword }),
+  changePassword: (currentPassword: string, newPassword: string) =>
+    api.post<void>('/auth/change-password', { currentPassword, newPassword }),
   logout: () => tokenStore.clear(),
 };
 
@@ -242,4 +247,60 @@ export const NotificationApi = {
   markRead: (id: string) => api.post(`/notifications/${id}/read`),
   remove: (id: string) => api.delete(`/notifications/${id}`),
   clearMine: () => api.delete('/notifications'),
+};
+
+export interface ManagedUser {
+  id: string;
+  email: string;
+  name: string;
+  role: UserRole;
+  active: boolean;
+}
+
+export const UsersApi = {
+  list: async (): Promise<ManagedUser[]> =>
+    (await api.get<{ items: ManagedUser[] }>('/users?page=1&pageSize=100')).items,
+  create: (data: { email: string; name: string; role: UserRole; password: string }) =>
+    api.post<ManagedUser>('/users', data),
+  update: (id: string, data: Partial<{ name: string; role: UserRole; active: boolean; password: string }>) =>
+    api.patch<ManagedUser>(`/users/${id}`, data),
+};
+
+export type TaskStatus = 'NUEVA' | 'EN_PROGRESO' | 'ENTREGADA';
+
+export interface TeacherTask {
+  id: string;
+  periodCode: string;
+  assigneeId: string;
+  assigneeName: string;
+  createdByName: string;
+  indicatorCode: string;
+  title: string;
+  evidenceLabel: string;
+  dueDate: string;
+  status: TaskStatus;
+}
+
+export const TasksApi = {
+  teachers: () => api.get<{ id: string; name: string; email: string }[]>('/teachers'),
+  list: (periodCode: string) => api.get<TeacherTask[]>(`${period(periodCode)}/tasks`),
+  create: (periodCode: string, data: { assigneeId: string; indicatorCode: string; title: string; evidenceLabel: string; dueDate: string }) =>
+    api.post<TeacherTask>(`${period(periodCode)}/tasks`, data),
+  changeStatus: (id: string, status: TaskStatus) => api.patch<TeacherTask>(`/tasks/${id}/status`, { status }),
+  remove: (id: string) => api.delete(`/tasks/${id}`),
+};
+
+export const DraftsApi = {
+  list: (periodCode: string) => api.get<EvidenceDraft[]>(`${period(periodCode)}/drafts`),
+  save: (periodCode: string, draft: EvidenceDraft, baseVersion: number) =>
+    api.put<EvidenceDraft>(`${period(periodCode)}/drafts/${encodeURIComponent(draft.indicatorCode)}/${encodeURIComponent(draft.requirementId)}`, {
+      baseVersion,
+      requirementLabel: draft.requirementLabel,
+      templateId: draft.templateId,
+      sections: draft.sections,
+      status: draft.status,
+      observations: draft.observations,
+    }),
+  remove: (periodCode: string, indicatorCode: string, requirementId: string) =>
+    api.delete(`${period(periodCode)}/drafts/${encodeURIComponent(indicatorCode)}/${encodeURIComponent(requirementId)}`),
 };

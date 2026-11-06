@@ -2,11 +2,11 @@ import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { APP_CONFIG, AppConfig } from '../../config/env';
 import { TOKEN_AUTHENTICATOR } from '../../shared/http/auth';
-import { AuthenticateTokenUseCase, ChangeOwnPasswordUseCase, LoginUseCase } from './application/auth.use-cases';
+import { AuthenticateTokenUseCase, ChangeOwnPasswordUseCase, LoginUseCase, RequestPasswordResetUseCase, ResetPasswordUseCase } from './application/auth.use-cases';
 import { CreateUserUseCase, ListUsersUseCase, UpdateUserUseCase } from './application/user-admin.use-cases';
-import { PASSWORD_HASHER, TOKEN_SERVICE, USER_REPOSITORY } from './domain/ports';
+import { MAILER, PASSWORD_HASHER, PASSWORD_RESET_REPOSITORY, TOKEN_SERVICE, USER_REPOSITORY } from './domain/ports';
 import { AuthController, UsersController } from './http/identity.controllers';
-import { BcryptPasswordHasher, JwtTokenService, PrismaUserRepository } from './infrastructure/adapters';
+import { BcryptPasswordHasher, ConsoleMailer, DisabledMailer, JwtTokenService, PrismaPasswordResetRepository, PrismaUserRepository } from './infrastructure/adapters';
 
 @Module({
   imports: [
@@ -26,6 +26,14 @@ import { BcryptPasswordHasher, JwtTokenService, PrismaUserRepository } from './i
     LoginUseCase,
     AuthenticateTokenUseCase,
     ChangeOwnPasswordUseCase,
+    RequestPasswordResetUseCase,
+    ResetPasswordUseCase,
+    { provide: PASSWORD_RESET_REPOSITORY, useClass: PrismaPasswordResetRepository },
+    {
+      provide: MAILER,
+      inject: [APP_CONFIG],
+      useFactory: (config: AppConfig) => (config.mailDriver === 'console' ? new ConsoleMailer() : new DisabledMailer()),
+    },
     ListUsersUseCase,
     CreateUserUseCase,
     UpdateUserUseCase,

@@ -1,3 +1,4 @@
+import { Menu } from 'lucide-react';
 import React from 'react';
 import { motion } from 'motion/react';
 import { TopBar } from './TopBar';
@@ -15,6 +16,10 @@ interface HeaderProps {
   onDeleteNotification?: (id: string) => void;
   userName?: string;
   userRole?: UserRole;
+  // Donde esta el usuario: titulo de la seccion y ruta (periodo / criterio / indicador).
+  title?: string;
+  trail?: string;
+  onToggleMenu?: () => void;
 }
 
 export const Header = ({
@@ -26,7 +31,10 @@ export const Header = ({
   onClearAllNotifications,
   onDeleteNotification,
   userName = 'Usuario',
-  userRole = 'ADMIN'
+  userRole = 'ADMIN',
+  title = 'Repositorio CACES 2025',
+  trail,
+  onToggleMenu
 }: HeaderProps) => {
   const roleLabel =
     userRole === 'ADMIN'
@@ -46,9 +54,17 @@ export const Header = ({
         className="flex w-full justify-between items-center"
       >
         <div className="flex min-w-0 items-center gap-3">
-          <h2 className="truncate text-lg font-black text-white tracking-tight">Repositorio CACES 2025</h2>
-          <div className="h-5 w-px bg-white/15" />
-          <div className="flex h-7 items-center gap-2 rounded-full border border-white/10 bg-white/10 px-3">
+          {onToggleMenu && (
+            <button type="button" onClick={onToggleMenu} aria-label="Abrir menu de navegacion" className="-ml-2 rounded-lg p-2 text-white hover:bg-white/10 lg:hidden">
+              <Menu className="h-5 w-5" aria-hidden />
+            </button>
+          )}
+          <div className="min-w-0">
+            <h2 className="truncate text-base font-black leading-tight tracking-tight text-white sm:text-lg">{title}</h2>
+            {trail && <p className="truncate text-[10px] font-bold uppercase leading-tight tracking-widest text-[#aac4e8]">{trail}</p>}
+          </div>
+          <div className="hidden h-5 w-px bg-white/15 md:block" />
+          <div className="hidden h-7 items-center gap-2 rounded-full border border-white/10 bg-white/10 px-3 md:flex">
             <div className="w-1.5 h-1.5 bg-[#22c55e] rounded-full animate-pulse" />
             <span className="whitespace-nowrap text-[9px] font-black text-[#aac4e8] uppercase tracking-widest">
               {userRole === 'EVALUADOR'

@@ -54,7 +54,7 @@ Reglas que garantiza la base de datos:
 
 ## Instalacion en Windows
 
-Requisitos: **Node.js 22** y **PostgreSQL 16 o superior** (instalado, o Docker Desktop).
+Requisitos: **Node.js 24** y **PostgreSQL 16 o superior** (instalado, o Docker Desktop).
 
 ### 1. Base de datos
 
@@ -153,6 +153,6 @@ queda anotado en la observacion de la version.
 ## Pendiente
 
 - Plantillas, carpetas organizativas del coordinador, asignaciones, borradores y la vista del docente siguen guardandose en el navegador (siguientes etapas).
-- Adaptador de almacenamiento compatible con S3 para produccion (el puerto `FileStorage` ya existe; hoy solo hay disco local).
+- Adaptador S3 implementado y probado con el SDK simulado; falta probarlo contra un bucket real. Ver `docs/DESPLIEGUE.md`.
 - Interfaz de administracion de usuarios en el frontend (la API ya existe en `/api/users`).
 - Recuperacion de contrasena por correo.

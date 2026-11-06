@@ -14,6 +14,8 @@ import { EvidenceHistoryModal } from '../components/evidences/EvidenceHistoryMod
 import { CoordinatorEvidenceEditor } from '../components/coordinator/CoordinatorEvidenceEditor';
 import { AssignmentsView } from '../components/assignments/AssignmentsView';
 import { DocenteView } from '../components/docente/DocenteView';
+import { UsersAdminView } from '../components/admin/UsersAdminView';
+import { ApiTasksView } from '../components/assignments/ApiTasksView';
 import { TemplatesView } from '../components/templates/TemplatesView';
 import { LocalDataImportCard } from '../components/layout/LocalDataImportCard';
 
@@ -23,13 +25,14 @@ import { useEvidences } from '../hooks/useEvidences';
 import { useNotifications } from '../hooks/useNotifications';
 import { useFileUpload } from '../hooks/useFileUpload';
 import { useAssignments } from '../hooks/useAssignments';
+import { DraftService, DraftSync } from '../services/draftService';
 import { useEvaluatorRecords } from '../hooks/useEvaluatorRecords';
 
 import { getIndicatorCurrentStatus, getIndicatorStats, getPresentialStats } from '../utils/progressUtils';
 import { getIndicatorAssessmentHistory } from '../services/indicatorAssessmentService';
 import { getReadableAllowedFormats, isFileAllowedForRequirement } from '../utils/evidenceFormatUtils';
 import { canUserAssessIndicator, canUserAssign, canUserDelete, canUserUpload, canUserVerifyPresential } from '../utils/permissions';
-import { describeError, isApiMode } from '../services/api/apiClient';
+import { configurationError, describeError, isApiMode, isDemoMode } from '../services/api/apiClient';
 import { viewTransition } from '../utils/animations';
 import { getAcademicPeriodsForYear } from '../utils/academicPeriodUtils';
 import { Indicator, IndicatorRating, Requirement, Status, VerificationResult } from '../types';
@@ -55,6 +58,9 @@ export default function App() {
   const [isChecklistOpen, setIsChecklistOpen] = useState(false);
   const [isAssignmentsOpen, setIsAssignmentsOpen] = useState(false);
   const [isTemplatesOpen, setIsTemplatesOpen] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  // El menu lateral es un cajon en pantallas pequenas: se cierra al cambiar de seccion.
+  useEffect(() => { setIsMenuOpen(false); }, [selectedIndicator?.code, isTemplatesOpen, isAssignmentsOpen, isChecklistOpen]);
 
   // Periodo academico activo: las evidencias, verificaciones y valoraciones se consultan por periodo.
   const academicPeriods = useMemo(() => getAcademicPeriodsForYear(mockData[0].year), [mockData]);
@@ -90,6 +96,17 @@ export default function App() {
 
   useAssignments();
 
+
+  // Modo servidor: los borradores del coordinador viven en el servidor; localStorage solo es cache.
+  useEffect(() => {
+    if (!isApiMode) return;
+    if (!isAuthenticated) {
+      DraftService.configurePeriod(null);
+      return;
+    }
+    DraftService.hydrate(activePeriodId, userRole === 'COORDINADOR' || userRole === 'ADMIN').catch(error => window.alert(describeError(error)));
+  }, [activePeriodId, isAuthenticated, userRole]);
+  useEffect(() => DraftSync.onError(message => window.alert(message)), []);
   const { verifications, assessments, registerVerification, registerAssessment, refreshEvaluatorRecords } = useEvaluatorRecords(activePeriodId, isAuthenticated);
 
   // Las notificaciones dirigidas a un perfil solo se muestran a ese perfil.
@@ -268,6 +285,10 @@ export default function App() {
     }
   };
 
+  const allIndicators = useMemo(
+    () => mockData.flatMap(yearPeriod => yearPeriod.criteria.flatMap(criterion => criterion.subCriteria.flatMap(subCriterion => subCriterion.indicators))),
+    [mockData],
+  );
   const canAccessAssignments = userRole === 'ADMIN' || canUserAssign(userRole);
   const activeView = selectedIndicator
     ? 'indicator'
@@ -278,6 +299,15 @@ export default function App() {
       : isChecklistOpen
         ? 'checklist'
         : 'dashboard';
+  const sectionTitle = activeView === 'indicator' && selectedIndicator
+    ? `Indicador ${selectedIndicator.code}`
+    : activeView === 'templates'
+      ? 'Crear: plantillas'
+      : activeView === 'assignments'
+        ? (userRole === 'ADMIN' ? 'Usuarios y roles' : 'Docentes y tareas')
+        : activeView === 'checklist'
+          ? 'Todos los requerimientos'
+          : 'Repositorio CACES 2025';
   const selectedIndicatorContext = useMemo(() => {
     if (!selectedIndicator) return null;
 
@@ -307,6 +337,17 @@ export default function App() {
     };
   }, [allFiles, selectedIndicator, verifications]);
 
+  if (configurationError) {
+    return (
+      <div role="alert" className="flex h-screen items-center justify-center bg-[#0f172a] p-6 text-center">
+        <div className="max-w-md space-y-2 rounded-2xl bg-white p-8">
+          <h1 className="text-sm font-black uppercase tracking-widest text-rose-600">Configuracion incompleta</h1>
+          <p className="text-sm text-slate-600">{configurationError}</p>
+        </div>
+      </div>
+    );
+  }
+
   if (isRestoring) {
     return <div className="flex h-screen items-center justify-center bg-[#0f172a] text-xs font-black uppercase tracking-widest text-slate-400">Recuperando sesion...</div>;
   }
@@ -317,6 +358,8 @@ export default function App() {
 
   return (
     <div className="flex h-screen bg-[#f4f6f9] font-sans text-slate-800">
+      {isMenuOpen && <div className="fixed inset-0 z-30 bg-slate-900/50 lg:hidden" onClick={() => setIsMenuOpen(false)} aria-hidden />}
+      <div className={`fixed inset-y-0 left-0 z-40 transition-transform duration-200 lg:static lg:z-auto lg:translate-x-0 ${isMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
       <Sidebar
         mockData={mockData}
         selectedIndicator={selectedIndicator}
@@ -335,6 +378,7 @@ export default function App() {
         onOpenTemplates={handleOpenTemplates}
         onOpenAssignments={handleOpenAssignments}
       />
+      </div>
 
       <main className="flex-1 flex flex-col overflow-hidden">
         <Header
@@ -347,12 +391,22 @@ export default function App() {
           onDeleteNotification={removeNotification}
           userName={user?.name}
           userRole={userRole}
+          title={sectionTitle}
+          trail={[activePeriod.label, ...(activeView === 'indicator' ? [selectedIndicatorContext?.criterionName, selectedIndicatorContext?.subCriterionName] : [])].filter(Boolean).join(' › ')}
+          onToggleMenu={() => setIsMenuOpen(open => !open)}
         />
-
+        {isDemoMode && (
+          <p role="note" className="shrink-0 bg-amber-50 px-4 py-2 text-center text-[11px] font-bold text-amber-800">
+            Modo demostracion: los datos se guardan solo en este navegador y no se comparten con otras personas.
+          </p>
+        )}
         {userRole === 'DOCENTE' ? (
-          <DocenteView onLogout={logout} />
+          <DocenteView
+            onLogout={logout}
+            tasksSlot={isApiMode ? <ApiTasksView userRole={userRole} periodCode={activePeriodId} periodLabel={activePeriod.label} indicators={allIndicators} /> : undefined}
+          />
         ) : (
-          <div className="flex-1 overflow-y-auto p-8 bg-[#f4f6f9]">
+          <div className="flex-1 overflow-y-auto p-4 md:p-8 bg-[#f4f6f9]">
             <AnimatePresence mode="wait">
               {!selectedIndicator && !isChecklistOpen && !isTemplatesOpen && (!isAssignmentsOpen || !canAccessAssignments) && (
                 <motion.div key="dashboard" variants={viewTransition} initial="initial" animate="animate" exit="exit">
@@ -379,6 +433,7 @@ export default function App() {
                     onOpenCriterionSubCriteria={openCriterionSubCriteria}
                     onOpenAssignments={handleOpenAssignments}
                     canManageAssignments={canUserAssign(userRole)}
+                    userRole={userRole}
                   />
                 </motion.div>
               )}
@@ -401,7 +456,11 @@ export default function App() {
 
               {!selectedIndicator && isAssignmentsOpen && canAccessAssignments && !isTemplatesOpen && (
                 <motion.div key="assignments" variants={viewTransition} initial="initial" animate="animate" exit="exit">
-                  <AssignmentsView userRole={userRole} mockData={mockData} />
+                  {isApiMode && userRole === 'COORDINADOR'
+                    ? <ApiTasksView userRole={userRole} periodCode={activePeriodId} periodLabel={activePeriod.label} indicators={allIndicators} />
+                    : isApiMode && userRole === 'ADMIN'
+                    ? <UsersAdminView currentUserId={user?.id} />
+                    : <AssignmentsView userRole={userRole} mockData={mockData} />}
                 </motion.div>
               )}
 

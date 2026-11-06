@@ -79,7 +79,7 @@ export const Sidebar = ({
       initial={{ x: -300, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
       transition={{ duration: 0.4, ease: 'easeOut' }}
-      className="w-80 bg-white border-r border-[#e2e8f0] flex flex-col shadow-sm"
+      className="h-full w-80 max-w-[85vw] bg-white border-r border-[#e2e8f0] flex flex-col shadow-sm"
     >
       <div className="h-16 border-b border-white/10 flex items-center gap-3 bg-[#1e2d4a] px-6">
         <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#2563eb] shadow-lg shadow-blue-600/20">
@@ -187,7 +187,7 @@ export const Sidebar = ({
             }`}>
               <ClipboardList className="w-4 h-4" />
             </span>
-            <span className="flex-1 text-left">{userRole === 'ADMIN' ? '3. Roles' : '3. Docentes y tareas'}</span>
+            <span className="flex-1 text-left">{userRole === 'ADMIN' ? '3. Usuarios y roles' : '3. Docentes y tareas'}</span>
             {isAssignmentsActive && (
               <span className="rounded-full bg-[#2563eb] px-2.5 py-1 text-[9px] font-black uppercase tracking-[0.2em] text-white">
                 Actual

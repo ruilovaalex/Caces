@@ -10,6 +10,8 @@ import { hoverScale, tapScale } from '../../utils/animations';
 
 interface DocenteViewProps {
   onLogout: () => void;
+  // En modo servidor reemplaza las actividades de demostracion por las tareas reales.
+  tasksSlot?: React.ReactNode;
 }
 
 const tabs = [
@@ -19,7 +21,7 @@ const tabs = [
   { key: 'profile' as const, label: 'Perfil', Icon: User },
 ];
 
-export const DocenteView = ({ onLogout }: DocenteViewProps) => {
+export const DocenteView = ({ onLogout, tasksSlot }: DocenteViewProps) => {
   const [activeTab, setActiveTab] = useState<'dashboard' | 'activities' | 'files' | 'profile'>('dashboard');
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
 
@@ -31,7 +33,7 @@ export const DocenteView = ({ onLogout }: DocenteViewProps) => {
                   onViewAllActivities={() => setActiveTab('activities')} 
                 />;
       case 'activities':
-        return <DocenteActivities onOpenUploadModal={() => setIsUploadModalOpen(true)} />;
+        return tasksSlot ?? <DocenteActivities onOpenUploadModal={() => setIsUploadModalOpen(true)} />;
       case 'files':
         return <DocenteFiles onOpenUploadModal={() => setIsUploadModalOpen(true)} />;
       case 'profile':
