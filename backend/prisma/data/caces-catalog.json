@@ -459,15 +459,15 @@
             "requirements": [
               {
                 "number": 1,
-                "label": "Verificación del número y condiciones de los puestos de trabajo para profesores, según lo indicado en la Descripción (visita in situ ).",
-                "description": "Verificación del número y condiciones de los puestos de trabajo para profesores, según lo indicado en la Descripción (visita in situ ).",
+                "label": "Verificación del número y condiciones de los puestos de trabajo para profesores, según lo indicado en la Descripción (visita in situ).",
+                "description": "Verificación del número y condiciones de los puestos de trabajo para profesores, según lo indicado en la Descripción (visita in situ).",
                 "format": "PDF",
                 "mode": "PRESENCIAL"
               },
               {
                 "number": 2,
-                "label": "Lista certificada de los profesores que trabajan a tiempo completo y a medio tiempo cuando se desarrolla la visita in situ (visita in situ ).",
-                "description": "Lista certificada de los profesores que trabajan a tiempo completo y a medio tiempo cuando se desarrolla la visita in situ (visita in situ ).",
+                "label": "Lista certificada de los profesores que trabajan a tiempo completo y a medio tiempo cuando se desarrolla la visita in situ (visita in situ).",
+                "description": "Lista certificada de los profesores que trabajan a tiempo completo y a medio tiempo cuando se desarrolla la visita in situ (visita in situ).",
                 "format": "PDF",
                 "mode": "DOCUMENTAL"
               }
@@ -510,8 +510,8 @@
               },
               {
                 "number": 5,
-                "label": "Evidencias de las medidas de prevención adoptadas y de los recursos disponibles para hacer frente a emergencias y desastres (personal capacitado, instalaciones, equipamiento, insumos, entre otros) (visita in situ ).",
-                "description": "Evidencias de las medidas de prevención adoptadas y de los recursos disponibles para hacer frente a emergencias y desastres (personal capacitado, instalaciones, equipamiento, insumos, entre otros) (visita in situ ).",
+                "label": "Evidencias de las medidas de prevención adoptadas y de los recursos disponibles para hacer frente a emergencias y desastres (personal capacitado, instalaciones, equipamiento, insumos, entre otros) (visita in situ).",
+                "description": "Evidencias de las medidas de prevención adoptadas y de los recursos disponibles para hacer frente a emergencias y desastres (personal capacitado, instalaciones, equipamiento, insumos, entre otros) (visita in situ).",
                 "format": "PDF",
                 "mode": "DOCUMENTAL"
               },
@@ -531,29 +531,29 @@
               },
               {
                 "number": 8,
-                "label": "Botiquín de primeros auxilios, enfermería o servicio médico, o el convenio correspondiente para enfermería y servicio médico (visita in situ ) (captado a través del aplicativo SIIES).",
-                "description": "Botiquín de primeros auxilios, enfermería o servicio médico, o el convenio correspondiente para enfermería y servicio médico (visita in situ ) (captado a través del aplicativo SIIES).",
+                "label": "Botiquín de primeros auxilios, enfermería o servicio médico, o el convenio correspondiente para enfermería y servicio médico (visita in situ) (captado a través del aplicativo SIIES).",
+                "description": "Botiquín de primeros auxilios, enfermería o servicio médico, o el convenio correspondiente para enfermería y servicio médico (visita in situ) (captado a través del aplicativo SIIES).",
                 "format": "PDF",
                 "mode": "DOCUMENTAL"
               },
               {
                 "number": 9,
-                "label": "Evidencias de que el instituto ha creado condiciones en sus espacios para reducir la posibilidad de contagio de enfermedades trasmisibles por vía respiratoria o alimentaria (por ejemplo, disponibilidad adecuada de lavamanos con jabón, higiene de los alimentos en la cafetería, etc.) y hace la labor educativa necesaria al respecto (visita in situ ).",
-                "description": "Evidencias de que el instituto ha creado condiciones en sus espacios para reducir la posibilidad de contagio de enfermedades trasmisibles por vía respiratoria o alimentaria (por ejemplo, disponibilidad adecuada de lavamanos con jabón, higiene de los alimentos en la cafetería, etc.) y hace la labor educativa necesaria al respecto (visita in situ ).",
+                "label": "Evidencias de que el instituto ha creado condiciones en sus espacios para reducir la posibilidad de contagio de enfermedades trasmisibles por vía respiratoria o alimentaria (por ejemplo, disponibilidad adecuada de lavamanos con jabón, higiene de los alimentos en la cafetería, etc.) y hace la labor educativa necesaria al respecto (visita in situ).",
+                "description": "Evidencias de que el instituto ha creado condiciones en sus espacios para reducir la posibilidad de contagio de enfermedades trasmisibles por vía respiratoria o alimentaria (por ejemplo, disponibilidad adecuada de lavamanos con jabón, higiene de los alimentos en la cafetería, etc.) y hace la labor educativa necesaria al respecto (visita in situ).",
                 "format": "PDF",
                 "mode": "DOCUMENTAL"
               },
               {
                 "number": 10,
-                "label": "Evidencias de que el instituto ha creado las condiciones necesarias en sus espacios para promover un estilo de vida saludable entre los miembros de la comunidad educativa (áreas de ejercicios, frutas y verduras frescas en la cafetería, espacios libres de humo, etc.) y hace la labor educativa necesaria al respecto (visita in situ ).",
-                "description": "Evidencias de que el instituto ha creado las condiciones necesarias en sus espacios para promover un estilo de vida saludable entre los miembros de la comunidad educativa (áreas de ejercicios, frutas y verduras frescas en la cafetería, espacios libres de humo, etc.) y hace la labor educativa necesaria al respecto (visita in situ ).",
+                "label": "Evidencias de que el instituto ha creado las condiciones necesarias en sus espacios para promover un estilo de vida saludable entre los miembros de la comunidad educativa (áreas de ejercicios, frutas y verduras frescas en la cafetería, espacios libres de humo, etc.) y hace la labor educativa necesaria al respecto (visita in situ).",
+                "description": "Evidencias de que el instituto ha creado las condiciones necesarias en sus espacios para promover un estilo de vida saludable entre los miembros de la comunidad educativa (áreas de ejercicios, frutas y verduras frescas en la cafetería, espacios libres de humo, etc.) y hace la labor educativa necesaria al respecto (visita in situ).",
                 "format": "PDF",
                 "mode": "DOCUMENTAL"
               },
               {
                 "number": 11,
-                "label": "Si existiera, proceso de producción de alimentos y otros productos para consumo interno y/o externo (visita in situ ).",
-                "description": "Si existiera, proceso de producción de alimentos y otros productos para consumo interno y/o externo (visita in situ ).",
+                "label": "Si existiera, proceso de producción de alimentos y otros productos para consumo interno y/o externo (visita in situ).",
+                "description": "Si existiera, proceso de producción de alimentos y otros productos para consumo interno y/o externo (visita in situ).",
                 "format": "PDF",
                 "mode": "DOCUMENTAL"
               }
@@ -582,8 +582,8 @@
               },
               {
                 "number": 3,
-                "label": "Entrevistas a los miembros de la comunidad educativa (visita in situ ). 7 La suficiencia se determinará a partir de lo establecido en el Art. 41 del Reglamento de Seguridad y Salud de los Trabajadores y Mejoramiento del Medio Ambiente de Trabajo que menciona: “Excusados 1 por cada 25 varones o fracción 1 por cada 15 mujeres o fracción; Urinarios 1 por cada 25 varones o fracción” (Decreto Ejecutivo 2393).",
-                "description": "Entrevistas a los miembros de la comunidad educativa (visita in situ ). 7 La suficiencia se determinará a partir de lo establecido en el Art. 41 del Reglamento de Seguridad y Salud de los Trabajadores y Mejoramiento del Medio Ambiente de Trabajo que menciona: “Excusados 1 por cada 25 varones o fracción 1 por cada 15 mujeres o fracción; Urinarios 1 por cada 25 varones o fracción” (Decreto Ejecutivo 2393).",
+                "label": "Entrevistas a los miembros de la comunidad educativa (visita in situ). Nota: la suficiencia se determinará a partir de lo establecido en el Art. 41 del Reglamento de Seguridad y Salud de los Trabajadores y Mejoramiento del Medio Ambiente de Trabajo que menciona: “Excusados 1 por cada 25 varones o fracción 1 por cada 15 mujeres o fracción; Urinarios 1 por cada 25 varones o fracción” (Decreto Ejecutivo 2393).",
+                "description": "Entrevistas a los miembros de la comunidad educativa (visita in situ). Nota: la suficiencia se determinará a partir de lo establecido en el Art. 41 del Reglamento de Seguridad y Salud de los Trabajadores y Mejoramiento del Medio Ambiente de Trabajo que menciona: “Excusados 1 por cada 25 varones o fracción 1 por cada 15 mujeres o fracción; Urinarios 1 por cada 25 varones o fracción” (Decreto Ejecutivo 2393).",
                 "format": "PDF",
                 "mode": "PRESENCIAL"
               }
@@ -663,8 +663,8 @@
               },
               {
                 "number": 3,
-                "label": "Documentos relacionados con el desarrollo de los procesos de selección de profesores no titulares o concursos de méritos y oposición para la designación de profesores titulares (carpetas de candidatos, actas de reuniones, videos o grabaciones de entrevistas y clases demostrativas, documentos con los resultados, etc.) Los registros en audio y video deben cumplir con lo establecido en el Art. 178 del COIP (captados a través del aplicativo SIIES y visita in situ ).",
-                "description": "Documentos relacionados con el desarrollo de los procesos de selección de profesores no titulares o concursos de méritos y oposición para la designación de profesores titulares (carpetas de candidatos, actas de reuniones, videos o grabaciones de entrevistas y clases demostrativas, documentos con los resultados, etc.) Los registros en audio y video deben cumplir con lo establecido en el Art. 178 del COIP (captados a través del aplicativo SIIES y visita in situ ).",
+                "label": "Documentos relacionados con el desarrollo de los procesos de selección de profesores no titulares o concursos de méritos y oposición para la designación de profesores titulares (carpetas de candidatos, actas de reuniones, videos o grabaciones de entrevistas y clases demostrativas, documentos con los resultados, etc.) Los registros en audio y video deben cumplir con lo establecido en el Art. 178 del COIP (captados a través del aplicativo SIIES y visita in situ).",
+                "description": "Documentos relacionados con el desarrollo de los procesos de selección de profesores no titulares o concursos de méritos y oposición para la designación de profesores titulares (carpetas de candidatos, actas de reuniones, videos o grabaciones de entrevistas y clases demostrativas, documentos con los resultados, etc.) Los registros en audio y video deben cumplir con lo establecido en el Art. 178 del COIP (captados a través del aplicativo SIIES y visita in situ).",
                 "format": "PDF",
                 "mode": "DOCUMENTAL"
               }
@@ -850,15 +850,15 @@
               },
               {
                 "number": 3,
-                "label": "Evidencias de que los profesores tienen acceso a los resultados de sus evaluaciones y de que dichos resultados se han analizado con cada profesor evaluado a efectos de tomar medidas correctivas, de perfeccionamiento o estímulo (formularios individuales de evaluación con los resultados y acciones que cuenten con firmas de responsabilidad, o certificación firmada por el profesor evaluado en la que deja constancia del conocimiento de los resultados y del análisis realizado) (captadas a través del aplicativo SIIES y visita in situ ).",
-                "description": "Evidencias de que los profesores tienen acceso a los resultados de sus evaluaciones y de que dichos resultados se han analizado con cada profesor evaluado a efectos de tomar medidas correctivas, de perfeccionamiento o estímulo (formularios individuales de evaluación con los resultados y acciones que cuenten con firmas de responsabilidad, o certificación firmada por el profesor evaluado en la que deja constancia del conocimiento de los resultados y del análisis realizado) (captadas a través del aplicativo SIIES y visita in situ ).",
+                "label": "Evidencias de que los profesores tienen acceso a los resultados de sus evaluaciones y de que dichos resultados se han analizado con cada profesor evaluado a efectos de tomar medidas correctivas, de perfeccionamiento o estímulo (formularios individuales de evaluación con los resultados y acciones que cuenten con firmas de responsabilidad, o certificación firmada por el profesor evaluado en la que deja constancia del conocimiento de los resultados y del análisis realizado) (captadas a través del aplicativo SIIES y visita in situ).",
+                "description": "Evidencias de que los profesores tienen acceso a los resultados de sus evaluaciones y de que dichos resultados se han analizado con cada profesor evaluado a efectos de tomar medidas correctivas, de perfeccionamiento o estímulo (formularios individuales de evaluación con los resultados y acciones que cuenten con firmas de responsabilidad, o certificación firmada por el profesor evaluado en la que deja constancia del conocimiento de los resultados y del análisis realizado) (captadas a través del aplicativo SIIES y visita in situ).",
                 "format": "PDF",
                 "mode": "DOCUMENTAL"
               },
               {
                 "number": 4,
-                "label": "Evidencias de aplicación de acciones tomadas a partir de los resultados de la evaluación (capacitaciones programadas o ejecutadas, estímulos otorgados, planes de acción implementados, planes de seguimiento implementados, etc.) (captadas a través del aplicativo SIIES y visita in situ ).",
-                "description": "Evidencias de aplicación de acciones tomadas a partir de los resultados de la evaluación (capacitaciones programadas o ejecutadas, estímulos otorgados, planes de acción implementados, planes de seguimiento implementados, etc.) (captadas a través del aplicativo SIIES y visita in situ ).",
+                "label": "Evidencias de aplicación de acciones tomadas a partir de los resultados de la evaluación (capacitaciones programadas o ejecutadas, estímulos otorgados, planes de acción implementados, planes de seguimiento implementados, etc.) (captadas a través del aplicativo SIIES y visita in situ).",
+                "description": "Evidencias de aplicación de acciones tomadas a partir de los resultados de la evaluación (capacitaciones programadas o ejecutadas, estímulos otorgados, planes de acción implementados, planes de seguimiento implementados, etc.) (captadas a través del aplicativo SIIES y visita in situ).",
                 "format": "PDF",
                 "mode": "DOCUMENTAL"
               }
@@ -894,8 +894,8 @@
               },
               {
                 "number": 4,
-                "label": "Informes con los resultados del seguimiento, control y evaluación de la ejecución del plan de formación y capacitación (captados a través del aplicativo SIIES y Visita in situ ).",
-                "description": "Informes con los resultados del seguimiento, control y evaluación de la ejecución del plan de formación y capacitación (captados a través del aplicativo SIIES y Visita in situ ).",
+                "label": "Informes con los resultados del seguimiento, control y evaluación de la ejecución del plan de formación y capacitación (captados a través del aplicativo SIIES y Visita in situ).",
+                "description": "Informes con los resultados del seguimiento, control y evaluación de la ejecución del plan de formación y capacitación (captados a través del aplicativo SIIES y Visita in situ).",
                 "format": "PDF",
                 "mode": "DOCUMENTAL"
               },
@@ -908,22 +908,22 @@
               },
               {
                 "number": 6,
-                "label": "Evidencias de los procesos de auto preparación (certificaciones institucionales, planificación y productos de los procesos, según lo indicado en la Descripción) (captadas a través del aplicativo SIIES y visita in situ ).",
-                "description": "Evidencias de los procesos de auto preparación (certificaciones institucionales, planificación y productos de los procesos, según lo indicado en la Descripción) (captadas a través del aplicativo SIIES y visita in situ ).",
+                "label": "Evidencias de los procesos de auto preparación (certificaciones institucionales, planificación y productos de los procesos, según lo indicado en la Descripción) (captadas a través del aplicativo SIIES y visita in situ).",
+                "description": "Evidencias de los procesos de auto preparación (certificaciones institucionales, planificación y productos de los procesos, según lo indicado en la Descripción) (captadas a través del aplicativo SIIES y visita in situ).",
                 "format": "PDF",
                 "mode": "DOCUMENTAL"
               },
               {
                 "number": 7,
-                "label": "Entrevista con el responsable institucional de la formación académica en curso y capacitación de los profesores (visita in situ ).",
-                "description": "Entrevista con el responsable institucional de la formación académica en curso y capacitación de los profesores (visita in situ ).",
+                "label": "Entrevista con el responsable institucional de la formación académica en curso y capacitación de los profesores (visita in situ).",
+                "description": "Entrevista con el responsable institucional de la formación académica en curso y capacitación de los profesores (visita in situ).",
                 "format": "PDF",
                 "mode": "PRESENCIAL"
               },
               {
                 "number": 8,
-                "label": "Entrevistas a los profesores (visita in situ ).",
-                "description": "Entrevistas a los profesores (visita in situ ).",
+                "label": "Entrevistas a los profesores (visita in situ).",
+                "description": "Entrevistas a los profesores (visita in situ).",
                 "format": "PDF",
                 "mode": "PRESENCIAL"
               },
@@ -1084,7 +1084,7 @@
           },
           {
             "code": "4.1.2",
-            "name": "AFINIDAD FORMACIÓN- DOCENCIA",
+            "name": "AFINIDAD FORMACIÓN-DOCENCIA",
             "description": "El 100% de las horas de clase son impartidas por profesores que cuentan con títulos de tercer nivel, maestría o doctorado (PhD) afín a la asignatura.",
             "type": "CUANTITATIVO",
             "sortOrder": 2,
@@ -1142,29 +1142,29 @@
               },
               {
                 "number": 2,
-                "label": "Evidencias sobre las acciones de seguimiento; es decir, sobre la captación, registro y procesamiento de información (registros, formularios, informes, entrevistas a actores, etc.). (captadas a través del aplicativo SIIES y visita in situ ).",
-                "description": "Evidencias sobre las acciones de seguimiento; es decir, sobre la captación, registro y procesamiento de información (registros, formularios, informes, entrevistas a actores, etc.). (captadas a través del aplicativo SIIES y visita in situ ).",
+                "label": "Evidencias sobre las acciones de seguimiento; es decir, sobre la captación, registro y procesamiento de información (registros, formularios, informes, entrevistas a actores, etc.). (captadas a través del aplicativo SIIES y visita in situ).",
+                "description": "Evidencias sobre las acciones de seguimiento; es decir, sobre la captación, registro y procesamiento de información (registros, formularios, informes, entrevistas a actores, etc.). (captadas a través del aplicativo SIIES y visita in situ).",
                 "format": "PDF",
                 "mode": "DOCUMENTAL"
               },
               {
                 "number": 3,
-                "label": "Evidencias que reflejan el análisis, a nivel de colectivos de asignatura/ cátedra, u otro nombre que se elija, del órgano colegiado superior, etc., de la información derivada del proceso de seguimiento, y las acciones acordadas (actas de reuniones, comunicación a los interesados de las acciones acordadas, entrevistas a actores, etc.) (captadas a través del aplicativo SIIES y visita in situ ).",
-                "description": "Evidencias que reflejan el análisis, a nivel de colectivos de asignatura/ cátedra, u otro nombre que se elija, del órgano colegiado superior, etc., de la información derivada del proceso de seguimiento, y las acciones acordadas (actas de reuniones, comunicación a los interesados de las acciones acordadas, entrevistas a actores, etc.) (captadas a través del aplicativo SIIES y visita in situ ).",
+                "label": "Evidencias que reflejan el análisis, a nivel de colectivos de asignatura/ cátedra, u otro nombre que se elija, del órgano colegiado superior, etc., de la información derivada del proceso de seguimiento, y las acciones acordadas (actas de reuniones, comunicación a los interesados de las acciones acordadas, entrevistas a actores, etc.) (captadas a través del aplicativo SIIES y visita in situ).",
+                "description": "Evidencias que reflejan el análisis, a nivel de colectivos de asignatura/ cátedra, u otro nombre que se elija, del órgano colegiado superior, etc., de la información derivada del proceso de seguimiento, y las acciones acordadas (actas de reuniones, comunicación a los interesados de las acciones acordadas, entrevistas a actores, etc.) (captadas a través del aplicativo SIIES y visita in situ).",
                 "format": "PDF",
                 "mode": "DOCUMENTAL"
               },
               {
                 "number": 4,
-                "label": "Evidencias de la aplicación de las acciones correctivas acordadas con relación a la ejecución del proceso de formación (actas de reuniones, comunicaciones a los interesados, entrevistas a actores, etc.) (captadas a través del aplicativo SIIES y visita in situ ).",
-                "description": "Evidencias de la aplicación de las acciones correctivas acordadas con relación a la ejecución del proceso de formación (actas de reuniones, comunicaciones a los interesados, entrevistas a actores, etc.) (captadas a través del aplicativo SIIES y visita in situ ).",
+                "label": "Evidencias de la aplicación de las acciones correctivas acordadas con relación a la ejecución del proceso de formación (actas de reuniones, comunicaciones a los interesados, entrevistas a actores, etc.) (captadas a través del aplicativo SIIES y visita in situ).",
+                "description": "Evidencias de la aplicación de las acciones correctivas acordadas con relación a la ejecución del proceso de formación (actas de reuniones, comunicaciones a los interesados, entrevistas a actores, etc.) (captadas a través del aplicativo SIIES y visita in situ).",
                 "format": "PDF",
                 "mode": "DOCUMENTAL"
               },
               {
                 "number": 5,
-                "label": "Evidencias de la aplicación de las modificaciones acordadas al diseño curricular (Actas de reuniones, comunicaciones a los interesados, comunicaciones y solicitudes al CES, entrevistas a actores, etc.) (captadas a través del aplicativo SIIES y visita in situ ).",
-                "description": "Evidencias de la aplicación de las modificaciones acordadas al diseño curricular (Actas de reuniones, comunicaciones a los interesados, comunicaciones y solicitudes al CES, entrevistas a actores, etc.) (captadas a través del aplicativo SIIES y visita in situ ).",
+                "label": "Evidencias de la aplicación de las modificaciones acordadas al diseño curricular (Actas de reuniones, comunicaciones a los interesados, comunicaciones y solicitudes al CES, entrevistas a actores, etc.) (captadas a través del aplicativo SIIES y visita in situ).",
+                "description": "Evidencias de la aplicación de las modificaciones acordadas al diseño curricular (Actas de reuniones, comunicaciones a los interesados, comunicaciones y solicitudes al CES, entrevistas a actores, etc.) (captadas a través del aplicativo SIIES y visita in situ).",
                 "format": "PDF",
                 "mode": "DOCUMENTAL"
               },
@@ -1177,8 +1177,8 @@
               },
               {
                 "number": 7,
-                "label": "Entrevista a responsables de los colectivos de asignatura/cátedra y directores/coordinadores de carrera (visita in situ ).",
-                "description": "Entrevista a responsables de los colectivos de asignatura/cátedra y directores/coordinadores de carrera (visita in situ ).",
+                "label": "Entrevista a responsables de los colectivos de asignatura/cátedra y directores/coordinadores de carrera (visita in situ).",
+                "description": "Entrevista a responsables de los colectivos de asignatura/cátedra y directores/coordinadores de carrera (visita in situ).",
                 "format": "PDF",
                 "mode": "PRESENCIAL"
               }
@@ -1207,8 +1207,8 @@
               },
               {
                 "number": 3,
-                "label": "Bibliografía básica de las asignaturas en formato digital (captado a través del aplicativo SIIES). Bibliografía impresa que no cuente con una versión digital (visita in situ ).",
-                "description": "Bibliografía básica de las asignaturas en formato digital (captado a través del aplicativo SIIES). Bibliografía impresa que no cuente con una versión digital (visita in situ ).",
+                "label": "Bibliografía básica de las asignaturas en formato digital (captado a través del aplicativo SIIES). Bibliografía impresa que no cuente con una versión digital (visita in situ).",
+                "description": "Bibliografía básica de las asignaturas en formato digital (captado a través del aplicativo SIIES). Bibliografía impresa que no cuente con una versión digital (visita in situ).",
                 "format": "PDF",
                 "mode": "DOCUMENTAL"
               },
@@ -1221,8 +1221,8 @@
               },
               {
                 "number": 5,
-                "label": "Entrevistas a profesores y estudiantes para constatar la utilización efectiva de la cobertura bibliográfica indicada en el PEA (visita in situ ).",
-                "description": "Entrevistas a profesores y estudiantes para constatar la utilización efectiva de la cobertura bibliográfica indicada en el PEA (visita in situ ).",
+                "label": "Entrevistas a profesores y estudiantes para constatar la utilización efectiva de la cobertura bibliográfica indicada en el PEA (visita in situ).",
+                "description": "Entrevistas a profesores y estudiantes para constatar la utilización efectiva de la cobertura bibliográfica indicada en el PEA (visita in situ).",
                 "format": "PDF",
                 "mode": "PRESENCIAL"
               }
@@ -1237,8 +1237,8 @@
             "requirements": [
               {
                 "number": 1,
-                "label": "Versión digital en formato PDF de la publicación ya editorializada, según los requisitos indicados en la Descripción. Si no se dispusiera de versiones digitales, escanear la versión impresa y subirla. En los casos de documentos sin versión digital y que cuenten con un elevado número de páginas (más de 30) se revisará el documento impreso durante la visita in situ, siempre en versiones editorializadas (captadas a través del aplicativo SIIES y visita in situ ).",
-                "description": "Versión digital en formato PDF de la publicación ya editorializada, según los requisitos indicados en la Descripción. Si no se dispusiera de versiones digitales, escanear la versión impresa y subirla. En los casos de documentos sin versión digital y que cuenten con un elevado número de páginas (más de 30) se revisará el documento impreso durante la visita in situ, siempre en versiones editorializadas (captadas a través del aplicativo SIIES y visita in situ ).",
+                "label": "Versión digital en formato PDF de la publicación ya editorializada, según los requisitos indicados en la Descripción. Si no se dispusiera de versiones digitales, escanear la versión impresa y subirla. En los casos de documentos sin versión digital y que cuenten con un elevado número de páginas (más de 30) se revisará el documento impreso durante la visita in situ, siempre en versiones editorializadas (captadas a través del aplicativo SIIES y visita in situ).",
+                "description": "Versión digital en formato PDF de la publicación ya editorializada, según los requisitos indicados en la Descripción. Si no se dispusiera de versiones digitales, escanear la versión impresa y subirla. En los casos de documentos sin versión digital y que cuenten con un elevado número de páginas (más de 30) se revisará el documento impreso durante la visita in situ, siempre en versiones editorializadas (captadas a través del aplicativo SIIES y visita in situ).",
                 "format": "PDF",
                 "mode": "DOCUMENTAL"
               },
@@ -1281,15 +1281,15 @@
             "requirements": [
               {
                 "number": 1,
-                "label": "Verificación de las condiciones de las aulas, según lo indicado en la Descripción (visita in situ ).",
-                "description": "Verificación de las condiciones de las aulas, según lo indicado en la Descripción (visita in situ ).",
+                "label": "Verificación de las condiciones de las aulas, según lo indicado en la Descripción (visita in situ).",
+                "description": "Verificación de las condiciones de las aulas, según lo indicado en la Descripción (visita in situ).",
                 "format": "PDF",
                 "mode": "PRESENCIAL"
               },
               {
                 "number": 2,
-                "label": "Entrevistas a la comunidad educativa sobre las condiciones de las aulas (visita in situ ).",
-                "description": "Entrevistas a la comunidad educativa sobre las condiciones de las aulas (visita in situ ).",
+                "label": "Entrevistas a la comunidad educativa sobre las condiciones de las aulas (visita in situ).",
+                "description": "Entrevistas a la comunidad educativa sobre las condiciones de las aulas (visita in situ).",
                 "format": "PDF",
                 "mode": "PRESENCIAL"
               }
@@ -1355,8 +1355,8 @@
               },
               {
                 "number": 3,
-                "label": "Instrumentos aplicados con la información captada de cada estudiante (informes sobre el perfil de los estudiantes, informes socioeconómicos, etc.) (visita in situ ).",
-                "description": "Instrumentos aplicados con la información captada de cada estudiante (informes sobre el perfil de los estudiantes, informes socioeconómicos, etc.) (visita in situ ).",
+                "label": "Instrumentos aplicados con la información captada de cada estudiante (informes sobre el perfil de los estudiantes, informes socioeconómicos, etc.) (visita in situ).",
+                "description": "Instrumentos aplicados con la información captada de cada estudiante (informes sobre el perfil de los estudiantes, informes socioeconómicos, etc.) (visita in situ).",
                 "format": "PDF",
                 "mode": "DOCUMENTAL"
               },
@@ -1369,8 +1369,8 @@
               },
               {
                 "number": 5,
-                "label": "Evidencias de las actividades realizadas como parte del proceso de acompañamiento y sus resultados (informes, actas de reuniones, actas de tutorías, entrevistas a estudiantes y profesores, etc.) (captadas a través del aplicativo SIIES y visita in situ ).",
-                "description": "Evidencias de las actividades realizadas como parte del proceso de acompañamiento y sus resultados (informes, actas de reuniones, actas de tutorías, entrevistas a estudiantes y profesores, etc.) (captadas a través del aplicativo SIIES y visita in situ ).",
+                "label": "Evidencias de las actividades realizadas como parte del proceso de acompañamiento y sus resultados (informes, actas de reuniones, actas de tutorías, entrevistas a estudiantes y profesores, etc.) (captadas a través del aplicativo SIIES y visita in situ).",
+                "description": "Evidencias de las actividades realizadas como parte del proceso de acompañamiento y sus resultados (informes, actas de reuniones, actas de tutorías, entrevistas a estudiantes y profesores, etc.) (captadas a través del aplicativo SIIES y visita in situ).",
                 "format": "PDF",
                 "mode": "DOCUMENTAL"
               },
@@ -1383,8 +1383,8 @@
               },
               {
                 "number": 7,
-                "label": "Evidencias de la aplicación del sistema de estímulos (actas del Órgano Colegiado Superior, material audiovisual explícito sobre los actos de entrega de los estímulos, entrevistas a los miembros de la comunidad educativa estimulados, etc.) Los registros en audio y video deben cumplir con lo establecido en el Art. 178 del COIP (captadas a través del aplicativo SIIES y visita in situ ).",
-                "description": "Evidencias de la aplicación del sistema de estímulos (actas del Órgano Colegiado Superior, material audiovisual explícito sobre los actos de entrega de los estímulos, entrevistas a los miembros de la comunidad educativa estimulados, etc.) Los registros en audio y video deben cumplir con lo establecido en el Art. 178 del COIP (captadas a través del aplicativo SIIES y visita in situ ).",
+                "label": "Evidencias de la aplicación del sistema de estímulos (actas del Órgano Colegiado Superior, material audiovisual explícito sobre los actos de entrega de los estímulos, entrevistas a los miembros de la comunidad educativa estimulados, etc.) Los registros en audio y video deben cumplir con lo establecido en el Art. 178 del COIP (captadas a través del aplicativo SIIES y visita in situ).",
+                "description": "Evidencias de la aplicación del sistema de estímulos (actas del Órgano Colegiado Superior, material audiovisual explícito sobre los actos de entrega de los estímulos, entrevistas a los miembros de la comunidad educativa estimulados, etc.) Los registros en audio y video deben cumplir con lo establecido en el Art. 178 del COIP (captadas a través del aplicativo SIIES y visita in situ).",
                 "format": "PDF",
                 "mode": "DOCUMENTAL"
               }
@@ -1413,15 +1413,15 @@
               },
               {
                 "number": 3,
-                "label": "Instrumentos que se utilizan para obtener información de los graduados y empleadores. (formatos de actas de reuniones, encuestas, formularios, etc.) (captados a través del aplicativo SIIES y visita in situ ).",
-                "description": "Instrumentos que se utilizan para obtener información de los graduados y empleadores. (formatos de actas de reuniones, encuestas, formularios, etc.) (captados a través del aplicativo SIIES y visita in situ ).",
+                "label": "Instrumentos que se utilizan para obtener información de los graduados y empleadores. (formatos de actas de reuniones, encuestas, formularios, etc.) (captados a través del aplicativo SIIES y visita in situ).",
+                "description": "Instrumentos que se utilizan para obtener información de los graduados y empleadores. (formatos de actas de reuniones, encuestas, formularios, etc.) (captados a través del aplicativo SIIES y visita in situ).",
                 "format": "PDF",
                 "mode": "DOCUMENTAL"
               },
               {
                 "number": 4,
-                "label": "Instrumentos aplicados con la información captada de los graduados y empleadores. (Actas de reuniones suscritas, encuestas llenadas, etc.) (visita in situ ).",
-                "description": "Instrumentos aplicados con la información captada de los graduados y empleadores. (Actas de reuniones suscritas, encuestas llenadas, etc.) (visita in situ ).",
+                "label": "Instrumentos aplicados con la información captada de los graduados y empleadores. (Actas de reuniones suscritas, encuestas llenadas, etc.) (visita in situ).",
+                "description": "Instrumentos aplicados con la información captada de los graduados y empleadores. (Actas de reuniones suscritas, encuestas llenadas, etc.) (visita in situ).",
                 "format": "PDF",
                 "mode": "DOCUMENTAL"
               },
@@ -1448,8 +1448,8 @@
               },
               {
                 "number": 8,
-                "label": "Evidencias de la participación de los graduados en actividades académicas (certificados de participación) y no académicas (documentos de constitución de asociación de graduados, actas de reuniones, etc.) y de la difusión que se hace de sus logros (publicaciones impresas o digitales, reconocimientos, material audiovisual explícito, etc.) Los registros en audio y video deben cumplir con lo establecido en el Art. 178 del COIP (captadas a través del aplicativo SIIES y visita in situ ).",
-                "description": "Evidencias de la participación de los graduados en actividades académicas (certificados de participación) y no académicas (documentos de constitución de asociación de graduados, actas de reuniones, etc.) y de la difusión que se hace de sus logros (publicaciones impresas o digitales, reconocimientos, material audiovisual explícito, etc.) Los registros en audio y video deben cumplir con lo establecido en el Art. 178 del COIP (captadas a través del aplicativo SIIES y visita in situ ).",
+                "label": "Evidencias de la participación de los graduados en actividades académicas (certificados de participación) y no académicas (documentos de constitución de asociación de graduados, actas de reuniones, etc.) y de la difusión que se hace de sus logros (publicaciones impresas o digitales, reconocimientos, material audiovisual explícito, etc.) Los registros en audio y video deben cumplir con lo establecido en el Art. 178 del COIP (captadas a través del aplicativo SIIES y visita in situ).",
+                "description": "Evidencias de la participación de los graduados en actividades académicas (certificados de participación) y no académicas (documentos de constitución de asociación de graduados, actas de reuniones, etc.) y de la difusión que se hace de sus logros (publicaciones impresas o digitales, reconocimientos, material audiovisual explícito, etc.) Los registros en audio y video deben cumplir con lo establecido en el Art. 178 del COIP (captadas a través del aplicativo SIIES y visita in situ).",
                 "format": "PDF",
                 "mode": "DOCUMENTAL"
               }
@@ -1478,8 +1478,8 @@
               },
               {
                 "number": 2,
-                "label": "Evidencias de la disponibilidad 24 horas, los 7 días de la semana de los EVA; ya sea por equipos UPS (Uninterruptible Power Supply) ubicados localmente o mediante una certificación del hosting en la nube (captadas a través del aplicativo SIIES y visita in situ ).",
-                "description": "Evidencias de la disponibilidad 24 horas, los 7 días de la semana de los EVA; ya sea por equipos UPS (Uninterruptible Power Supply) ubicados localmente o mediante una certificación del hosting en la nube (captadas a través del aplicativo SIIES y visita in situ ).",
+                "label": "Evidencias de la disponibilidad 24 horas, los 7 días de la semana de los EVA; ya sea por equipos UPS (Uninterruptible Power Supply) ubicados localmente o mediante una certificación del hosting en la nube (captadas a través del aplicativo SIIES y visita in situ).",
+                "description": "Evidencias de la disponibilidad 24 horas, los 7 días de la semana de los EVA; ya sea por equipos UPS (Uninterruptible Power Supply) ubicados localmente o mediante una certificación del hosting en la nube (captadas a través del aplicativo SIIES y visita in situ).",
                 "format": "PDF",
                 "mode": "DOCUMENTAL"
               },
@@ -1513,8 +1513,8 @@
               },
               {
                 "number": 7,
-                "label": "Entrevistas a profesores y estudiantes sobre acceso, interfaz y utilización de EVA (visita in situ ).",
-                "description": "Entrevistas a profesores y estudiantes sobre acceso, interfaz y utilización de EVA (visita in situ ).",
+                "label": "Entrevistas a profesores y estudiantes sobre acceso, interfaz y utilización de EVA (visita in situ).",
+                "description": "Entrevistas a profesores y estudiantes sobre acceso, interfaz y utilización de EVA (visita in situ).",
                 "format": "PDF",
                 "mode": "PRESENCIAL"
               }
@@ -1543,36 +1543,36 @@
               },
               {
                 "number": 3,
-                "label": "Evidencias de actividades realizadas por los profesores que requieren uso de TIC por parte de los estudiantes (pueden ser: plan de desarrollo de la actividad, portafolio docente o estudiantil, programas informáticos o aplicaciones utilizadas entrevistas a profesores y estudiantes) (visita in situ ).",
-                "description": "Evidencias de actividades realizadas por los profesores que requieren uso de TIC por parte de los estudiantes (pueden ser: plan de desarrollo de la actividad, portafolio docente o estudiantil, programas informáticos o aplicaciones utilizadas entrevistas a profesores y estudiantes) (visita in situ ).",
+                "label": "Evidencias de actividades realizadas por los profesores que requieren uso de TIC por parte de los estudiantes (pueden ser: plan de desarrollo de la actividad, portafolio docente o estudiantil, programas informáticos o aplicaciones utilizadas entrevistas a profesores y estudiantes) (visita in situ).",
+                "description": "Evidencias de actividades realizadas por los profesores que requieren uso de TIC por parte de los estudiantes (pueden ser: plan de desarrollo de la actividad, portafolio docente o estudiantil, programas informáticos o aplicaciones utilizadas entrevistas a profesores y estudiantes) (visita in situ).",
                 "format": "PDF",
                 "mode": "DOCUMENTAL"
               },
               {
                 "number": 4,
-                "label": "Evidencias de la utilización, por parte de los estudiantes, de las aplicaciones y paquetes informáticos generales y específicos instalados en los computadores de la institución (pueden ser: programas de estudio de las asignaturas, plan de clase, trabajos, actividades realizadas mediante el uso de las aplicaciones o paquetes informáticos, entrevistas a profesores y estudiantes) (captadas a través del aplicativo SIIES y visita in situ ).",
-                "description": "Evidencias de la utilización, por parte de los estudiantes, de las aplicaciones y paquetes informáticos generales y específicos instalados en los computadores de la institución (pueden ser: programas de estudio de las asignaturas, plan de clase, trabajos, actividades realizadas mediante el uso de las aplicaciones o paquetes informáticos, entrevistas a profesores y estudiantes) (captadas a través del aplicativo SIIES y visita in situ ).",
+                "label": "Evidencias de la utilización, por parte de los estudiantes, de las aplicaciones y paquetes informáticos generales y específicos instalados en los computadores de la institución (pueden ser: programas de estudio de las asignaturas, plan de clase, trabajos, actividades realizadas mediante el uso de las aplicaciones o paquetes informáticos, entrevistas a profesores y estudiantes) (captadas a través del aplicativo SIIES y visita in situ).",
+                "description": "Evidencias de la utilización, por parte de los estudiantes, de las aplicaciones y paquetes informáticos generales y específicos instalados en los computadores de la institución (pueden ser: programas de estudio de las asignaturas, plan de clase, trabajos, actividades realizadas mediante el uso de las aplicaciones o paquetes informáticos, entrevistas a profesores y estudiantes) (captadas a través del aplicativo SIIES y visita in situ).",
                 "format": "PDF",
                 "mode": "DOCUMENTAL"
               },
               {
                 "number": 5,
-                "label": "Recursos de realidad virtual y/o simuladores basados en programas informáticos que se utilizan en la institución (visita in situ ).",
-                "description": "Recursos de realidad virtual y/o simuladores basados en programas informáticos que se utilizan en la institución (visita in situ ).",
+                "label": "Recursos de realidad virtual y/o simuladores basados en programas informáticos que se utilizan en la institución (visita in situ).",
+                "description": "Recursos de realidad virtual y/o simuladores basados en programas informáticos que se utilizan en la institución (visita in situ).",
                 "format": "PDF",
                 "mode": "DOCUMENTAL"
               },
               {
                 "number": 6,
-                "label": "Evidencias de la utilización, por parte de los estudiantes, de los recursos de realidad virtual y/o simuladores basados en programas informáticos en el proceso de enseñanza (pueden ser: programas de estudio de las asignaturas, plan de desarrollo de las actividades, registros generados por los simuladores o recursos de realidad virtual, entrevistas a profesores y estudiantes) (captadas a través del aplicativo SIIES y visita in situ ).",
-                "description": "Evidencias de la utilización, por parte de los estudiantes, de los recursos de realidad virtual y/o simuladores basados en programas informáticos en el proceso de enseñanza (pueden ser: programas de estudio de las asignaturas, plan de desarrollo de las actividades, registros generados por los simuladores o recursos de realidad virtual, entrevistas a profesores y estudiantes) (captadas a través del aplicativo SIIES y visita in situ ).",
+                "label": "Evidencias de la utilización, por parte de los estudiantes, de los recursos de realidad virtual y/o simuladores basados en programas informáticos en el proceso de enseñanza (pueden ser: programas de estudio de las asignaturas, plan de desarrollo de las actividades, registros generados por los simuladores o recursos de realidad virtual, entrevistas a profesores y estudiantes) (captadas a través del aplicativo SIIES y visita in situ).",
+                "description": "Evidencias de la utilización, por parte de los estudiantes, de los recursos de realidad virtual y/o simuladores basados en programas informáticos en el proceso de enseñanza (pueden ser: programas de estudio de las asignaturas, plan de desarrollo de las actividades, registros generados por los simuladores o recursos de realidad virtual, entrevistas a profesores y estudiantes) (captadas a través del aplicativo SIIES y visita in situ).",
                 "format": "PDF",
                 "mode": "DOCUMENTAL"
               },
               {
                 "number": 7,
-                "label": "Verificación de las aplicaciones y paquetes informáticos generales y específicos instalados en los computadores de la institución. (visita in situ ).",
-                "description": "Verificación de las aplicaciones y paquetes informáticos generales y específicos instalados en los computadores de la institución. (visita in situ ).",
+                "label": "Verificación de las aplicaciones y paquetes informáticos generales y específicos instalados en los computadores de la institución. (visita in situ).",
+                "description": "Verificación de las aplicaciones y paquetes informáticos generales y específicos instalados en los computadores de la institución. (visita in situ).",
                 "format": "PDF",
                 "mode": "PRESENCIAL"
               }
@@ -1608,15 +1608,15 @@
               },
               {
                 "number": 3,
-                "label": "Evidencias de las acciones de buenas prácticas ambientales implementadas por la institución (proyectos de buenas prácticas ambientales y sus respectivos informes de cumplimiento, certificaciones ambientales obtenidas, entrevistas a profesores y estudiantes, etc.) (captadas a través del aplicativo SIIES y visita in situ ).",
-                "description": "Evidencias de las acciones de buenas prácticas ambientales implementadas por la institución (proyectos de buenas prácticas ambientales y sus respectivos informes de cumplimiento, certificaciones ambientales obtenidas, entrevistas a profesores y estudiantes, etc.) (captadas a través del aplicativo SIIES y visita in situ ).",
+                "label": "Evidencias de las acciones de buenas prácticas ambientales implementadas por la institución (proyectos de buenas prácticas ambientales y sus respectivos informes de cumplimiento, certificaciones ambientales obtenidas, entrevistas a profesores y estudiantes, etc.) (captadas a través del aplicativo SIIES y visita in situ).",
+                "description": "Evidencias de las acciones de buenas prácticas ambientales implementadas por la institución (proyectos de buenas prácticas ambientales y sus respectivos informes de cumplimiento, certificaciones ambientales obtenidas, entrevistas a profesores y estudiantes, etc.) (captadas a través del aplicativo SIIES y visita in situ).",
                 "format": "PDF",
                 "mode": "DOCUMENTAL"
               },
               {
                 "number": 4,
-                "label": "Evidencias de las acciones de promoción y difusión del cuidado ambiental implementadas por la institución (materiales de campañas creadas o en las que participa la institución, convenios suscritos con otras instituciones para la promoción del cuidado ambiental, PEA de los cursos de formación continua y registros de participantes, entrevistas a profesores y estudiantes, etc.) (captadas a través del aplicativo SIIES y visita in situ ).",
-                "description": "Evidencias de las acciones de promoción y difusión del cuidado ambiental implementadas por la institución (materiales de campañas creadas o en las que participa la institución, convenios suscritos con otras instituciones para la promoción del cuidado ambiental, PEA de los cursos de formación continua y registros de participantes, entrevistas a profesores y estudiantes, etc.) (captadas a través del aplicativo SIIES y visita in situ ).",
+                "label": "Evidencias de las acciones de promoción y difusión del cuidado ambiental implementadas por la institución (materiales de campañas creadas o en las que participa la institución, convenios suscritos con otras instituciones para la promoción del cuidado ambiental, PEA de los cursos de formación continua y registros de participantes, entrevistas a profesores y estudiantes, etc.) (captadas a través del aplicativo SIIES y visita in situ).",
+                "description": "Evidencias de las acciones de promoción y difusión del cuidado ambiental implementadas por la institución (materiales de campañas creadas o en las que participa la institución, convenios suscritos con otras instituciones para la promoción del cuidado ambiental, PEA de los cursos de formación continua y registros de participantes, entrevistas a profesores y estudiantes, etc.) (captadas a través del aplicativo SIIES y visita in situ).",
                 "format": "PDF",
                 "mode": "DOCUMENTAL"
               }
@@ -1638,8 +1638,8 @@
               },
               {
                 "number": 2,
-                "label": "Evidencias de las acciones realizadas como parte del plan de formación en valores y desarrollo de habilidades blandas (informes de ejecución de proyectos y actividades, material audiovisual explícito, afiches, entrevistas a profesores y estudiantes, etc.) Los registros en audio y video deben cumplir con lo establecido en el Art. 178 del COIP (captadas a través del aplicativo SIIES y Visita in situ ).",
-                "description": "Evidencias de las acciones realizadas como parte del plan de formación en valores y desarrollo de habilidades blandas (informes de ejecución de proyectos y actividades, material audiovisual explícito, afiches, entrevistas a profesores y estudiantes, etc.) Los registros en audio y video deben cumplir con lo establecido en el Art. 178 del COIP (captadas a través del aplicativo SIIES y Visita in situ ).",
+                "label": "Evidencias de las acciones realizadas como parte del plan de formación en valores y desarrollo de habilidades blandas (informes de ejecución de proyectos y actividades, material audiovisual explícito, afiches, entrevistas a profesores y estudiantes, etc.) Los registros en audio y video deben cumplir con lo establecido en el Art. 178 del COIP (captadas a través del aplicativo SIIES y Visita in situ).",
+                "description": "Evidencias de las acciones realizadas como parte del plan de formación en valores y desarrollo de habilidades blandas (informes de ejecución de proyectos y actividades, material audiovisual explícito, afiches, entrevistas a profesores y estudiantes, etc.) Los registros en audio y video deben cumplir con lo establecido en el Art. 178 del COIP (captadas a través del aplicativo SIIES y Visita in situ).",
                 "format": "PDF",
                 "mode": "DOCUMENTAL"
               },
@@ -1696,15 +1696,15 @@
               },
               {
                 "number": 2,
-                "label": "Laboratorios, talleres y otros espacios para prácticas, equipos e insumos para el desarrollo de este tipo de clases (visita in situ ).",
-                "description": "Laboratorios, talleres y otros espacios para prácticas, equipos e insumos para el desarrollo de este tipo de clases (visita in situ ).",
+                "label": "Laboratorios, talleres y otros espacios para prácticas, equipos e insumos para el desarrollo de este tipo de clases (visita in situ).",
+                "description": "Laboratorios, talleres y otros espacios para prácticas, equipos e insumos para el desarrollo de este tipo de clases (visita in situ).",
                 "format": "PDF",
                 "mode": "DOCUMENTAL"
               },
               {
                 "number": 3,
-                "label": "Desarrollo de las clases de formación práctica (visita in situ ).",
-                "description": "Desarrollo de las clases de formación práctica (visita in situ ).",
+                "label": "Desarrollo de las clases de formación práctica (visita in situ).",
+                "description": "Desarrollo de las clases de formación práctica (visita in situ).",
                 "format": "PDF",
                 "mode": "PRESENCIAL"
               },
@@ -1724,22 +1724,22 @@
               },
               {
                 "number": 6,
-                "label": "Inventario actualizado de los equipos disponibles en cada laboratorio, taller y otros espacios para prácticas, incluidos los equipos para la seguridad de estudiantes y profesores (visita in situ ).",
-                "description": "Inventario actualizado de los equipos disponibles en cada laboratorio, taller y otros espacios para prácticas, incluidos los equipos para la seguridad de estudiantes y profesores (visita in situ ).",
+                "label": "Inventario actualizado de los equipos disponibles en cada laboratorio, taller y otros espacios para prácticas, incluidos los equipos para la seguridad de estudiantes y profesores (visita in situ).",
+                "description": "Inventario actualizado de los equipos disponibles en cada laboratorio, taller y otros espacios para prácticas, incluidos los equipos para la seguridad de estudiantes y profesores (visita in situ).",
                 "format": "PDF",
                 "mode": "DOCUMENTAL"
               },
               {
                 "number": 7,
-                "label": "Lista certificada de los estudiantes de cada paralelo (visita in situ ).",
-                "description": "Lista certificada de los estudiantes de cada paralelo (visita in situ ).",
+                "label": "Lista certificada de los estudiantes de cada paralelo (visita in situ).",
+                "description": "Lista certificada de los estudiantes de cada paralelo (visita in situ).",
                 "format": "PDF",
                 "mode": "DOCUMENTAL"
               },
               {
                 "number": 8,
-                "label": "Horarios de clases en los que se indica, claramente, la ocupación de laboratorios, talleres y otros espacios para prácticas por los distintos paralelos (visita in situ ).",
-                "description": "Horarios de clases en los que se indica, claramente, la ocupación de laboratorios, talleres y otros espacios para prácticas por los distintos paralelos (visita in situ ).",
+                "label": "Horarios de clases en los que se indica, claramente, la ocupación de laboratorios, talleres y otros espacios para prácticas por los distintos paralelos (visita in situ).",
+                "description": "Horarios de clases en los que se indica, claramente, la ocupación de laboratorios, talleres y otros espacios para prácticas por los distintos paralelos (visita in situ).",
                 "format": "PDF",
                 "mode": "DOCUMENTAL"
               },
@@ -1782,8 +1782,8 @@
               },
               {
                 "number": 2,
-                "label": "Documentación de las entidades formadoras según lo indicado en la Descripción (visita in situ ).",
-                "description": "Documentación de las entidades formadoras según lo indicado en la Descripción (visita in situ ).",
+                "label": "Documentación de las entidades formadoras según lo indicado en la Descripción (visita in situ).",
+                "description": "Documentación de las entidades formadoras según lo indicado en la Descripción (visita in situ).",
                 "format": "PDF",
                 "mode": "DOCUMENTAL"
               },
@@ -1796,15 +1796,15 @@
               },
               {
                 "number": 4,
-                "label": "Plan de Aprendizaje Práctico y de Rotación (PAPR) de los estudiantes (visita in situ ).",
-                "description": "Plan de Aprendizaje Práctico y de Rotación (PAPR) de los estudiantes (visita in situ ).",
+                "label": "Plan de Aprendizaje Práctico y de Rotación (PAPR) de los estudiantes (visita in situ).",
+                "description": "Plan de Aprendizaje Práctico y de Rotación (PAPR) de los estudiantes (visita in situ).",
                 "format": "PDF",
                 "mode": "DOCUMENTAL"
               },
               {
                 "number": 5,
-                "label": "Evidencias del seguimiento y control a los estudiantes en los períodos de formación práctica en el entorno laboral real (informes, actas, entrevistas, etc.) (captadas a través del aplicativo SIIES y visita in situ ).",
-                "description": "Evidencias del seguimiento y control a los estudiantes en los períodos de formación práctica en el entorno laboral real (informes, actas, entrevistas, etc.) (captadas a través del aplicativo SIIES y visita in situ ).",
+                "label": "Evidencias del seguimiento y control a los estudiantes en los períodos de formación práctica en el entorno laboral real (informes, actas, entrevistas, etc.) (captadas a través del aplicativo SIIES y visita in situ).",
+                "description": "Evidencias del seguimiento y control a los estudiantes en los períodos de formación práctica en el entorno laboral real (informes, actas, entrevistas, etc.) (captadas a través del aplicativo SIIES y visita in situ).",
                 "format": "PDF",
                 "mode": "DOCUMENTAL"
               },
@@ -1824,36 +1824,36 @@
               },
               {
                 "number": 8,
-                "label": "Bitácoras de los estudiantes en formación práctica en el entorno laboral real (visita in situ ).",
-                "description": "Bitácoras de los estudiantes en formación práctica en el entorno laboral real (visita in situ ).",
+                "label": "Bitácoras de los estudiantes en formación práctica en el entorno laboral real (visita in situ).",
+                "description": "Bitácoras de los estudiantes en formación práctica en el entorno laboral real (visita in situ).",
                 "format": "PDF",
                 "mode": "DOCUMENTAL"
               },
               {
                 "number": 9,
-                "label": "Documentación relacionada con la evaluación de los estudiantes en la formación práctica en el entorno laboral real (evaluación del periodo de práctica, defensa de informes, defensa de Proyectos empresariales (MFD), examen intermedio (MFD), examen final (MFD), etc. En el caso de los exámenes intermedio y final (MFD) presentar la documentación de los exámenes correspondientes a la última convocatoria en cada caso, aunque sea anterior al período de evaluación (visita in situ ).",
-                "description": "Documentación relacionada con la evaluación de los estudiantes en la formación práctica en el entorno laboral real (evaluación del periodo de práctica, defensa de informes, defensa de Proyectos empresariales (MFD), examen intermedio (MFD), examen final (MFD), etc. En el caso de los exámenes intermedio y final (MFD) presentar la documentación de los exámenes correspondientes a la última convocatoria en cada caso, aunque sea anterior al período de evaluación (visita in situ ).",
+                "label": "Documentación relacionada con la evaluación de los estudiantes en la formación práctica en el entorno laboral real (evaluación del periodo de práctica, defensa de informes, defensa de Proyectos empresariales (MFD), examen intermedio (MFD), examen final (MFD), etc. En el caso de los exámenes intermedio y final (MFD) presentar la documentación de los exámenes correspondientes a la última convocatoria en cada caso, aunque sea anterior al período de evaluación (visita in situ).",
+                "description": "Documentación relacionada con la evaluación de los estudiantes en la formación práctica en el entorno laboral real (evaluación del periodo de práctica, defensa de informes, defensa de Proyectos empresariales (MFD), examen intermedio (MFD), examen final (MFD), etc. En el caso de los exámenes intermedio y final (MFD) presentar la documentación de los exámenes correspondientes a la última convocatoria en cada caso, aunque sea anterior al período de evaluación (visita in situ).",
                 "format": "PDF",
                 "mode": "DOCUMENTAL"
               },
               {
                 "number": 10,
-                "label": "Documentos elaborados por los estudiantes (informes de prácticas, proyectos empresariales (MFD), etc.) (visita in situ ).",
-                "description": "Documentos elaborados por los estudiantes (informes de prácticas, proyectos empresariales (MFD), etc.) (visita in situ ).",
+                "label": "Documentos elaborados por los estudiantes (informes de prácticas, proyectos empresariales (MFD), etc.) (visita in situ).",
+                "description": "Documentos elaborados por los estudiantes (informes de prácticas, proyectos empresariales (MFD), etc.) (visita in situ).",
                 "format": "PDF",
                 "mode": "DOCUMENTAL"
               },
               {
                 "number": 11,
-                "label": "Actas de entrega a los estudiantes de las orientaciones sobre seguridad y de los medios de protección correspondientes (visita in situ ).",
-                "description": "Actas de entrega a los estudiantes de las orientaciones sobre seguridad y de los medios de protección correspondientes (visita in situ ).",
+                "label": "Actas de entrega a los estudiantes de las orientaciones sobre seguridad y de los medios de protección correspondientes (visita in situ).",
+                "description": "Actas de entrega a los estudiantes de las orientaciones sobre seguridad y de los medios de protección correspondientes (visita in situ).",
                 "format": "PDF",
                 "mode": "DOCUMENTAL"
               },
               {
                 "number": 12,
-                "label": "Entrevistas a estudiantes, tutores académicos, tutores de entidades formadoras y directores/coordinadores de carrera (visita in situ ).",
-                "description": "Entrevistas a estudiantes, tutores académicos, tutores de entidades formadoras y directores/coordinadores de carrera (visita in situ ).",
+                "label": "Entrevistas a estudiantes, tutores académicos, tutores de entidades formadoras y directores/coordinadores de carrera (visita in situ).",
+                "description": "Entrevistas a estudiantes, tutores académicos, tutores de entidades formadoras y directores/coordinadores de carrera (visita in situ).",
                 "format": "PDF",
                 "mode": "PRESENCIAL"
               },
@@ -1903,22 +1903,22 @@
               },
               {
                 "number": 2,
-                "label": "Evidencias de las actividades de formación de usuarios realizadas por la biblioteca (entrevistas a estudiantes, documentos de planificación de las actividades e informes de ejecución, certificados de los asistentes, material audiovisual explícito sobre las actividades, etc.) Los registros en audio y video deben cumplir con lo establecido en el Art. 178 del COIP (captadas a través del aplicativo SIIES y visita in situ ).",
-                "description": "Evidencias de las actividades de formación de usuarios realizadas por la biblioteca (entrevistas a estudiantes, documentos de planificación de las actividades e informes de ejecución, certificados de los asistentes, material audiovisual explícito sobre las actividades, etc.) Los registros en audio y video deben cumplir con lo establecido en el Art. 178 del COIP (captadas a través del aplicativo SIIES y visita in situ ).",
+                "label": "Evidencias de las actividades de formación de usuarios realizadas por la biblioteca (entrevistas a estudiantes, documentos de planificación de las actividades e informes de ejecución, certificados de los asistentes, material audiovisual explícito sobre las actividades, etc.) Los registros en audio y video deben cumplir con lo establecido en el Art. 178 del COIP (captadas a través del aplicativo SIIES y visita in situ).",
+                "description": "Evidencias de las actividades de formación de usuarios realizadas por la biblioteca (entrevistas a estudiantes, documentos de planificación de las actividades e informes de ejecución, certificados de los asistentes, material audiovisual explícito sobre las actividades, etc.) Los registros en audio y video deben cumplir con lo establecido en el Art. 178 del COIP (captadas a través del aplicativo SIIES y visita in situ).",
                 "format": "PDF",
                 "mode": "DOCUMENTAL"
               },
               {
                 "number": 3,
-                "label": "Evidencias de las actividades de difusión de la biblioteca (documentos de planificación de las actividades e informes de ejecución, carteleras, correos electrónicos, entrevistas al personal de la biblioteca y a estudiantes, material audiovisual explícito sobre las actividades, etc.) Los registros en audio y video deben cumplir con lo establecido en el Art. 178 del COIP (captadas a través del aplicativo SIIES y visita in situ ).",
-                "description": "Evidencias de las actividades de difusión de la biblioteca (documentos de planificación de las actividades e informes de ejecución, carteleras, correos electrónicos, entrevistas al personal de la biblioteca y a estudiantes, material audiovisual explícito sobre las actividades, etc.) Los registros en audio y video deben cumplir con lo establecido en el Art. 178 del COIP (captadas a través del aplicativo SIIES y visita in situ ).",
+                "label": "Evidencias de las actividades de difusión de la biblioteca (documentos de planificación de las actividades e informes de ejecución, carteleras, correos electrónicos, entrevistas al personal de la biblioteca y a estudiantes, material audiovisual explícito sobre las actividades, etc.) Los registros en audio y video deben cumplir con lo establecido en el Art. 178 del COIP (captadas a través del aplicativo SIIES y visita in situ).",
+                "description": "Evidencias de las actividades de difusión de la biblioteca (documentos de planificación de las actividades e informes de ejecución, carteleras, correos electrónicos, entrevistas al personal de la biblioteca y a estudiantes, material audiovisual explícito sobre las actividades, etc.) Los registros en audio y video deben cumplir con lo establecido en el Art. 178 del COIP (captadas a través del aplicativo SIIES y visita in situ).",
                 "format": "PDF",
                 "mode": "DOCUMENTAL"
               },
               {
                 "number": 4,
-                "label": "Sistema informático de gestión en pleno funcionamiento y su utilización por profesores y estudiantes (visita in situ ).",
-                "description": "Sistema informático de gestión en pleno funcionamiento y su utilización por profesores y estudiantes (visita in situ ).",
+                "label": "Sistema informático de gestión en pleno funcionamiento y su utilización por profesores y estudiantes (visita in situ).",
+                "description": "Sistema informático de gestión en pleno funcionamiento y su utilización por profesores y estudiantes (visita in situ).",
                 "format": "PDF",
                 "mode": "DOCUMENTAL"
               },
@@ -1938,8 +1938,8 @@
               },
               {
                 "number": 7,
-                "label": "Verificación de las condiciones de la biblioteca, según lo indicado en la Descripción (visita in situ ).",
-                "description": "Verificación de las condiciones de la biblioteca, según lo indicado en la Descripción (visita in situ ).",
+                "label": "Verificación de las condiciones de la biblioteca, según lo indicado en la Descripción (visita in situ).",
+                "description": "Verificación de las condiciones de la biblioteca, según lo indicado en la Descripción (visita in situ).",
                 "format": "PDF",
                 "mode": "PRESENCIAL"
               },
@@ -1952,8 +1952,8 @@
               },
               {
                 "number": 9,
-                "label": "Entrevistas a personal que labora en la biblioteca y a usuarios de la misma (visita in situ ).",
-                "description": "Entrevistas a personal que labora en la biblioteca y a usuarios de la misma (visita in situ ).",
+                "label": "Entrevistas a personal que labora en la biblioteca y a usuarios de la misma (visita in situ).",
+                "description": "Entrevistas a personal que labora en la biblioteca y a usuarios de la misma (visita in situ).",
                 "format": "PDF",
                 "mode": "PRESENCIAL"
               }
@@ -1982,8 +1982,8 @@
               },
               {
                 "number": 3,
-                "label": "Evidencias de la participación de los profesores de las asignaturas y carreras en la elaboración del plan de adquisiciones y de generación de contenidos específicos (actas de reuniones, oficios enviados a la biblioteca, entrevistas a profesores, etc.) (captados a través del aplicativo SIIES y visita in situ ).",
-                "description": "Evidencias de la participación de los profesores de las asignaturas y carreras en la elaboración del plan de adquisiciones y de generación de contenidos específicos (actas de reuniones, oficios enviados a la biblioteca, entrevistas a profesores, etc.) (captados a través del aplicativo SIIES y visita in situ ).",
+                "label": "Evidencias de la participación de los profesores de las asignaturas y carreras en la elaboración del plan de adquisiciones y de generación de contenidos específicos (actas de reuniones, oficios enviados a la biblioteca, entrevistas a profesores, etc.) (captados a través del aplicativo SIIES y visita in situ).",
+                "description": "Evidencias de la participación de los profesores de las asignaturas y carreras en la elaboración del plan de adquisiciones y de generación de contenidos específicos (actas de reuniones, oficios enviados a la biblioteca, entrevistas a profesores, etc.) (captados a través del aplicativo SIIES y visita in situ).",
                 "format": "PDF",
                 "mode": "DOCUMENTAL"
               },
@@ -1996,15 +1996,15 @@
               },
               {
                 "number": 5,
-                "label": "Verificación de existencia y revisión de los documentos incluidos en el listado de títulos de la biblioteca (visita in situ ).",
-                "description": "Verificación de existencia y revisión de los documentos incluidos en el listado de títulos de la biblioteca (visita in situ ).",
+                "label": "Verificación de existencia y revisión de los documentos incluidos en el listado de títulos de la biblioteca (visita in situ).",
+                "description": "Verificación de existencia y revisión de los documentos incluidos en el listado de títulos de la biblioteca (visita in situ).",
                 "format": "PDF",
                 "mode": "PRESENCIAL"
               },
               {
                 "number": 6,
-                "label": "Evidencias de las actividades de coordinación e interrelación implementadas en la institución (actas de reuniones, informes de gestión de la biblioteca, documentos de planificación de las actividades e informes de ejecución, entrevistas a la persona encargada de la biblioteca y a profesores, etc.) (captados a través del aplicativo SIIES y visita in situ ).",
-                "description": "Evidencias de las actividades de coordinación e interrelación implementadas en la institución (actas de reuniones, informes de gestión de la biblioteca, documentos de planificación de las actividades e informes de ejecución, entrevistas a la persona encargada de la biblioteca y a profesores, etc.) (captados a través del aplicativo SIIES y visita in situ ).",
+                "label": "Evidencias de las actividades de coordinación e interrelación implementadas en la institución (actas de reuniones, informes de gestión de la biblioteca, documentos de planificación de las actividades e informes de ejecución, entrevistas a la persona encargada de la biblioteca y a profesores, etc.) (captados a través del aplicativo SIIES y visita in situ).",
+                "description": "Evidencias de las actividades de coordinación e interrelación implementadas en la institución (actas de reuniones, informes de gestión de la biblioteca, documentos de planificación de las actividades e informes de ejecución, entrevistas a la persona encargada de la biblioteca y a profesores, etc.) (captados a través del aplicativo SIIES y visita in situ).",
                 "format": "PDF",
                 "mode": "DOCUMENTAL"
               },
@@ -2017,8 +2017,8 @@
               },
               {
                 "number": 8,
-                "label": "Registros de préstamos en sala y a domicilio efectuados por la biblioteca (captados a través del aplicativo SIIES y visita in situ ).",
-                "description": "Registros de préstamos en sala y a domicilio efectuados por la biblioteca (captados a través del aplicativo SIIES y visita in situ ).",
+                "label": "Registros de préstamos en sala y a domicilio efectuados por la biblioteca (captados a través del aplicativo SIIES y visita in situ).",
+                "description": "Registros de préstamos en sala y a domicilio efectuados por la biblioteca (captados a través del aplicativo SIIES y visita in situ).",
                 "format": "PDF",
                 "mode": "DOCUMENTAL"
               },
@@ -2031,8 +2031,8 @@
               },
               {
                 "number": 10,
-                "label": "Verificación del acceso efectivo a las bibliotecas virtuales que son utilizadas por la institución mediante suscripción, y de las habilidades de estudiantes y profesores para ello (visita in situ ).",
-                "description": "Verificación del acceso efectivo a las bibliotecas virtuales que son utilizadas por la institución mediante suscripción, y de las habilidades de estudiantes y profesores para ello (visita in situ ).",
+                "label": "Verificación del acceso efectivo a las bibliotecas virtuales que son utilizadas por la institución mediante suscripción, y de las habilidades de estudiantes y profesores para ello (visita in situ).",
+                "description": "Verificación del acceso efectivo a las bibliotecas virtuales que son utilizadas por la institución mediante suscripción, y de las habilidades de estudiantes y profesores para ello (visita in situ).",
                 "format": "PDF",
                 "mode": "PRESENCIAL"
               },
@@ -2103,15 +2103,15 @@
               },
               {
                 "number": 5,
-                "label": "Evidencias del análisis en la comunidad académica del instituto de las propuestas de la planificación de I+D (líneas y programas) (actas de reuniones, testimonios, material audiovisual explícito, etc.) Los registros en audio y video deben cumplir con lo establecido en el Art. 178 del COIP (captadas a través del aplicativo SIIES) (visita in situ ).",
-                "description": "Evidencias del análisis en la comunidad académica del instituto de las propuestas de la planificación de I+D (líneas y programas) (actas de reuniones, testimonios, material audiovisual explícito, etc.) Los registros en audio y video deben cumplir con lo establecido en el Art. 178 del COIP (captadas a través del aplicativo SIIES) (visita in situ ).",
+                "label": "Evidencias del análisis en la comunidad académica del instituto de las propuestas de la planificación de I+D (líneas y programas) (actas de reuniones, testimonios, material audiovisual explícito, etc.) Los registros en audio y video deben cumplir con lo establecido en el Art. 178 del COIP (captadas a través del aplicativo SIIES) (visita in situ).",
+                "description": "Evidencias del análisis en la comunidad académica del instituto de las propuestas de la planificación de I+D (líneas y programas) (actas de reuniones, testimonios, material audiovisual explícito, etc.) Los registros en audio y video deben cumplir con lo establecido en el Art. 178 del COIP (captadas a través del aplicativo SIIES) (visita in situ).",
                 "format": "PDF",
                 "mode": "DOCUMENTAL"
               },
               {
                 "number": 6,
-                "label": "Evidencias del seguimiento, control y evaluación de la ejecución de los proyectos de I+D y de la participación de los estudiantes en estos (actas, informes, testimonios, etc.) (captadas a través del aplicativo SIIES) (visita in situ ).",
-                "description": "Evidencias del seguimiento, control y evaluación de la ejecución de los proyectos de I+D y de la participación de los estudiantes en estos (actas, informes, testimonios, etc.) (captadas a través del aplicativo SIIES) (visita in situ ).",
+                "label": "Evidencias del seguimiento, control y evaluación de la ejecución de los proyectos de I+D y de la participación de los estudiantes en estos (actas, informes, testimonios, etc.) (captadas a través del aplicativo SIIES) (visita in situ).",
+                "description": "Evidencias del seguimiento, control y evaluación de la ejecución de los proyectos de I+D y de la participación de los estudiantes en estos (actas, informes, testimonios, etc.) (captadas a través del aplicativo SIIES) (visita in situ).",
                 "format": "PDF",
                 "mode": "DOCUMENTAL"
               },
@@ -2124,22 +2124,22 @@
               },
               {
                 "number": 8,
-                "label": "Planes de aprendizaje de los estudiantes participantes en los proyectos de I+D con su evaluación (visita in situ ).",
-                "description": "Planes de aprendizaje de los estudiantes participantes en los proyectos de I+D con su evaluación (visita in situ ).",
+                "label": "Planes de aprendizaje de los estudiantes participantes en los proyectos de I+D con su evaluación (visita in situ).",
+                "description": "Planes de aprendizaje de los estudiantes participantes en los proyectos de I+D con su evaluación (visita in situ).",
                 "format": "PDF",
                 "mode": "DOCUMENTAL"
               },
               {
                 "number": 9,
-                "label": "Entrevistas a estudiantes participantes en proyectos de I+D (visita in situ ).",
-                "description": "Entrevistas a estudiantes participantes en proyectos de I+D (visita in situ ).",
+                "label": "Entrevistas a estudiantes participantes en proyectos de I+D (visita in situ).",
+                "description": "Entrevistas a estudiantes participantes en proyectos de I+D (visita in situ).",
                 "format": "PDF",
                 "mode": "PRESENCIAL"
               },
               {
                 "number": 10,
-                "label": "Entrevistas a responsables de líneas, programas y proyectos de I+D (visita in situ ).",
-                "description": "Entrevistas a responsables de líneas, programas y proyectos de I+D (visita in situ ).",
+                "label": "Entrevistas a responsables de líneas, programas y proyectos de I+D (visita in situ).",
+                "description": "Entrevistas a responsables de líneas, programas y proyectos de I+D (visita in situ).",
                 "format": "PDF",
                 "mode": "PRESENCIAL"
               },
@@ -2152,15 +2152,15 @@
               },
               {
                 "number": 12,
-                "label": "Web institucional (visita in situ ).",
-                "description": "Web institucional (visita in situ ).",
+                "label": "Web institucional (visita in situ).",
+                "description": "Web institucional (visita in situ).",
                 "format": "PDF",
                 "mode": "DOCUMENTAL"
               },
               {
                 "number": 13,
-                "label": "Visita a la biblioteca (visita in situ )",
-                "description": "Visita a la biblioteca (visita in situ )",
+                "label": "Visita a la biblioteca (visita in situ)",
+                "description": "Visita a la biblioteca (visita in situ)",
                 "format": "PDF",
                 "mode": "PRESENCIAL"
               }
@@ -2240,29 +2240,29 @@
               },
               {
                 "number": 2,
-                "label": "Evidencias de la introducción de innovaciones en la actividad del instituto (acuerdos del órgano académico, proyectos para la introducción de las innovaciones, estudios que evidencien los resultados obtenidos, constatación directa de los procesos si es posible, etc.) (captadas a través del aplicativo SIIES y visita in situ ).",
-                "description": "Evidencias de la introducción de innovaciones en la actividad del instituto (acuerdos del órgano académico, proyectos para la introducción de las innovaciones, estudios que evidencien los resultados obtenidos, constatación directa de los procesos si es posible, etc.) (captadas a través del aplicativo SIIES y visita in situ ).",
+                "label": "Evidencias de la introducción de innovaciones en la actividad del instituto (acuerdos del órgano académico, proyectos para la introducción de las innovaciones, estudios que evidencien los resultados obtenidos, constatación directa de los procesos si es posible, etc.) (captadas a través del aplicativo SIIES y visita in situ).",
+                "description": "Evidencias de la introducción de innovaciones en la actividad del instituto (acuerdos del órgano académico, proyectos para la introducción de las innovaciones, estudios que evidencien los resultados obtenidos, constatación directa de los procesos si es posible, etc.) (captadas a través del aplicativo SIIES y visita in situ).",
                 "format": "PDF",
                 "mode": "DOCUMENTAL"
               },
               {
                 "number": 3,
-                "label": "Evidencias de la actividad del instituto como agente de la actividad innovadora en el entorno (proyectos de vinculación ejecutados o en ejecución en los que se explicite la introducción de innovaciones en las entidades beneficiarias, constatación directa de los procesos si es posible, acciones divulgativas en el entorno sobre nuevas tecnologías, etc.) (captadas a través del aplicativo SIIES y visita in situ ).",
-                "description": "Evidencias de la actividad del instituto como agente de la actividad innovadora en el entorno (proyectos de vinculación ejecutados o en ejecución en los que se explicite la introducción de innovaciones en las entidades beneficiarias, constatación directa de los procesos si es posible, acciones divulgativas en el entorno sobre nuevas tecnologías, etc.) (captadas a través del aplicativo SIIES y visita in situ ).",
+                "label": "Evidencias de la actividad del instituto como agente de la actividad innovadora en el entorno (proyectos de vinculación ejecutados o en ejecución en los que se explicite la introducción de innovaciones en las entidades beneficiarias, constatación directa de los procesos si es posible, acciones divulgativas en el entorno sobre nuevas tecnologías, etc.) (captadas a través del aplicativo SIIES y visita in situ).",
+                "description": "Evidencias de la actividad del instituto como agente de la actividad innovadora en el entorno (proyectos de vinculación ejecutados o en ejecución en los que se explicite la introducción de innovaciones en las entidades beneficiarias, constatación directa de los procesos si es posible, acciones divulgativas en el entorno sobre nuevas tecnologías, etc.) (captadas a través del aplicativo SIIES y visita in situ).",
                 "format": "PDF",
                 "mode": "DOCUMENTAL"
               },
               {
                 "number": 4,
-                "label": "Evidencias del funcionamiento del sistema de innovación y de capacidad de absorción, que incluye las cinco acciones indicadas en la Descripción (ficha de cada proceso de absorción de nuevo conocimiento, documentos académicos y técnicos relacionados, registros de la captación del etnoconocimiento o conocimiento tradicional, acciones de divulgación de la biblioteca en este sentido, registros del evento de multiplicación, documentos que evidencien la introducción del conocimiento nuevo en el proceso docente, etc.) (captadas a través del aplicativo SIIES y visita in situ ).",
-                "description": "Evidencias del funcionamiento del sistema de innovación y de capacidad de absorción, que incluye las cinco acciones indicadas en la Descripción (ficha de cada proceso de absorción de nuevo conocimiento, documentos académicos y técnicos relacionados, registros de la captación del etnoconocimiento o conocimiento tradicional, acciones de divulgación de la biblioteca en este sentido, registros del evento de multiplicación, documentos que evidencien la introducción del conocimiento nuevo en el proceso docente, etc.) (captadas a través del aplicativo SIIES y visita in situ ).",
+                "label": "Evidencias del funcionamiento del sistema de innovación y de capacidad de absorción, que incluye las cinco acciones indicadas en la Descripción (ficha de cada proceso de absorción de nuevo conocimiento, documentos académicos y técnicos relacionados, registros de la captación del etnoconocimiento o conocimiento tradicional, acciones de divulgación de la biblioteca en este sentido, registros del evento de multiplicación, documentos que evidencien la introducción del conocimiento nuevo en el proceso docente, etc.) (captadas a través del aplicativo SIIES y visita in situ).",
+                "description": "Evidencias del funcionamiento del sistema de innovación y de capacidad de absorción, que incluye las cinco acciones indicadas en la Descripción (ficha de cada proceso de absorción de nuevo conocimiento, documentos académicos y técnicos relacionados, registros de la captación del etnoconocimiento o conocimiento tradicional, acciones de divulgación de la biblioteca en este sentido, registros del evento de multiplicación, documentos que evidencien la introducción del conocimiento nuevo en el proceso docente, etc.) (captadas a través del aplicativo SIIES y visita in situ).",
                 "format": "PDF",
                 "mode": "DOCUMENTAL"
               },
               {
                 "number": 5,
-                "label": "Entrevistas a actores del sistema de innovación y de capacidad de absorción (visita in situ ).",
-                "description": "Entrevistas a actores del sistema de innovación y de capacidad de absorción (visita in situ ).",
+                "label": "Entrevistas a actores del sistema de innovación y de capacidad de absorción (visita in situ).",
+                "description": "Entrevistas a actores del sistema de innovación y de capacidad de absorción (visita in situ).",
                 "format": "PDF",
                 "mode": "PRESENCIAL"
               }
@@ -2319,29 +2319,29 @@
               },
               {
                 "number": 5,
-                "label": "Evidencias del seguimiento, control y evaluación de la ejecución de los proyectos de vinculación con la sociedad, especialmente del cumplimiento de sus objetivos, y de la participación de los estudiantes en estos. (captadas a través del aplicativo SIIES y visita in situ ).",
-                "description": "Evidencias del seguimiento, control y evaluación de la ejecución de los proyectos de vinculación con la sociedad, especialmente del cumplimiento de sus objetivos, y de la participación de los estudiantes en estos. (captadas a través del aplicativo SIIES y visita in situ ).",
+                "label": "Evidencias del seguimiento, control y evaluación de la ejecución de los proyectos de vinculación con la sociedad, especialmente del cumplimiento de sus objetivos, y de la participación de los estudiantes en estos. (captadas a través del aplicativo SIIES y visita in situ).",
+                "description": "Evidencias del seguimiento, control y evaluación de la ejecución de los proyectos de vinculación con la sociedad, especialmente del cumplimiento de sus objetivos, y de la participación de los estudiantes en estos. (captadas a través del aplicativo SIIES y visita in situ).",
                 "format": "PDF",
                 "mode": "DOCUMENTAL"
               },
               {
                 "number": 6,
-                "label": "Planes de aprendizaje de los estudiantes participantes en los proyectos con su evaluación. (visita in situ ).",
-                "description": "Planes de aprendizaje de los estudiantes participantes en los proyectos con su evaluación. (visita in situ ).",
+                "label": "Planes de aprendizaje de los estudiantes participantes en los proyectos con su evaluación. (visita in situ).",
+                "description": "Planes de aprendizaje de los estudiantes participantes en los proyectos con su evaluación. (visita in situ).",
                 "format": "PDF",
                 "mode": "DOCUMENTAL"
               },
               {
                 "number": 7,
-                "label": "Evidencias de que tanto la planificación, como los resultados de los proyectos de vinculación con la sociedad han sido difundidos y debatidos en la comunidad académica y se han construido y evaluado con la participación de los beneficiarios ( web institucional, informes, material audiovisual explícito, actas de reuniones, etc.) Los registros en audio y video deben cumplir con lo establecido en el Art. 178 del COIP (captadas a través del aplicativo SIIES y visita in situ ).",
-                "description": "Evidencias de que tanto la planificación, como los resultados de los proyectos de vinculación con la sociedad han sido difundidos y debatidos en la comunidad académica y se han construido y evaluado con la participación de los beneficiarios ( web institucional, informes, material audiovisual explícito, actas de reuniones, etc.) Los registros en audio y video deben cumplir con lo establecido en el Art. 178 del COIP (captadas a través del aplicativo SIIES y visita in situ ).",
+                "label": "Evidencias de que tanto la planificación, como los resultados de los proyectos de vinculación con la sociedad han sido difundidos y debatidos en la comunidad académica y se han construido y evaluado con la participación de los beneficiarios (web institucional, informes, material audiovisual explícito, actas de reuniones, etc.) Los registros en audio y video deben cumplir con lo establecido en el Art. 178 del COIP (captadas a través del aplicativo SIIES y visita in situ).",
+                "description": "Evidencias de que tanto la planificación, como los resultados de los proyectos de vinculación con la sociedad han sido difundidos y debatidos en la comunidad académica y se han construido y evaluado con la participación de los beneficiarios (web institucional, informes, material audiovisual explícito, actas de reuniones, etc.) Los registros en audio y video deben cumplir con lo establecido en el Art. 178 del COIP (captadas a través del aplicativo SIIES y visita in situ).",
                 "format": "PDF",
                 "mode": "DOCUMENTAL"
               },
               {
                 "number": 8,
-                "label": "Entrevistas a estudiantes y profesores involucrados en programas y proyectos de vinculación con la sociedad (visita in situ ).",
-                "description": "Entrevistas a estudiantes y profesores involucrados en programas y proyectos de vinculación con la sociedad (visita in situ ).",
+                "label": "Entrevistas a estudiantes y profesores involucrados en programas y proyectos de vinculación con la sociedad (visita in situ).",
+                "description": "Entrevistas a estudiantes y profesores involucrados en programas y proyectos de vinculación con la sociedad (visita in situ).",
                 "format": "PDF",
                 "mode": "PRESENCIAL"
               },
@@ -2370,22 +2370,22 @@
             "requirements": [
               {
                 "number": 1,
-                "label": "Evidencias del acceso de la comunidad a espacios institucionales (registros de usuarios, solicitudes de uso, etc.) (captadas a través del aplicativo SIIES y visita in situ ).",
-                "description": "Evidencias del acceso de la comunidad a espacios institucionales (registros de usuarios, solicitudes de uso, etc.) (captadas a través del aplicativo SIIES y visita in situ ).",
+                "label": "Evidencias del acceso de la comunidad a espacios institucionales (registros de usuarios, solicitudes de uso, etc.) (captadas a través del aplicativo SIIES y visita in situ).",
+                "description": "Evidencias del acceso de la comunidad a espacios institucionales (registros de usuarios, solicitudes de uso, etc.) (captadas a través del aplicativo SIIES y visita in situ).",
                 "format": "PDF",
                 "mode": "DOCUMENTAL"
               },
               {
                 "number": 2,
-                "label": "Evidencias de las actividades sociales y culturales en las que ha participado, y de las que ha organizado la institución (material gráfico y audiovisual explícito, informes de resultados, cartas de invitación, etc.) Los registros en audio y video deben cumplir con lo establecido en el Art. 178 del COIP (captadas a través del aplicativo SIIES y visita in situ ).",
-                "description": "Evidencias de las actividades sociales y culturales en las que ha participado, y de las que ha organizado la institución (material gráfico y audiovisual explícito, informes de resultados, cartas de invitación, etc.) Los registros en audio y video deben cumplir con lo establecido en el Art. 178 del COIP (captadas a través del aplicativo SIIES y visita in situ ).",
+                "label": "Evidencias de las actividades sociales y culturales en las que ha participado, y de las que ha organizado la institución (material gráfico y audiovisual explícito, informes de resultados, cartas de invitación, etc.) Los registros en audio y video deben cumplir con lo establecido en el Art. 178 del COIP (captadas a través del aplicativo SIIES y visita in situ).",
+                "description": "Evidencias de las actividades sociales y culturales en las que ha participado, y de las que ha organizado la institución (material gráfico y audiovisual explícito, informes de resultados, cartas de invitación, etc.) Los registros en audio y video deben cumplir con lo establecido en el Art. 178 del COIP (captadas a través del aplicativo SIIES y visita in situ).",
                 "format": "PDF",
                 "mode": "DOCUMENTAL"
               },
               {
                 "number": 3,
-                "label": "Evidencias de las acciones para contribuir al desarrollo de intereses profesionales afines a las carreras del instituto en los estudiantes de bachillerato y en jóvenes egresados de este nivel de enseñanza que se interesan por conocer opciones para continuar sus estudios que ha ejecutado la institución (material audiovisual explícito, informes de resultados, documentos de planificación de actividades, etc.) Los registros en audio y video deben cumplir con lo establecido en el Art. 178 del COIP (captadas a través del aplicativo SIIES y visita in situ ).",
-                "description": "Evidencias de las acciones para contribuir al desarrollo de intereses profesionales afines a las carreras del instituto en los estudiantes de bachillerato y en jóvenes egresados de este nivel de enseñanza que se interesan por conocer opciones para continuar sus estudios que ha ejecutado la institución (material audiovisual explícito, informes de resultados, documentos de planificación de actividades, etc.) Los registros en audio y video deben cumplir con lo establecido en el Art. 178 del COIP (captadas a través del aplicativo SIIES y visita in situ ).",
+                "label": "Evidencias de las acciones para contribuir al desarrollo de intereses profesionales afines a las carreras del instituto en los estudiantes de bachillerato y en jóvenes egresados de este nivel de enseñanza que se interesan por conocer opciones para continuar sus estudios que ha ejecutado la institución (material audiovisual explícito, informes de resultados, documentos de planificación de actividades, etc.) Los registros en audio y video deben cumplir con lo establecido en el Art. 178 del COIP (captadas a través del aplicativo SIIES y visita in situ).",
+                "description": "Evidencias de las acciones para contribuir al desarrollo de intereses profesionales afines a las carreras del instituto en los estudiantes de bachillerato y en jóvenes egresados de este nivel de enseñanza que se interesan por conocer opciones para continuar sus estudios que ha ejecutado la institución (material audiovisual explícito, informes de resultados, documentos de planificación de actividades, etc.) Los registros en audio y video deben cumplir con lo establecido en el Art. 178 del COIP (captadas a través del aplicativo SIIES y visita in situ).",
                 "format": "PDF",
                 "mode": "DOCUMENTAL"
               }
