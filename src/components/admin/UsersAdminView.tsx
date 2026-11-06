@@ -145,7 +145,7 @@ export const UsersAdminView = ({ currentUserId }: UsersAdminViewProps) => {
               return (
                 <tr key={user.id} className="border-b border-slate-50 align-top last:border-0">
                   <td className="px-4 py-3">
-                    <p className="font-bold text-slate-800">{user.name}{isSelf && <span className="ml-2 text-[10px] font-black uppercase text-slate-400">(tu)</span>}</p>
+                    <p className="font-bold text-slate-800">{user.name}{isSelf && <span className="ml-2 text-[10px] font-black uppercase text-slate-400">(tú)</span>}</p>
                     <p className="text-xs text-slate-500">{user.email}</p>
                   </td>
                   <td className="px-4 py-3">

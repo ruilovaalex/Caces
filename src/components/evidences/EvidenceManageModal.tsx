@@ -28,7 +28,7 @@ export const EvidenceManageModal = ({
     <Modal 
       isOpen={isOpen} 
       onClose={onClose} 
-      title="Gestión de Evidencia"
+      title="Gestión de evidencia"
       maxWidth="max-w-4xl"
       zIndex={101}
     >
@@ -81,7 +81,7 @@ export const EvidenceManageModal = ({
                   className="w-full py-4 bg-white/10 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-white/20 transition-all flex items-center justify-center gap-2"
                 >
                   <Upload className="w-4 h-4" />
-                  Subir Versión
+                  Subir versión
                 </button>
               </div>
             </div>
@@ -89,7 +89,7 @@ export const EvidenceManageModal = ({
 
         <div className="pt-4">
             <h4 className="text-[11px] font-black text-slate-500 uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
-                Historial de Versiones
+                Historial de versiones
             </h4>
             <EvidenceVersionHistory files={files} />
         </div>

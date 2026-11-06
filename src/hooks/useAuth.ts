@@ -28,7 +28,7 @@ const buildUserByRole = (role: UserRole): User => ({
         ? 'Coord. Académico'
         : role === 'DOCENTE'
           ? 'Prof. Pablo Mora'
-          : 'Evaluador Externo',
+          : 'Evaluador externo',
   role
 });
 
@@ -73,8 +73,8 @@ export const useAuth = () => {
     setUser(buildUserByRole(role));
 
     NotificationService.add({
-      title: 'Sesión Iniciada',
-      message: `Bienvenido al sistema de acreditación EduSudamericano. Perfil activo: ${role}`,
+      title: 'Sesión iniciada',
+      message: `Te damos la bienvenida al sistema de acreditación EduSudamericano. Perfil activo: ${role}`,
       type: 'info'
     });
   }, []);
@@ -88,7 +88,7 @@ export const useAuth = () => {
     setUserRole(role);
     setUser(buildUserByRole(role));
     NotificationService.add({
-      title: 'Cambiando Perfil',
+      title: 'Cambiando perfil',
       message: `Asumiendo rol de: ${role}`,
       type: 'info'
     });

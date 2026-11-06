@@ -19,7 +19,7 @@ const steps = {
   assignments: {
     label: 'Paso 2',
     title: 'Asignaciones',
-    detail: 'Define quien prepara cada evidencia y para que fecha.',
+    detail: 'Define quién prepara cada evidencia y para qué fecha.',
     next: 'Abre la evidencia asignada para prepararla.',
     icon: ClipboardList
   },

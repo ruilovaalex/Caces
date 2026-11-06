@@ -51,7 +51,7 @@ const inferDocumentFocus = (requirement: Requirement) => {
       ],
       supports: [
         'Matrices de seguimiento.',
-        'Reportes, graficos o respaldos estadisticos.',
+        'Reportes, gráficos o respaldos estadísticos.',
         'Actas o comunicaciones de socialización.'
       ]
     };
@@ -77,12 +77,12 @@ const inferDocumentFocus = (requirement: Requirement) => {
     return {
       focus: 'Evidencia visual clara, fechada y relacionada con el indicador.',
       checks: [
-        'Imagenes legibles y asociadas al espacio, actividad o sistema evaluado.',
+        'Imágenes legibles y asociadas al espacio, actividad o sistema evaluado.',
         'Fecha, lugar, responsable y breve descripción.',
         'Relación directa con el requerimiento del indicador.'
       ],
       supports: [
-        'Fotografias, capturas o planos.',
+        'Fotografías, capturas o planos.',
         'Acta de constatación si aplica.',
         'Archivo ZIP organizado por carpetas si son varios soportes.'
       ]
@@ -100,7 +100,7 @@ const inferDocumentFocus = (requirement: Requirement) => {
       supports: [
         'Actas y convocatorias.',
         'Registros de asistencia.',
-        'Fotografias, correos o publicaciones.'
+        'Fotografías, correos o publicaciones.'
       ]
     };
   }

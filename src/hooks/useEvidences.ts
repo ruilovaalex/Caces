@@ -57,7 +57,7 @@ export const useEvidences = (periodCode: string, enabled = true) => {
     });
     await loadData();
     NotificationService.add({
-      title: 'Documento Cargado',
+      title: 'Documento cargado',
       message: `Nueva versión de ${requirement.label} subida correctamente.`,
       type: 'success'
     });
@@ -76,7 +76,7 @@ export const useEvidences = (periodCode: string, enabled = true) => {
     EvidenceService.updateStatus(evidenceId, status, observation);
     await loadData();
     NotificationService.add({
-      title: 'Revisión Actualizada',
+      title: 'Revisión actualizada',
       message: `La evidencia fue marcada como ${status}.`,
       type: status === 'Validado' ? 'success' : status === 'Observado' ? 'warning' : 'error'
     });

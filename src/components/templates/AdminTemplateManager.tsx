@@ -185,7 +185,7 @@ export const AdminTemplateManager = ({
               <textarea
                 value={form.description}
                 onChange={event => setForm(current => ({ ...current, description: event.target.value }))}
-                placeholder="Explica para que sirve este formato y cuando debe usarse."
+                placeholder="Explica para qué sirve este formato y cuándo debe usarse."
                 rows={4}
                 className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-blue-400"
               />

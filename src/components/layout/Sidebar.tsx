@@ -59,7 +59,7 @@ export const Sidebar = ({
   const roleNames: Record<UserRole, string> = {
     ADMIN: 'Admin Sudamericano',
     COORDINADOR: 'Coord. Académico',
-    EVALUADOR: 'Evaluador Externo',
+    EVALUADOR: 'Evaluador externo',
     DOCENTE: 'Prof. Pablo Mora',
   };
 
@@ -375,7 +375,7 @@ export const Sidebar = ({
       ) : userRole === 'DOCENTE' ? (
         <div className="flex-1 p-4">
           <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
-            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Docente Adjunto</p>
+            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Docente</p>
             <p className="mt-2 text-sm font-bold leading-relaxed text-slate-700">
               Navega por tus actividades y archivos usando el menú superior.
             </p>

@@ -149,7 +149,7 @@ const writeCache = (drafts: EvidenceDraft[]) => localStorage.setItem(DRAFTS_KEY,
 const enqueue = (key: string, job: () => Promise<void>) => {
   const next = (queues.get(key) ?? Promise.resolve()).then(job).catch(error => {
     const message = error instanceof ApiError && error.status === 409
-      ? 'El borrador fue modificado por otra persona. Se recargo la versión del servidor.'
+      ? 'El borrador fue modificado por otra persona. Se recargó la versión del servidor.'
       : `No se pudo guardar el borrador en el servidor: ${describeError(error)}`;
     syncErrorListeners.forEach(listener => listener(message));
     if (error instanceof ApiError && error.status === 409 && syncPeriod) void DraftService.hydrate(syncPeriod);

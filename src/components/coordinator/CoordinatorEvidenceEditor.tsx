@@ -216,7 +216,7 @@ export const CoordinatorEvidenceEditor = ({
         </head>
         <body>
           <div class="brand">
-            <p>Instituto Superior Tecnologico Sudamericano</p>
+            <p>Instituto Superior Tecnológico Sudamericano</p>
             <h1>Documento único de evidencia</h1>
             <p><strong>Código:</strong> ${fileName}</p>
           </div>
@@ -374,7 +374,7 @@ export const CoordinatorEvidenceEditor = ({
                 <div className="grid grid-cols-1 gap-3 md:grid-cols-4">
                   {[
                     { label: 'Plantilla', detail: draft ? 'Seleccionada' : 'Pendiente', icon: Layout, active: !draft },
-                    { label: 'Redaccion', detail: draft ? `${completionPercent}% completo` : 'Crear borrador', icon: PenSquare, active: Boolean(draft && workspaceMode === 'compose') },
+                    { label: 'Redacción', detail: draft ? `${completionPercent}% completo` : 'Crear borrador', icon: PenSquare, active: Boolean(draft && workspaceMode === 'compose') },
                     { label: 'Vista previa', detail: draft ? 'Disponible' : 'Sin contenido', icon: Eye, active: workspaceMode === 'preview' },
                     { label: 'Descarga', detail: draft ? generatedFileName : 'Formato único', icon: FileDown, active: draft?.status === 'DOCUMENTO_GENERADO' }
                   ].map(step => {
@@ -518,7 +518,7 @@ export const CoordinatorEvidenceEditor = ({
                     </div>
                     <div className="mx-auto max-w-3xl rounded-sm bg-white p-10 shadow-xl ring-1 ring-slate-200">
                       <div className="border-b-4 border-blue-600 pb-4">
-                        <p className="text-[10px] font-black uppercase tracking-[0.24em] text-slate-500">Instituto Superior Tecnologico Sudamericano</p>
+                        <p className="text-[10px] font-black uppercase tracking-[0.24em] text-slate-500">Instituto Superior Tecnológico Sudamericano</p>
                         <h1 className="mt-2 text-xl font-black uppercase text-slate-900">Documento único de evidencia</h1>
                         <p className="mt-1 text-xs font-bold text-slate-500">Código: {generatedFileName}</p>
                       </div>
@@ -609,7 +609,7 @@ export const CoordinatorEvidenceEditor = ({
               <p className="mt-2 text-xs text-slate-500 leading-relaxed">{workGuide.intro}</p>
 
               <div className="mt-5 rounded-lg border border-blue-100 bg-white p-4">
-                <p className="text-[10px] font-black uppercase tracking-widest text-blue-700">Que hay que preparar</p>
+                <p className="text-[10px] font-black uppercase tracking-widest text-blue-700">Qué hay que preparar</p>
                 <p className="mt-2 text-sm font-bold leading-relaxed text-slate-800">{workGuide.title}</p>
                 <p className="mt-2 text-xs leading-relaxed text-slate-500">{workGuide.focus}</p>
                 <div className="mt-3 inline-flex rounded-lg bg-slate-100 px-2.5 py-1 text-[10px] font-black uppercase tracking-widest text-slate-600">

@@ -15,9 +15,9 @@ interface DocenteViewProps {
 }
 
 const tabs = [
-  { key: 'dashboard' as const, label: 'Dashboard', Icon: LayoutDashboard },
+  { key: 'dashboard' as const, label: 'Panel', Icon: LayoutDashboard },
   { key: 'activities' as const, label: 'Actividades', Icon: CheckSquare },
-  { key: 'files' as const, label: 'Mis Archivos', Icon: FileText },
+  { key: 'files' as const, label: 'Mis archivos', Icon: FileText },
   { key: 'profile' as const, label: 'Perfil', Icon: User },
 ];
 

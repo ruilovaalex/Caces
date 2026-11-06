@@ -165,7 +165,7 @@ export const TemplateService = {
     if ('source' in template && template.source === 'admin' && template.fileContentId) {
       const blob = await FileContentService.get(template.fileContentId);
       if (!blob) {
-        window.alert('No se encontro el archivo publicado para esta plantilla.');
+        window.alert('No se encontró el archivo publicado para esta plantilla.');
         return;
       }
 

@@ -12,7 +12,7 @@ interface DocenteActivitiesProps {
 export const DocenteActivities = ({ onOpenUploadModal }: DocenteActivitiesProps) => {
   const pendingTasks = [
     { id: '1', title: 'Subir título de cuarto nivel', description: 'Copia certificada del título registrado en SENESCYT.', daysLeft: 2, status: 'Pendiente' },
-    { id: '2', title: 'Syllabus período 2025', description: 'Documento oficial firmado por dirección de carrera.', daysLeft: 6, status: 'Pendiente' },
+    { id: '2', title: 'Syllabus periodo 2025', description: 'Documento oficial firmado por dirección de carrera.', daysLeft: 6, status: 'Pendiente' },
     { id: '3', title: 'Certificado de capacitación docente', description: 'Certificado de al menos 40 horas de formación continua.', daysLeft: 10, status: 'Pendiente' }
   ];
 
@@ -49,7 +49,7 @@ export const DocenteActivities = ({ onOpenUploadModal }: DocenteActivitiesProps)
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3, ease: 'easeOut' }}
       >
-        <h2 className="text-2xl font-black text-slate-800 tracking-tight leading-tight">Actividades Asignadas</h2>
+        <h2 className="text-2xl font-black text-slate-800 tracking-tight leading-tight">Actividades asignadas</h2>
         <p className="text-xs font-bold uppercase tracking-widest text-slate-400 mt-1">Tareas requeridas por coordinación</p>
       </motion.div>
 
@@ -85,7 +85,7 @@ export const DocenteActivities = ({ onOpenUploadModal }: DocenteActivitiesProps)
                 className="evidence-btn inline-flex items-center gap-2 !px-3 !py-2 bg-[#2563eb] !text-white border-none hover:bg-blue-700"
               >
                 <Upload className="w-4 h-4" />
-                Subir Archivo
+                Subir archivo
               </motion.button>
               <motion.button 
                 whileHover={hoverScale}
@@ -118,7 +118,7 @@ export const DocenteActivities = ({ onOpenUploadModal }: DocenteActivitiesProps)
       >
         <h3 className="text-sm font-black text-slate-800 uppercase tracking-tight mb-4 flex items-center gap-2">
           <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-          Tareas Completadas
+          Tareas completadas
         </h3>
         <motion.div
           className="space-y-3"

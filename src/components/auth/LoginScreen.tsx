@@ -59,7 +59,7 @@ export const LoginScreen = ({ onLogin, onCredentialsLogin }: LoginScreenProps) =
             <div>
               <h1 className="text-3xl font-black text-[#0f172a] tracking-tight">EduSudamericano</h1>
               <p className="text-[10px] font-black text-[#2563eb] uppercase tracking-[0.25em] mt-1">
-                Gestión de Acreditación CACES
+                Gestión de acreditación CACES
               </p>
             </div>
           </div>
@@ -72,7 +72,7 @@ export const LoginScreen = ({ onLogin, onCredentialsLogin }: LoginScreenProps) =
           <>
           <div className="space-y-4">
             <div className="space-y-2 text-left">
-              <label className="text-[10px] font-black text-[#64748b] uppercase tracking-widest ml-1">Perfil de Acceso</label>
+              <label className="text-[10px] font-black text-[#64748b] uppercase tracking-widest ml-1">Perfil de acceso</label>
               <div className="grid grid-cols-2 gap-2">
                 {(['ADMIN', 'COORDINADOR', 'EVALUADOR', 'DOCENTE'] as UserRole[]).map(r => (
                   <motion.button
@@ -92,7 +92,7 @@ export const LoginScreen = ({ onLogin, onCredentialsLogin }: LoginScreenProps) =
             </div>
 
             <div className="space-y-2 text-left">
-              <label className="text-[10px] font-black text-[#64748b] uppercase tracking-widest ml-1">Usuario Institucional</label>
+              <label className="text-[10px] font-black text-[#64748b] uppercase tracking-widest ml-1">Usuario institucional</label>
               <div className="relative">
                 <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#94a3b8]">
                   <Users className="w-4 h-4" />
@@ -195,7 +195,7 @@ const CredentialsForm = ({ onSubmit }: { onSubmit: (email: string, password: str
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="space-y-2 text-left">
-        <label htmlFor="login-email" className="text-[10px] font-black text-[#64748b] uppercase tracking-widest ml-1">Usuario Institucional</label>
+        <label htmlFor="login-email" className="text-[10px] font-black text-[#64748b] uppercase tracking-widest ml-1">Usuario institucional</label>
         <div className="relative">
           <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#94a3b8]">
             <Users className="w-4 h-4" />
@@ -272,7 +272,7 @@ const PasswordRecovery = ({ mode, onDone }: { mode: 'forgot' | 'reset'; onDone: 
     try {
       if (mode === 'forgot') {
         await AuthApi.forgotPassword(email.trim());
-        setMessage('Si el correo esta registrado, recibiras un enlace para restablecer la clave. Si no llega, solicita al administrador que la restablezca.');
+        setMessage('Si el correo está registrado, recibirás un enlace para restablecer la clave. Si no llega, solicita al administrador que la restablezca.');
       } else {
         await AuthApi.resetPassword(new URLSearchParams(window.location.search).get('reset') ?? '', password);
         setMessage('Contraseña actualizada. Ya puedes iniciar sesión.');

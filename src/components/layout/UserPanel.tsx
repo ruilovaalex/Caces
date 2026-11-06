@@ -30,7 +30,7 @@ export const UserPanel = ({ onLogout, userName = 'Usuario', userRole = 'Perfil' 
             className="w-full flex items-center gap-3 px-3 py-2 text-rose-600 hover:bg-rose-50 rounded-lg transition-colors text-xs font-bold"
           >
             <LogOut className="w-4 h-4" />
-            Cerrar Sesión
+            Cerrar sesión
           </button>
         </div>
       </div>

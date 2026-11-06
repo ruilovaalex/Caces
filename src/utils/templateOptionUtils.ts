@@ -65,7 +65,7 @@ const baseSections = (indicator: Indicator, requirement: Requirement, context: T
   section(
     'pertinencia',
     'Pertinencia con el indicador',
-    'Explica por que este soporte responde directamente a lo solicitado por CACES.',
+    'Explica por qué este soporte responde directamente a lo solicitado por CACES.',
     requirement.description
   ),
   section(
@@ -77,7 +77,7 @@ const baseSections = (indicator: Indicator, requirement: Requirement, context: T
   section(
     'anexos',
     'Anexos y trazabilidad',
-    'Lista los archivos, matrices, actas, capturas o soportes que acompanan la evidencia.',
+    'Lista los archivos, matrices, actas, capturas o soportes que acompañan la evidencia.',
     'Anexo 1..., Anexo 2..., fuente...'
   )
 ];
@@ -86,7 +86,7 @@ const kindSections = (kind: ReturnType<typeof detectEvidenceKind>) => {
   switch (kind) {
     case 'normativa':
       return [
-        section('objeto', 'Objeto y alcance normativo', 'Define que regula el documento y a quienes aplica.', 'La normativa regula...'),
+        section('objeto', 'Objeto y alcance normativo', 'Define qué regula el documento y a quiénes aplica.', 'La normativa regula...'),
         section('aprobacion', 'Aprobación y vigencia', 'Registra resolución, acta, fecha y autoridad que aprueba.', 'Resolución No..., vigente desde...')
       ];
     case 'plan':
@@ -96,17 +96,17 @@ const kindSections = (kind: ReturnType<typeof detectEvidenceKind>) => {
       ];
     case 'informe':
       return [
-        section('metodologia', 'Metodologia y periodo revisado', 'Explica cómo se levantó la información y qué periodo cubre.', 'Periodo..., fuente..., metodologia...'),
+        section('metodologia', 'Metodología y periodo revisado', 'Explica cómo se levantó la información y qué periodo cubre.', 'Periodo..., fuente..., metodología...'),
         section('hallazgos', 'Resultados y acciones de mejora', 'Presenta resultados, conclusiones y acciones correctivas.', 'Resultado..., acción de mejora...')
       ];
     case 'matriz':
       return [
         section('campos', 'Campos de la matriz', 'Describe columnas, fuentes, responsables y periodo de actualización.', 'Código, carrera, responsable, estado...'),
-        section('certificacion', 'Certificación de datos', 'Indica quien certifica la matriz y de donde salen los datos.', 'Fuente institucional..., certificado por...')
+        section('certificacion', 'Certificación de datos', 'Indica quién certifica la matriz y de dónde salen los datos.', 'Fuente institucional..., certificado por...')
       ];
     case 'visual':
       return [
-        section('registro', 'Registro visual', 'Describe lugar, fecha, responsable y que demuestra cada imagen o captura.', 'Imagen 1: fecha, lugar, descripción...'),
+        section('registro', 'Registro visual', 'Describe lugar, fecha, responsable y qué demuestra cada imagen o captura.', 'Imagen 1: fecha, lugar, descripción...'),
         section('constatacion', 'Constatación y respaldo', 'Agrega acta, recorrido, fuente o validación institucional si aplica.', 'Acta de constatación..., responsable...')
       ];
     case 'acta':
@@ -188,13 +188,13 @@ export const buildEvidenceTemplateOptions = (
     createTemplate(
       4,
       'Expediente de anexos',
-      'Para agrupar multiples soportes y explicar la trazabilidad de cada archivo.',
+      'Para agrupar múltiples soportes y explicar la trazabilidad de cada archivo.',
       indicator,
       requirement,
       context,
       [
         section('indice', 'Índice de anexos', 'Lista anexos con código, nombre, fecha y descripción.', 'Anexo 1..., Anexo 2...'),
-        section('trazabilidad', 'Trazabilidad documental', 'Explica de donde viene cada soporte y quien lo valida.', 'Fuente..., responsable..., fecha...')
+        section('trazabilidad', 'Trazabilidad documental', 'Explica de dónde viene cada soporte y quién lo valida.', 'Fuente..., responsable..., fecha...')
       ]
     ),
     createTemplate(
@@ -205,7 +205,7 @@ export const buildEvidenceTemplateOptions = (
       requirement,
       context,
       [
-        section('constatacion', 'Constatación interna', 'Registra quien revisó la evidencia y qué se verificó.', 'Fecha..., responsable..., verificación...'),
+        section('constatacion', 'Constatación interna', 'Registra quién revisó la evidencia y qué se verificó.', 'Fecha..., responsable..., verificación...'),
         section('validacion', 'Resultado de validación', 'Indica si queda lista, observada o pendiente antes de revisión externa.', 'Resultado..., observaciones...')
       ]
     )

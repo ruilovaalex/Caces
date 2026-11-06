@@ -179,7 +179,7 @@ export const RequirementTemplateManagerModal = ({
                   value={form.description}
                   onChange={event => setForm(current => ({ ...current, description: event.target.value }))}
                   rows={4}
-                  placeholder="Explica cuando se usa este formato y que debe completar el coordinador."
+                  placeholder="Explica cuándo se usa este formato y qué debe completar el coordinador."
                   className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-blue-400"
                 />
               </Field>

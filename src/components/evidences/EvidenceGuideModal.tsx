@@ -86,7 +86,7 @@ export const EvidenceGuideModal = ({
         <section>
           <div className="mb-3 flex items-center gap-2">
             <FileCheck2 className="h-4 w-4 text-blue-600" />
-            <h4 className="text-xs font-black uppercase tracking-widest text-slate-700">Que debe preparar</h4>
+            <h4 className="text-xs font-black uppercase tracking-widest text-slate-700">Qué debe preparar</h4>
           </div>
           <p className="rounded-lg border border-slate-200 bg-slate-50 p-4 text-sm font-semibold leading-relaxed text-slate-700">
             {guide.focus}

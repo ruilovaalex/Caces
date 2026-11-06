@@ -20,13 +20,13 @@ export const EvaluatorReviewGuidePanel = ({ currentFile, indicator, requirement 
             <ClipboardCheck className="w-4 h-4" />
           </div>
           <div>
-            <h3 className="font-black text-slate-800 text-sm tracking-tight text-amber-700">Guía del Evaluador</h3>
+            <h3 className="font-black text-slate-800 text-sm tracking-tight text-amber-700">Guía del evaluador</h3>
             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Revisión técnica</p>
           </div>
         </div>
 
         <div className="rounded-xl border border-amber-100 bg-amber-50/70 p-3">
-          <p className="text-[10px] font-black uppercase tracking-widest text-amber-700">Que revisar</p>
+          <p className="text-[10px] font-black uppercase tracking-widest text-amber-700">Qué revisar</p>
           <p className="mt-1 text-xs text-slate-600 leading-relaxed">
             {workGuide
               ? `Revisa que cumpla con: ${workGuide.title}.`

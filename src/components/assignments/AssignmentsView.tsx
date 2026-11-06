@@ -45,7 +45,7 @@ const initialTeachers: Teacher[] = [
   },
   {
     id: 'doc-2',
-    name: 'Maria Torres',
+    name: 'María Torres',
     email: 'maria.torres@edusudamericano.edu.ec',
     area: 'Vinculacion',
     mobileStatus: 'Pendiente'
@@ -240,7 +240,7 @@ export const AssignmentsView = ({ userRole, mockData }: AssignmentsViewProps) =>
             <input type="date" value={dueDate} onChange={event => setDueDate(event.target.value)} className="w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold outline-none focus:border-blue-300 focus:bg-white" />
             <button onClick={handleCreateTask} className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-emerald-600 px-5 py-3 text-xs font-black uppercase tracking-widest text-white hover:bg-emerald-700">
               <Smartphone className="h-4 w-4" />
-              Publicar para app movil
+              Publicar para app móvil
             </button>
           </div>
         </section>
@@ -286,7 +286,7 @@ export const AssignmentsView = ({ userRole, mockData }: AssignmentsViewProps) =>
                     Entrega {task.dueDate}
                   </span>
                   <span className="rounded-md bg-white px-2.5 py-1 text-[10px] font-black uppercase tracking-widest text-blue-700 border border-blue-100">
-                    Visible en movil
+                    Visible en móvil
                   </span>
                 </div>
               </div>

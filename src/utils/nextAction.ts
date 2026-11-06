@@ -81,5 +81,5 @@ export const getNextAction = (
     return { tone: 'done', title: 'Evidencias documentales completas', detail: 'Todas tienen un archivo vigente sin observaciones. Espera la revisión del evaluador.', target: 'none' };
   }
 
-  return { tone: 'done', title: 'Revisa tus actividades', detail: 'Tus tareas estan en la pestana Actividades.', target: 'none' };
+  return { tone: 'done', title: 'Revisa tus actividades', detail: 'Tus tareas están en la pestaña Actividades.', target: 'none' };
 };

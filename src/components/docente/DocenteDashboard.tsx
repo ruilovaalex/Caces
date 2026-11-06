@@ -57,8 +57,8 @@ export const DocenteDashboard = ({ onViewAllFiles, onViewAllActivities }: Docent
         transition={{ duration: 0.3, ease: 'easeOut' }}
         className="flex items-center justify-between"
       >
-        <h2 className="text-2xl font-black text-slate-800 tracking-tight leading-tight">Dashboard General</h2>
-        <p className="text-xs font-bold uppercase tracking-widest text-slate-400">Período 2025</p>
+        <h2 className="text-2xl font-black text-slate-800 tracking-tight leading-tight">Panel general</h2>
+        <p className="text-xs font-bold uppercase tracking-widest text-slate-400">Periodo 2025</p>
       </motion.div>
 
       {/* Stat cards with staggered fade-in from below */}
@@ -89,7 +89,7 @@ export const DocenteDashboard = ({ onViewAllFiles, onViewAllActivities }: Docent
         className="premium-card bg-white p-6 rounded-lg space-y-4"
       >
         <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-wider">
-          <span className="text-[#64748b]">Progreso General de mis Entregas</span>
+          <span className="text-[#64748b]">Progreso general de mis entregas</span>
           <span className="text-[#2563eb]">50%</span>
         </div>
         <div className="w-full h-2 bg-[#f1f5f9] rounded-full overflow-hidden">
@@ -118,7 +118,7 @@ export const DocenteDashboard = ({ onViewAllFiles, onViewAllActivities }: Docent
           <div className="p-6 border-b border-[#f1f5f9] flex items-center justify-between bg-white">
             <div className="flex items-center gap-3">
               <Clock className="w-5 h-5 text-amber-500" />
-              <h3 className="text-sm font-black text-slate-800 uppercase tracking-tight">Actividades Pendientes</h3>
+              <h3 className="text-sm font-black text-slate-800 uppercase tracking-tight">Actividades pendientes</h3>
             </div>
             <motion.button
               whileHover={hoverScale}
@@ -143,7 +143,7 @@ export const DocenteDashboard = ({ onViewAllFiles, onViewAllActivities }: Docent
           <div className="p-6 border-b border-[#f1f5f9] flex items-center justify-between bg-white">
             <div className="flex items-center gap-3">
               <FileText className="w-5 h-5 text-[#2563eb]" />
-              <h3 className="text-sm font-black text-slate-800 uppercase tracking-tight">Archivos Recientes</h3>
+              <h3 className="text-sm font-black text-slate-800 uppercase tracking-tight">Archivos recientes</h3>
             </div>
             <motion.button
               whileHover={hoverScale}

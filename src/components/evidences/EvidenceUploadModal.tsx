@@ -31,7 +31,7 @@ export const EvidenceUploadModal = ({
   const isInvalidFile = Boolean(uploadForm.file && !isFileAllowedForRequirement(uploadForm.file, activeRequirement));
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Cargar Evidencia">
+    <Modal isOpen={isOpen} onClose={onClose} title="Cargar evidencia">
       <div className="p-8 border-t border-slate-50 space-y-6">
         <p className="text-slate-400 text-sm font-medium -mt-4">{activeRequirement.label}</p>
         
@@ -56,7 +56,7 @@ export const EvidenceUploadModal = ({
                 {uploadForm.file ? uploadForm.file.name : 'Seleccionar archivo local'}
               </p>
               <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">
-                {uploadForm.file ? `${(uploadForm.file.size / 1024).toFixed(1)} KB` : `${allowedFormats} hasta 20MB`}
+                {uploadForm.file ? `${(uploadForm.file.size / 1024).toFixed(1)} KB` : `${allowedFormats} hasta 20 MB`}
               </p>
             </div>
           </label>
@@ -69,11 +69,11 @@ export const EvidenceUploadModal = ({
         )}
 
         <div className="space-y-3">
-          <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Observación de la Versión</label>
+          <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Observación de la versión</label>
           <textarea 
             value={uploadForm.obs}
             onChange={(e) => onObsChange(e.target.value)}
-            placeholder="Ej: Versión inicial con firmas del decano..."
+            placeholder="Ej.: Versión inicial con firmas del decano..."
             className="w-full bg-slate-50 border border-slate-100 rounded-2xl p-4 text-sm focus:ring-2 focus:ring-blue-500/20 focus:outline-none min-h-[100px] resize-none"
           />
         </div>
@@ -90,7 +90,7 @@ export const EvidenceUploadModal = ({
             onClick={onSave}
             className="flex-1 py-4 bg-slate-900 text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-slate-800 transition-all disabled:opacity-50 text-nowrap"
           >
-            {isGenerating ? 'Subiendo...' : 'Subir Archivo'}
+            {isGenerating ? 'Subiendo...' : 'Subir archivo'}
           </button>
         </div>
       </div>
