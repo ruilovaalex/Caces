@@ -124,11 +124,11 @@ export const ApiTasksView = ({ userRole, periodCode, periodLabel, indicators }: 
             </select>
           </div>
           <div className="space-y-1">
-            <label htmlFor="task-due" className={label}>Fecha limite</label>
+            <label htmlFor="task-due" className={label}>Fecha límite</label>
             <input id="task-due" type="date" required className={field} value={form.dueDate} onChange={e => setForm({ ...form, dueDate: e.target.value })} />
           </div>
           <div className="space-y-1">
-            <label htmlFor="task-title" className={label}>Titulo</label>
+            <label htmlFor="task-title" className={label}>Título</label>
             <input id="task-title" required minLength={2} maxLength={200} className={field} value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} />
           </div>
           <div className="space-y-1">

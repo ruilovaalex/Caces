@@ -71,7 +71,7 @@ const baseSections = (indicator: Indicator, requirement: Requirement, context: T
   section(
     'validez',
     'Validez institucional',
-    'Incluye aprobacion, firmas, fechas, unidad responsable o fuente institucional.',
+    'Incluye aprobación, firmas, fechas, unidad responsable o fuente institucional.',
     'Documento aprobado por..., fecha..., responsable...'
   ),
   section(
@@ -87,7 +87,7 @@ const kindSections = (kind: ReturnType<typeof detectEvidenceKind>) => {
     case 'normativa':
       return [
         section('objeto', 'Objeto y alcance normativo', 'Define que regula el documento y a quienes aplica.', 'La normativa regula...'),
-        section('aprobacion', 'Aprobacion y vigencia', 'Registra resolucion, acta, fecha y autoridad que aprueba.', 'Resolucion No..., vigente desde...')
+        section('aprobacion', 'Aprobacion y vigencia', 'Registra resolución, acta, fecha y autoridad que aprueba.', 'Resolución No..., vigente desde...')
       ];
     case 'plan':
       return [
@@ -97,17 +97,17 @@ const kindSections = (kind: ReturnType<typeof detectEvidenceKind>) => {
     case 'informe':
       return [
         section('metodologia', 'Metodologia y periodo revisado', 'Explica como se levanto la informacion y que periodo cubre.', 'Periodo..., fuente..., metodologia...'),
-        section('hallazgos', 'Resultados y acciones de mejora', 'Presenta resultados, conclusiones y acciones correctivas.', 'Resultado..., accion de mejora...')
+        section('hallazgos', 'Resultados y acciones de mejora', 'Presenta resultados, conclusiones y acciones correctivas.', 'Resultado..., acción de mejora...')
       ];
     case 'matriz':
       return [
-        section('campos', 'Campos de la matriz', 'Describe columnas, fuentes, responsables y periodo de actualizacion.', 'Codigo, carrera, responsable, estado...'),
+        section('campos', 'Campos de la matriz', 'Describe columnas, fuentes, responsables y periodo de actualización.', 'Código, carrera, responsable, estado...'),
         section('certificacion', 'Certificacion de datos', 'Indica quien certifica la matriz y de donde salen los datos.', 'Fuente institucional..., certificado por...')
       ];
     case 'visual':
       return [
-        section('registro', 'Registro visual', 'Describe lugar, fecha, responsable y que demuestra cada imagen o captura.', 'Imagen 1: fecha, lugar, descripcion...'),
-        section('constatacion', 'Constatacion y respaldo', 'Agrega acta, recorrido, fuente o validacion institucional si aplica.', 'Acta de constatacion..., responsable...')
+        section('registro', 'Registro visual', 'Describe lugar, fecha, responsable y que demuestra cada imagen o captura.', 'Imagen 1: fecha, lugar, descripción...'),
+        section('constatacion', 'Constatacion y respaldo', 'Agrega acta, recorrido, fuente o validación institucional si aplica.', 'Acta de constatación..., responsable...')
       ];
     case 'acta':
       return [
@@ -164,25 +164,25 @@ export const buildEvidenceTemplateOptions = (
     createTemplate(
       2,
       'Matriz de cumplimiento',
-      'Para organizar datos, responsables, fechas, estado y fuente de verificacion.',
+      'Para organizar datos, responsables, fechas, estado y fuente de verificación.',
       indicator,
       requirement,
       context,
       [
         section('tabla', 'Tabla de cumplimiento', 'Construye una matriz con responsable, actividad, estado y evidencia.', 'Responsable | Actividad | Estado | Soporte'),
-        section('observaciones', 'Observaciones de cumplimiento', 'Registra brechas, pendientes o notas de control.', 'Observacion..., accion...')
+        section('observaciones', 'Observaciones de cumplimiento', 'Registra brechas, pendientes o notas de control.', 'Observación..., acción...')
       ]
     ),
     createTemplate(
       3,
       'Informe tecnico de respaldo',
-      'Para explicar resultados, analisis y conclusiones de la evidencia.',
+      'Para explicar resultados, análisis y conclusiones de la evidencia.',
       indicator,
       requirement,
       context,
       [
         section('analisis', 'Analisis tecnico', 'Relaciona la evidencia con el criterio, subcriterio e indicador.', 'Analisis del cumplimiento...'),
-        section('conclusiones', 'Conclusiones y recomendaciones', 'Cierra con estado de cumplimiento y acciones sugeridas.', 'Conclusion..., recomendacion...')
+        section('conclusiones', 'Conclusiones y recomendaciones', 'Cierra con estado de cumplimiento y acciones sugeridas.', 'Conclusión..., recomendación...')
       ]
     ),
     createTemplate(
@@ -193,20 +193,20 @@ export const buildEvidenceTemplateOptions = (
       requirement,
       context,
       [
-        section('indice', 'Indice de anexos', 'Lista anexos con codigo, nombre, fecha y descripcion.', 'Anexo 1..., Anexo 2...'),
+        section('indice', 'Indice de anexos', 'Lista anexos con código, nombre, fecha y descripción.', 'Anexo 1..., Anexo 2...'),
         section('trazabilidad', 'Trazabilidad documental', 'Explica de donde viene cada soporte y quien lo valida.', 'Fuente..., responsable..., fecha...')
       ]
     ),
     createTemplate(
       5,
       'Acta de constatacion o validacion',
-      'Para dejar evidencia de revision, constatacion o validacion interna antes de subir.',
+      'Para dejar evidencia de revisión, constatación o validación interna antes de subir.',
       indicator,
       requirement,
       context,
       [
-        section('constatacion', 'Constatacion interna', 'Registra quien reviso la evidencia y que se verifico.', 'Fecha..., responsable..., verificacion...'),
-        section('validacion', 'Resultado de validacion', 'Indica si queda lista, observada o pendiente antes de revision externa.', 'Resultado..., observaciones...')
+        section('constatacion', 'Constatacion interna', 'Registra quien reviso la evidencia y que se verifico.', 'Fecha..., responsable..., verificación...'),
+        section('validacion', 'Resultado de validacion', 'Indica si queda lista, observada o pendiente antes de revisión externa.', 'Resultado..., observaciones...')
       ]
     )
   ];

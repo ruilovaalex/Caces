@@ -59,7 +59,7 @@ export const LoginScreen = ({ onLogin, onCredentialsLogin }: LoginScreenProps) =
             <div>
               <h1 className="text-3xl font-black text-[#0f172a] tracking-tight">EduSudamericano</h1>
               <p className="text-[10px] font-black text-[#2563eb] uppercase tracking-[0.25em] mt-1">
-                Gestion de Acreditacion CACES
+                Gestión de Acreditación CACES
               </p>
             </div>
           </div>
@@ -115,7 +115,7 @@ export const LoginScreen = ({ onLogin, onCredentialsLogin }: LoginScreenProps) =
             </div>
 
             <div className="space-y-2 text-left">
-              <label className="text-[10px] font-black text-[#64748b] uppercase tracking-widest ml-1">Contrasena</label>
+              <label className="text-[10px] font-black text-[#64748b] uppercase tracking-widest ml-1">Contraseña</label>
               <div className="relative">
                 <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#94a3b8]">
                   <CheckCircle2 className="w-4 h-4" />
@@ -135,7 +135,7 @@ export const LoginScreen = ({ onLogin, onCredentialsLogin }: LoginScreenProps) =
             onClick={() => onLogin(role)}
             className="w-full py-4 bg-[#2563eb] hover:bg-blue-700 text-white rounded-2xl font-black text-xs uppercase tracking-widest transition-all shadow-lg shadow-blue-600/25 active:scale-95"
           >
-            Iniciar sesion
+            Iniciar sesión
           </motion.button>
           </>
           )}
@@ -148,7 +148,7 @@ export const LoginScreen = ({ onLogin, onCredentialsLogin }: LoginScreenProps) =
                 <span className="text-center normal-case tracking-normal font-bold">¿Olvidó su clave? Pida al administrador que la restablezca desde Usuarios y roles.</span>
               )
             ) : (
-              <span className="text-center normal-case tracking-normal text-amber-700">Modo demostracion: elige un perfil, no se pide contrasena y los datos quedan solo en este navegador.</span>
+              <span className="text-center normal-case tracking-normal text-amber-700">Modo demostración: elige un perfil, no se pide contraseña y los datos quedan solo en este navegador.</span>
             )}
           </div>
         </div>
@@ -214,7 +214,7 @@ const CredentialsForm = ({ onSubmit }: { onSubmit: (email: string, password: str
       </div>
 
       <div className="space-y-2 text-left">
-        <label htmlFor="login-password" className="text-[10px] font-black text-[#64748b] uppercase tracking-widest ml-1">Contrasena</label>
+        <label htmlFor="login-password" className="text-[10px] font-black text-[#64748b] uppercase tracking-widest ml-1">Contraseña</label>
         <div className="relative">
           <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#94a3b8]">
             <CheckCircle2 className="w-4 h-4" />
@@ -303,7 +303,7 @@ const PasswordRecovery = ({ mode, onDone }: { mode: 'forgot' | 'reset'; onDone: 
             <input id="recovery-password" type="password" required minLength={12} autoComplete="new-password" value={password} onChange={e => setPassword(e.target.value)} className={inputClass.replace('pl-12', 'pl-4')} />
           </div>
           <div className="space-y-2">
-            <label htmlFor="recovery-confirm" className="ml-1 text-[10px] font-black uppercase tracking-widest text-[#64748b]">Confirmar contrasena</label>
+            <label htmlFor="recovery-confirm" className="ml-1 text-[10px] font-black uppercase tracking-widest text-[#64748b]">Confirmar contraseña</label>
             <input id="recovery-confirm" type="password" required minLength={12} autoComplete="new-password" value={confirm} onChange={e => setConfirm(e.target.value)} className={inputClass.replace('pl-12', 'pl-4')} />
           </div>
         </>
@@ -315,7 +315,7 @@ const PasswordRecovery = ({ mode, onDone }: { mode: 'forgot' | 'reset'; onDone: 
         </button>
       )}
       <button type="button" onClick={onDone} className="w-full text-center text-[10px] font-black uppercase tracking-widest text-[#64748b] hover:text-[#2563eb]">
-        Volver al inicio de sesion
+        Volver al inicio de sesión
       </button>
     </form>
   );

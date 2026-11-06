@@ -74,7 +74,7 @@ export const useAuth = () => {
 
     NotificationService.add({
       title: 'Sesion Iniciada',
-      message: `Bienvenido al sistema de acreditacion EduSudamericano. Perfil activo: ${role}`,
+      message: `Bienvenido al sistema de acreditación EduSudamericano. Perfil activo: ${role}`,
       type: 'info'
     });
   }, []);

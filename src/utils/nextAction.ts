@@ -25,7 +25,7 @@ export const getNextAction = (
     return {
       tone: 'action',
       title: 'Gestiona las cuentas del sistema',
-      detail: 'Crea usuarios, asigna roles y restablece contrasenas desde la seccion 3.',
+      detail: 'Crea usuarios, asigna roles y restablece contraseñas desde la sección 3.',
       cta: 'Abrir usuarios y roles',
       target: 'assignments',
     };
@@ -41,7 +41,7 @@ export const getNextAction = (
       const codes = new Set(toReview.map(file => file.indicatorCode));
       return {
         tone: 'action',
-        title: `${plural(toReview.length, 'evidencia espera', 'evidencias esperan')} tu revision`,
+        title: `${plural(toReview.length, 'evidencia espera', 'evidencias esperan')} tu revisión`,
         detail: `En ${plural(codes.size, 'indicador', 'indicadores')}. Empieza por ${indicator.code} - ${indicator.name}.`,
         cta: `Revisar ${indicator.code}`,
         target: 'indicator',

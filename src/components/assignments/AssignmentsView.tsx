@@ -154,7 +154,7 @@ export const AssignmentsView = ({ userRole, mockData }: AssignmentsViewProps) =>
               <Shield className="h-5 w-5" />
             </div>
             <div>
-              <h2 className="text-2xl font-black text-slate-800 tracking-tight leading-tight">Administracion de roles</h2>
+              <h2 className="text-2xl font-black text-slate-800 tracking-tight leading-tight">Administración de roles</h2>
               <p className="text-xs font-bold uppercase tracking-widest text-slate-400 mt-1">
                 El administrador solo crea roles del sistema.
               </p>
@@ -214,7 +214,7 @@ export const AssignmentsView = ({ userRole, mockData }: AssignmentsViewProps) =>
           <div className="mt-5 space-y-3">
             <input value={teacherName} onChange={event => setTeacherName(event.target.value)} placeholder="Nombre del docente" className="w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold outline-none focus:border-blue-300 focus:bg-white" />
             <input value={teacherEmail} onChange={event => setTeacherEmail(event.target.value)} placeholder="Correo institucional" className="w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold outline-none focus:border-blue-300 focus:bg-white" />
-            <input value={teacherArea} onChange={event => setTeacherArea(event.target.value)} placeholder="Area o carrera" className="w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold outline-none focus:border-blue-300 focus:bg-white" />
+            <input value={teacherArea} onChange={event => setTeacherArea(event.target.value)} placeholder="Área o carrera" className="w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold outline-none focus:border-blue-300 focus:bg-white" />
             <button onClick={handleCreateTeacher} className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-5 py-3 text-xs font-black uppercase tracking-widest text-white hover:bg-blue-700">
               <Plus className="h-4 w-4" />
               Crear docente
@@ -235,7 +235,7 @@ export const AssignmentsView = ({ userRole, mockData }: AssignmentsViewProps) =>
             <select value={selectedIndicatorCode} onChange={event => setSelectedIndicatorCode(event.target.value)} className="w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold outline-none focus:border-blue-300 focus:bg-white">
               {indicators.map(indicator => <option key={indicator.code} value={indicator.code}>{indicator.code} - {indicator.name}</option>)}
             </select>
-            <input value={taskTitle} onChange={event => setTaskTitle(event.target.value)} placeholder="Titulo de la tarea" className="w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold outline-none focus:border-blue-300 focus:bg-white" />
+            <input value={taskTitle} onChange={event => setTaskTitle(event.target.value)} placeholder="Título de la tarea" className="w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold outline-none focus:border-blue-300 focus:bg-white" />
             <input value={taskEvidence} onChange={event => setTaskEvidence(event.target.value)} placeholder="Evidencia solicitada" className="w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold outline-none focus:border-blue-300 focus:bg-white" />
             <input type="date" value={dueDate} onChange={event => setDueDate(event.target.value)} className="w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold outline-none focus:border-blue-300 focus:bg-white" />
             <button onClick={handleCreateTask} className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-emerald-600 px-5 py-3 text-xs font-black uppercase tracking-widest text-white hover:bg-emerald-700">

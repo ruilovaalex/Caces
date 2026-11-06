@@ -282,7 +282,7 @@ export const EvidenceTable = ({
                     <p className="mt-1 truncate text-sm font-black text-slate-800">{requirement.label}</p>
                     <p className="mt-1 text-xs text-slate-400">
                       {isPresential
-                        ? `Verificacion presencial · ${files.length} archivo${files.length === 1 ? '' : 's'} de respaldo opcional`
+                        ? `Verificación presencial · ${files.length} archivo${files.length === 1 ? '' : 's'} de respaldo opcional`
                         : `${files.length} archivo${files.length === 1 ? '' : 's'} · Formato ${requirement.format}`}
                     </p>
                   </div>
@@ -293,8 +293,8 @@ export const EvidenceTable = ({
                     <button
                       onClick={() => setGuideRequirement(requirement)}
                       className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-emerald-50 hover:text-emerald-700"
-                      title="Ver guia de carga"
-                      aria-label="Ver guia de carga"
+                      title="Ver guía de carga"
+                      aria-label="Ver guía de carga"
                     >
                       <BookOpen className="h-4 w-4" />
                     </button>
@@ -321,10 +321,10 @@ export const EvidenceTable = ({
                     <button
                       onClick={() => setVerificationRequirement(requirement)}
                       className="inline-flex h-9 items-center justify-center gap-2 rounded-lg bg-slate-900 px-3 text-[10px] font-black uppercase tracking-widest text-white hover:bg-slate-800"
-                      title="Registrar verificacion presencial"
+                      title="Registrar verificación presencial"
                     >
                       <MapPin className="h-3.5 w-3.5" />
-                      Registrar verificacion
+                      Registrar verificación
                     </button>
                   )}
                   {isEvaluator && currentFile && (
@@ -358,8 +358,8 @@ export const EvidenceTable = ({
                       <button
                         onClick={() => onOpenEditor(requirement)}
                         className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-amber-600 transition-colors hover:bg-amber-50"
-                        title="Revision detallada y observaciones"
-                        aria-label="Revision detallada y observaciones"
+                        title="Revisión detallada y observaciones"
+                        aria-label="Revisión detallada y observaciones"
                       >
                         <ClipboardCheck className="h-4 w-4" />
                       </button>
@@ -385,7 +385,7 @@ export const EvidenceTable = ({
                   className="border-t border-slate-100 bg-slate-50 px-6 py-5"
                 >
                   <div className="mb-4 flex flex-wrap gap-2 sm:hidden">
-                    {!isEvaluator && <RepositoryAction icon={BookOpen} label="Guia" onClick={() => setGuideRequirement(requirement)} />}
+                    {!isEvaluator && <RepositoryAction icon={BookOpen} label="Guía" onClick={() => setGuideRequirement(requirement)} />}
                     {isAdmin && <RepositoryAction icon={LayoutTemplate} label="Plantillas" onClick={() => setTemplateRequirement(requirement)} />}
                     <RepositoryAction icon={History} label="Historial" onClick={() => onOpenHistory(requirement)} />
                     {canVerify && isPresential && <RepositoryAction icon={MapPin} label="Verificar" onClick={() => setVerificationRequirement(requirement)} primary />}
@@ -432,7 +432,7 @@ export const EvidenceTable = ({
                           ) : (
                             <div className="flex items-center gap-3 px-4 py-5 text-sm text-slate-400">
                               <FileClock className="h-4 w-4" />
-                              Pendiente de verificacion por el evaluador en la visita in situ.
+                              Pendiente de verificación por el evaluador en la visita in situ.
                             </div>
                           )}
                         </div>
@@ -507,7 +507,7 @@ export const EvidenceTable = ({
                         ) : (
                           <div className="flex items-center gap-3 px-4 py-5 text-sm text-slate-400">
                             <FileClock className="h-4 w-4" />
-                            Todavia no hay archivos en esta evidencia.
+                            Todavía no hay archivos en esta evidencia.
                           </div>
                         )}
                       </div>
@@ -518,7 +518,7 @@ export const EvidenceTable = ({
                             <div>
                               <p className="text-sm font-black text-slate-800">Plantillas de esta evidencia</p>
                               <p className="mt-1 text-xs text-slate-500">
-                                Publica formatos especificos para que los coordinadores los descarguen desde esta misma evidencia.
+                                Publica formatos específicos para que los coordinadores los descarguen desde esta misma evidencia.
                               </p>
                             </div>
                             <button
@@ -604,7 +604,7 @@ export const EvidenceTable = ({
                               ) : (
                                 <div className="flex items-center gap-3 px-4 py-5 text-sm text-slate-400">
                                   <FileClock className="h-4 w-4" />
-                                  Todavia no hay archivos en esta carpeta.
+                                  Todavía no hay archivos en esta carpeta.
                                 </div>
                               )}
                             </div>
@@ -633,7 +633,7 @@ export const EvidenceTable = ({
             <FileClock className="mx-auto h-10 w-10 text-slate-300" />
             <p className="mt-3 text-sm font-black text-slate-600">No hay archivos para revisar en este indicador.</p>
             <p className="mt-1 text-xs text-slate-400">
-              Las evidencias apareceran aqui cuando un coordinador o docente cargue documentos.
+              Las evidencias aparecerán aquí cuando un coordinador o docente cargue documentos.
             </p>
           </div>
         )}

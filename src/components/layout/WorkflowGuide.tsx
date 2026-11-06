@@ -26,8 +26,8 @@ const steps = {
   evidence: {
     label: 'Paso 3',
     title: 'Evidencia',
-    detail: 'Prepara el documento, revisa el formato y sube la version final.',
-    next: 'Cuando este cargada, pasa a revision.',
+    detail: 'Prepara el documento, revisa el formato y sube la versión final.',
+    next: 'Cuando este cargada, pasa a revisión.',
     icon: UploadCloud
   },
   review: {

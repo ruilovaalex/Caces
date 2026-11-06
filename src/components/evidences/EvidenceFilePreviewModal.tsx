@@ -121,7 +121,7 @@ export const EvidenceFilePreviewModal = ({
 
         {file.observation && (
           <div className="mt-4 rounded-lg border border-amber-100 bg-amber-50 p-4">
-            <p className="text-[10px] font-black uppercase tracking-widest text-amber-700">Observacion</p>
+            <p className="text-[10px] font-black uppercase tracking-widest text-amber-700">Observación</p>
             <p className="mt-2 text-sm leading-relaxed text-amber-900">{file.observation}</p>
           </div>
         )}

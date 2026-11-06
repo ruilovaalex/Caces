@@ -40,7 +40,7 @@ describe('getNextAction', () => {
   it('evaluador: lleva al indicador con evidencias cargadas', () => {
     const action = getNextAction('EVALUADOR', indicators, [file('9.9.2', '1', 'Cargado')], 5);
     expect(action.indicator?.code).toBe('9.9.2');
-    expect(action.title).toMatch(/1 evidencia espera tu revision/);
+    expect(action.title).toMatch(/1 evidencia espera tu revisión/);
   });
 
   it('evaluador: sin revisiones menciona verificaciones presenciales; sin nada, listo', () => {

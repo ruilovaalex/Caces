@@ -60,7 +60,7 @@ export const AdminTemplateManager = ({
 
   const handleCreate = async () => {
     if (!form.label.trim() || !form.description.trim() || !form.criterionId || !form.file) {
-      window.alert('Completa nombre, descripcion, criterio y archivo del formato.');
+      window.alert('Completa nombre, descripción, criterio y archivo del formato.');
       return;
     }
 
@@ -93,7 +93,7 @@ export const AdminTemplateManager = ({
   const handleSaveEdit = async () => {
     if (!editingTemplate) return;
     if (!editingForm.label.trim() || !editingForm.description.trim() || !editingForm.criterionId) {
-      window.alert('Completa nombre, descripcion y criterio antes de guardar.');
+      window.alert('Completa nombre, descripción y criterio antes de guardar.');
       return;
     }
 
@@ -120,14 +120,14 @@ export const AdminTemplateManager = ({
           <div className="max-w-3xl">
             <div className="inline-flex items-center gap-2 rounded-full border border-emerald-100 bg-emerald-50 px-4 py-2 text-[10px] font-black uppercase tracking-[0.24em] text-emerald-700">
               <FolderCog className="h-3.5 w-3.5" />
-              Administracion de formatos
+              Administración de formatos
             </div>
             <h2 className="mt-4 text-2xl font-black tracking-tight text-slate-900">
               Publicar formatos para coordinadores
             </h2>
             <p className="mt-3 max-w-2xl text-sm leading-relaxed text-slate-500">
-              Aqui el administrador puede subir, reemplazar y mantener los formatos oficiales por criterio para que
-              coordinacion trabaje con la misma base documental.
+              Aquí el administrador puede subir, reemplazar y mantener los formatos oficiales por criterio para que
+              coordinación trabaje con la misma base documental.
             </p>
           </div>
 
@@ -165,7 +165,7 @@ export const AdminTemplateManager = ({
                 <input
                   value={form.targetLabel}
                   onChange={event => setForm(current => ({ ...current, targetLabel: event.target.value }))}
-                  placeholder="Ej. POA del periodo de evaluacion"
+                  placeholder="Ej. POA del periodo de evaluación"
                   className="h-11 w-full rounded-xl border border-slate-200 bg-white px-4 text-sm outline-none focus:border-blue-400"
                 />
               </Field>
@@ -181,7 +181,7 @@ export const AdminTemplateManager = ({
                 </label>
               </Field>
             </div>
-            <Field label="Descripcion">
+            <Field label="Descripción">
               <textarea
                 value={form.description}
                 onChange={event => setForm(current => ({ ...current, description: event.target.value }))}
@@ -225,7 +225,7 @@ export const AdminTemplateManager = ({
         <div className="flex items-center justify-between gap-4">
           <div>
             <h3 className="text-lg font-black tracking-tight text-slate-900">Formatos publicados</h3>
-            <p className="mt-1 text-sm text-slate-500">Edita el contenido descriptivo o reemplaza el archivo cuando cambie la version oficial.</p>
+            <p className="mt-1 text-sm text-slate-500">Edita el contenido descriptivo o reemplaza el archivo cuando cambie la versión oficial.</p>
           </div>
         </div>
 
@@ -284,7 +284,7 @@ export const AdminTemplateManager = ({
           </div>
         ) : (
           <div className="mt-6 rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50 p-12 text-center">
-            <p className="text-sm font-bold text-slate-500">Todavia no hay formatos publicados por administracion.</p>
+            <p className="text-sm font-bold text-slate-500">Todavía no hay formatos publicados por administración.</p>
             <p className="mt-2 text-xs text-slate-400">Sube el primero desde el formulario superior.</p>
           </div>
         )}
@@ -335,7 +335,7 @@ export const AdminTemplateManager = ({
               </label>
             </Field>
           </div>
-          <Field label="Descripcion">
+          <Field label="Descripción">
             <textarea
               value={editingForm.description}
               onChange={event => setEditingForm(current => ({ ...current, description: event.target.value }))}

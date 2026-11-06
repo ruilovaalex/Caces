@@ -55,7 +55,7 @@ export const Header = ({
       >
         <div className="flex min-w-0 items-center gap-3">
           {onToggleMenu && (
-            <button type="button" onClick={onToggleMenu} aria-label="Abrir menu de navegacion" className="-ml-2 rounded-lg p-2 text-white hover:bg-white/10 lg:hidden">
+            <button type="button" onClick={onToggleMenu} aria-label="Abrir menú de navegación" className="-ml-2 rounded-lg p-2 text-white hover:bg-white/10 lg:hidden">
               <Menu className="h-5 w-5" aria-hidden />
             </button>
           )}

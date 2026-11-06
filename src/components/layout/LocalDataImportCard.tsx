@@ -66,11 +66,11 @@ export const LocalDataImportCard = ({ userRole, periodCode, periodLabel, onImpor
       });
     }
     for (const verification of localData.verifications) {
-      await track(`Verificacion ${verification.indicatorCode} #${verification.requirementId}`, () =>
+      await track(`Verificación ${verification.indicatorCode} #${verification.requirementId}`, () =>
         EvaluationApi.importVerification(periodCode, verification));
     }
     for (const assessment of localData.assessments) {
-      await track(`Valoracion ${assessment.indicatorCode}`, () => EvaluationApi.importAssessment(periodCode, assessment));
+      await track(`Valoración ${assessment.indicatorCode}`, () => EvaluationApi.importAssessment(periodCode, assessment));
     }
 
     setSummary(result);
@@ -89,7 +89,7 @@ export const LocalDataImportCard = ({ userRole, periodCode, periodLabel, onImpor
               {localData.evidences.length > 0 && `${localData.evidences.length} versiones de evidencias. `}
               {localData.verifications.length > 0 && `${localData.verifications.length} verificaciones presenciales. `}
               {localData.assessments.length > 0 && `${localData.assessments.length} valoraciones. `}
-              Se importan al periodo seleccionado y quedan pendientes de revision; los datos locales se conservan.
+              Se importan al periodo seleccionado y quedan pendientes de revisión; los datos locales se conservan.
             </p>
           </div>
         </div>

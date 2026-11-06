@@ -43,7 +43,7 @@ export const EvidenceHistoryModal = ({
 
   const handleDeleteFile = (file: UploadedFile) => {
     if (!onDeleteFile) return;
-    const confirmed = window.confirm(`Eliminar ${file.fileName}? Esta accion quitara la version v${file.version} del historial.`);
+    const confirmed = window.confirm(`Eliminar ${file.fileName}? Esta acción quitará la versión v${file.version} del historial.`);
     if (!confirmed) return;
 
     onDeleteFile(file.id);
@@ -127,7 +127,7 @@ export const EvidenceHistoryModal = ({
               {files.length > 0 ? 'No hay documentos con esos filtros.' : 'Aun no hay documentos subidos.'}
             </p>
             <p className="mt-1 text-xs text-slate-400">
-              {files.length > 0 ? 'Cambia los filtros para revisar otras versiones.' : 'Cuando se suban PDFs, DOCX, XLSX u otros archivos para esta evidencia, apareceran aqui.'}
+              {files.length > 0 ? 'Cambia los filtros para revisar otras versiones.' : 'Cuando se suban PDFs, DOCX, XLSX u otros archivos para esta evidencia, aparecerán aquí.'}
             </p>
           </div>
         )}

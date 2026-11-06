@@ -87,7 +87,7 @@ export const Sidebar = ({
         </div>
         <div>
           <h1 className="font-bold text-base tracking-tight text-white leading-none">CACES</h1>
-          <span className="text-[9px] text-[#aac4e8] font-bold uppercase tracking-[0.2em]">Acreditacion</span>
+          <span className="text-[9px] text-[#aac4e8] font-bold uppercase tracking-[0.2em]">Acreditación</span>
         </div>
       </div>
 
@@ -205,7 +205,7 @@ export const Sidebar = ({
           aria-label="Explorador de indicadores"
         >
           <div className="text-[10px] font-bold text-[#94a3b8] uppercase tracking-widest px-2 mb-4">
-            Gestion de periodos
+            Gestión de periodos
           </div>
 
           {mockData.map((yearPeriod) => {
@@ -376,7 +376,7 @@ export const Sidebar = ({
           <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
             <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Docente Adjunto</p>
             <p className="mt-2 text-sm font-bold leading-relaxed text-slate-700">
-              Navega por tus actividades y archivos usando el menu superior.
+              Navega por tus actividades y archivos usando el menú superior.
             </p>
           </div>
         </div>

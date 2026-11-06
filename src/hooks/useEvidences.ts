@@ -58,7 +58,7 @@ export const useEvidences = (periodCode: string, enabled = true) => {
     await loadData();
     NotificationService.add({
       title: 'Documento Cargado',
-      message: `Nueva version de ${requirement.label} subida correctamente.`,
+      message: `Nueva versión de ${requirement.label} subida correctamente.`,
       type: 'success'
     });
   }, [loadData, periodCode]);

@@ -45,7 +45,7 @@ export const EvidenceRow = ({
           {currentFile?.observation && (
             <p className="text-[10px] text-amber-600 font-bold mt-1.5 flex items-center gap-1">
               <AlertCircle className="w-3 h-3" />
-              Observacion: {currentFile.observation}
+              Observación: {currentFile.observation}
             </p>
           )}
         </div>
@@ -97,7 +97,7 @@ export const EvidenceRow = ({
                   ? 'bg-[#2563eb] text-white hover:bg-blue-700'
                   : 'bg-slate-50 text-[#94a3b8] hover:bg-slate-100'
               }`}
-              title={currentFile ? 'Reemplazar archivo (nueva version)' : 'Subir archivo'}
+              title={currentFile ? 'Reemplazar archivo (nueva versión)' : 'Subir archivo'}
             >
               <Upload className="w-4 h-4" />
             </motion.button>

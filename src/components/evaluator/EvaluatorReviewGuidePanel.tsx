@@ -20,8 +20,8 @@ export const EvaluatorReviewGuidePanel = ({ currentFile, indicator, requirement 
             <ClipboardCheck className="w-4 h-4" />
           </div>
           <div>
-            <h3 className="font-black text-slate-800 text-sm tracking-tight text-amber-700">Guia del Evaluador</h3>
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Revision tecnica</p>
+            <h3 className="font-black text-slate-800 text-sm tracking-tight text-amber-700">Guía del Evaluador</h3>
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Revisión técnica</p>
           </div>
         </div>
 
@@ -38,7 +38,7 @@ export const EvaluatorReviewGuidePanel = ({ currentFile, indicator, requirement 
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {workGuide && (
           <div className="bg-white rounded-lg border border-slate-200 p-4">
-            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Descripcion CACES</p>
+            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Descripción CACES</p>
             <p className="mt-2 text-xs text-slate-600 leading-relaxed">{workGuide.cacesDescription}</p>
             <p className="mt-3 text-[10px] font-black uppercase tracking-widest text-slate-500">Formato esperado: {workGuide.format}</p>
           </div>
@@ -56,27 +56,27 @@ export const EvaluatorReviewGuidePanel = ({ currentFile, indicator, requirement 
             <CheckCircle2 className="w-4 h-4 text-emerald-600 mt-0.5" />
             <div>
               <p className="text-xs font-black text-slate-700 uppercase tracking-widest">Completitud</p>
-              <p className="text-xs text-slate-500 mt-1">{workGuide?.checks.join(' ') || 'Revisa si contiene firmas, fechas, responsables, anexos y toda la informacion clave.'}</p>
+              <p className="text-xs text-slate-500 mt-1">{workGuide?.checks.join(' ') || 'Revisa si contiene firmas, fechas, responsables, anexos y toda la información clave.'}</p>
             </div>
           </div>
           <div className="flex items-start gap-3">
             <AlertTriangle className="w-4 h-4 text-amber-600 mt-0.5" />
             <div>
-              <p className="text-xs font-black text-slate-700 uppercase tracking-widest">Observacion</p>
-              <p className="text-xs text-slate-500 mt-1">Usa este estado cuando sea corregible y deja una instruccion precisa para el coordinador.</p>
+              <p className="text-xs font-black text-slate-700 uppercase tracking-widest">Observación</p>
+              <p className="text-xs text-slate-500 mt-1">Usa este estado cuando sea corregible y deja una instrucción precisa para el coordinador.</p>
             </div>
           </div>
           <div className="flex items-start gap-3">
             <XCircle className="w-4 h-4 text-rose-600 mt-0.5" />
             <div>
               <p className="text-xs font-black text-slate-700 uppercase tracking-widest">Rechazo</p>
-              <p className="text-xs text-slate-500 mt-1">Aplicalo cuando el archivo no corresponda, sea insuficiente o invalido para el CACES.</p>
+              <p className="text-xs text-slate-500 mt-1">Aplícalo cuando el archivo no corresponda, sea insuficiente o inválido para el CACES.</p>
             </div>
           </div>
         </div>
 
         <div className="bg-white rounded-lg border border-slate-200 p-4">
-          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Version actual</p>
+          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Versión actual</p>
           <p className="mt-2 text-sm font-bold text-slate-700">{currentFile?.fileName || 'Sin archivo cargado'}</p>
           <p className="mt-1 text-xs text-slate-500">
             {currentFile

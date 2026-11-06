@@ -341,7 +341,7 @@ export default function App() {
     return (
       <div role="alert" className="flex h-screen items-center justify-center bg-[#0f172a] p-6 text-center">
         <div className="max-w-md space-y-2 rounded-2xl bg-white p-8">
-          <h1 className="text-sm font-black uppercase tracking-widest text-rose-600">Configuracion incompleta</h1>
+          <h1 className="text-sm font-black uppercase tracking-widest text-rose-600">Configuración incompleta</h1>
           <p className="text-sm text-slate-600">{configurationError}</p>
         </div>
       </div>
@@ -349,7 +349,7 @@ export default function App() {
   }
 
   if (isRestoring) {
-    return <div className="flex h-screen items-center justify-center bg-[#0f172a] text-xs font-black uppercase tracking-widest text-slate-400">Recuperando sesion...</div>;
+    return <div className="flex h-screen items-center justify-center bg-[#0f172a] text-xs font-black uppercase tracking-widest text-slate-400">Recuperando sesión...</div>;
   }
 
   if (!isAuthenticated) {
@@ -397,7 +397,7 @@ export default function App() {
         />
         {isDemoMode && (
           <p role="note" className="shrink-0 bg-amber-50 px-4 py-2 text-center text-[11px] font-bold text-amber-800">
-            Modo demostracion: los datos se guardan solo en este navegador y no se comparten con otras personas.
+            Modo demostración: los datos se guardan solo en este navegador y no se comparten con otras personas.
           </p>
         )}
         {userRole === 'DOCENTE' ? (

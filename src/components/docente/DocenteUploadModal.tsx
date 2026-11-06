@@ -135,7 +135,7 @@ export const DocenteUploadModal = ({ isOpen, onClose }: DocenteUploadModalProps)
                         <div className="mt-4 border-2 border-dashed border-slate-200 rounded-xl p-8 text-center hover:bg-slate-50 hover:border-blue-300 transition-all cursor-pointer">
                           <FileText className="w-8 h-8 text-slate-400 mx-auto mb-2" />
                           <p className="text-sm font-bold text-slate-700">Arrastra tu archivo aquí o haz clic para explorar</p>
-                          <p className="text-xs text-slate-500 mt-1">Soporta PDF, DOCX, JPG (Max 10MB)</p>
+                          <p className="text-xs text-slate-500 mt-1">Soporta PDF, DOCX, JPG (máx. 10 MB)</p>
                         </div>
                       )}
                       

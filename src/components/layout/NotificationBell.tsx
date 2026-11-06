@@ -83,8 +83,8 @@ export const NotificationBell = ({
                             onDelete(n.id);
                           }}
                           className="shrink-0 rounded-md p-1 text-slate-300 hover:bg-slate-100 hover:text-slate-600"
-                          title="Eliminar notificacion"
-                          aria-label="Eliminar notificacion"
+                          title="Eliminar notificación"
+                          aria-label="Eliminar notificación"
                         >
                           <X className="h-3 w-3" />
                         </button>

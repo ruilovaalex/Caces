@@ -14,7 +14,7 @@ const inferDocumentFocus = (requirement: Requirement) => {
       focus: 'Documento normativo aprobado y vigente.',
       checks: [
         'Nombre oficial del documento y codigo interno si existe.',
-        'Fecha de aprobacion, resolucion, acta o autoridad que lo emite.',
+        'Fecha de aprobación, resolución, acta o autoridad que lo emite.',
         'Alcance, responsables y procedimiento que regula.'
       ],
       supports: [
@@ -27,7 +27,7 @@ const inferDocumentFocus = (requirement: Requirement) => {
 
   if (text.includes('plan') || text.includes('poa') || text.includes('pedi') || text.includes('cronograma')) {
     return {
-      focus: 'Planificacion con objetivos, actividades, responsables e indicadores.',
+      focus: 'Planificación con objetivos, actividades, responsables e indicadores.',
       checks: [
         'Periodo de aplicacion y relacion con el modelo CACES.',
         'Objetivos, metas, actividades y responsables definidos.',
@@ -35,7 +35,7 @@ const inferDocumentFocus = (requirement: Requirement) => {
       ],
       supports: [
         'Matriz o plan aprobado.',
-        'Acta, resolucion o firma de aprobacion.',
+        'Acta, resolución o firma de aprobación.',
         'Informe de seguimiento si ya hubo ejecucion.'
       ]
     };
@@ -43,7 +43,7 @@ const inferDocumentFocus = (requirement: Requirement) => {
 
   if (text.includes('informe') || text.includes('seguimiento') || text.includes('evaluacion') || text.includes('resultados')) {
     return {
-      focus: 'Informe verificable con resultados, analisis y acciones de mejora.',
+      focus: 'Informe verificable con resultados, análisis y acciones de mejora.',
       checks: [
         'Periodo evaluado y responsable del informe.',
         'Datos, indicadores o resultados que demuestren cumplimiento.',
@@ -63,7 +63,7 @@ const inferDocumentFocus = (requirement: Requirement) => {
       checks: [
         'Columnas claras: periodo, responsable, unidad/carrera y estado.',
         'Datos completos, consistentes y actualizados.',
-        'Firma, certificacion o fuente institucional.'
+        'Firma, certificación o fuente institucional.'
       ],
       supports: [
         'Archivo editable o PDF certificado.',
@@ -78,7 +78,7 @@ const inferDocumentFocus = (requirement: Requirement) => {
       focus: 'Evidencia visual clara, fechada y relacionada con el indicador.',
       checks: [
         'Imagenes legibles y asociadas al espacio, actividad o sistema evaluado.',
-        'Fecha, lugar, responsable y breve descripcion.',
+        'Fecha, lugar, responsable y breve descripción.',
         'Relacion directa con el requerimiento del indicador.'
       ],
       supports: [
@@ -124,7 +124,7 @@ export const buildRequirementWorkGuide = (indicator: Indicator, requirement: Req
   const inferred = inferDocumentFocus(requirement);
 
   return {
-    title: `Guia para ${requirement.label}`,
+    title: `Guía para ${requirement.label}`,
     intro: `Esta evidencia aporta al indicador ${indicator.code}: ${indicator.name}.`,
     focus: inferred.focus,
     checks: inferred.checks,

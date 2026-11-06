@@ -118,7 +118,7 @@ export const Dashboard = ({
     <div className="max-w-6xl mx-auto space-y-8">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <label htmlFor="dashboard-period" className="text-[10px] font-black text-[#64748b] uppercase tracking-widest">
-          Periodo academico
+          Periodo académico
         </label>
         <select
           id="dashboard-period"
