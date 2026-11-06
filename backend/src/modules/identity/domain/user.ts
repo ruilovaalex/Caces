@@ -18,4 +18,4 @@ export const toActor = (user: User): Actor => ({ id: user.id, name: user.name, e
 
 export const normalizeEmail = (email: string) => email.trim().toLowerCase();
 
-export const MIN_PASSWORD_LENGTH = 8;
+export const MIN_PASSWORD_LENGTH = 12;

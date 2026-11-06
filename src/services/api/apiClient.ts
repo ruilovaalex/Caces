@@ -36,6 +36,10 @@ export const setUnauthorizedHandler = (handler: (() => void) | null) => {
   onUnauthorized = handler;
 };
 
+// Tiempo maximo de espera: el servidor gratuito puede tardar ~1 minuto en despertar; las cargas de archivos tienen mas margen.
+export const REQUEST_TIMEOUT_MS = 90_000;
+export const UPLOAD_TIMEOUT_MS = 10 * 60_000;
+
 const request = async (path: string, init: RequestInit = {}): Promise<Response> => {
   const headers = new Headers(init.headers);
   const token = tokenStore.get();
@@ -44,11 +48,18 @@ const request = async (path: string, init: RequestInit = {}): Promise<Response> 
     headers.set('Content-Type', 'application/json');
   }
 
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), init.body instanceof FormData ? UPLOAD_TIMEOUT_MS : REQUEST_TIMEOUT_MS);
   let response: Response;
   try {
-    response = await fetch(`${API_URL}/api${path}`, { ...init, headers });
+    response = await fetch(`${API_URL}/api${path}`, { ...init, headers, signal: controller.signal });
   } catch {
-    throw new ApiError('No se pudo conectar con el servidor. Revisa tu conexion o que el backend este en ejecucion.', 0, 'NETWORK');
+    if (controller.signal.aborted) {
+      throw new ApiError('El servidor tardó demasiado en responder. Espera unos segundos e inténtalo de nuevo.', 0, 'TIMEOUT');
+    }
+    throw new ApiError('No se pudo conectar con el servidor. Revisa tu conexión o que el backend esté en ejecución.', 0, 'NETWORK');
+  } finally {
+    clearTimeout(timeout);
   }
 
   if (!response.ok) {
@@ -59,6 +70,9 @@ const request = async (path: string, init: RequestInit = {}): Promise<Response> 
       message = Array.isArray(body.details) && body.details.length ? `${body.message}: ${body.details.join(', ')}` : body.message || message;
       code = body.code;
     } catch { /* respuesta sin JSON */ }
+    if (response.status === 429) {
+      message = 'Demasiados intentos seguidos. Espera un minuto e inténtalo de nuevo.';
+    }
     if (response.status === 401 && path !== '/auth/login') {
       tokenStore.clear();
       onUnauthorized?.();

@@ -112,8 +112,8 @@ export const UsersAdminView = ({ currentUserId }: UsersAdminViewProps) => {
           </select>
         </div>
         <div className="space-y-1">
-          <label htmlFor="new-user-password" className={label}>Contrasena inicial (min. 8)</label>
-          <input id="new-user-password" type="password" autoComplete="new-password" required minLength={8} maxLength={200} className={field} value={form.password} onChange={e => setForm({ ...form, password: e.target.value })} />
+          <label htmlFor="new-user-password" className={label}>Contraseña inicial (mín. 12 caracteres)</label>
+          <input id="new-user-password" type="password" autoComplete="new-password" required minLength={12} maxLength={200} className={field} value={form.password} onChange={e => setForm({ ...form, password: e.target.value })} />
         </div>
         <button type="submit" disabled={isCreating} className="flex items-center justify-center gap-2 rounded-xl bg-[#2563eb] px-4 py-2.5 text-xs font-black uppercase tracking-widest text-white hover:bg-blue-700 disabled:opacity-60">
           {isCreating ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden /> : <UserPlus className="h-4 w-4" aria-hidden />}
@@ -176,7 +176,7 @@ export const UsersAdminView = ({ currentUserId }: UsersAdminViewProps) => {
                     {resetTarget === user.id ? (
                       <form onSubmit={event => void handleReset(event, user.id)} className="flex flex-wrap items-center gap-2">
                         <label htmlFor={`reset-${user.id}`} className="sr-only">Nueva contrasena de {user.name}</label>
-                        <input id={`reset-${user.id}`} type="password" autoComplete="new-password" required minLength={8} maxLength={200} placeholder="Nueva contrasena" className={`${field} w-44`} value={resetPassword} onChange={e => setResetPassword(e.target.value)} />
+                        <input id={`reset-${user.id}`} type="password" autoComplete="new-password" required minLength={12} maxLength={200} placeholder="Nueva contrasena" className={`${field} w-44`} value={resetPassword} onChange={e => setResetPassword(e.target.value)} />
                         <button type="submit" disabled={isBusy} className="rounded-xl bg-[#2563eb] px-3 py-2 text-xs font-black uppercase text-white disabled:opacity-60">Guardar</button>
                         <button type="button" onClick={() => { setResetTarget(null); setResetPassword(''); }} className="rounded-xl px-3 py-2 text-xs font-black uppercase text-slate-500 hover:bg-slate-100">Cancelar</button>
                       </form>

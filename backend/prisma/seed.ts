@@ -75,8 +75,8 @@ async function seedPeriods() {
 async function seedUsers() {
   const isProduction = process.env.NODE_ENV === 'production';
   const password = process.env.SEED_DEFAULT_PASSWORD;
-  if (!password || password.length < (isProduction ? 12 : 8)) {
-    throw new Error(`Define SEED_DEFAULT_PASSWORD (minimo ${isProduction ? 12 : 8} caracteres) para crear los usuarios iniciales.`);
+  if (!password || password.length < 12) {
+    throw new Error(`Define SEED_DEFAULT_PASSWORD (minimo 12 caracteres) para crear los usuarios iniciales.`);
   }
   let users = DEMO_USERS;
   if (isProduction) {

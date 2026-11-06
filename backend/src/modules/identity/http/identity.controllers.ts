@@ -1,13 +1,15 @@
-import { Body, Controller, Get, HttpCode, Param, ParseUUIDPipe, Patch, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, Inject, Param, ParseUUIDPipe, Patch, Post, Query } from '@nestjs/common';
 import { ApiBearerAuth, ApiProperty, ApiPropertyOptional, ApiTags } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
 import { Type } from 'class-transformer';
 import { IsBoolean, IsEmail, IsIn, IsInt, IsOptional, IsString, Max, MaxLength, Min, MinLength } from 'class-validator';
+import { APP_CONFIG, AppConfig } from '../../../config/env';
 import { normalizePage } from '../../../shared/application/pagination';
 import { Actor, Role, ROLES } from '../../../shared/domain/actor';
 import { CurrentActor, Public } from '../../../shared/http/auth';
 import { ChangeOwnPasswordUseCase, LoginUseCase, RequestPasswordResetUseCase, ResetPasswordUseCase } from '../application/auth.use-cases';
 import { CreateUserUseCase, ListUsersUseCase, UpdateUserUseCase } from '../application/user-admin.use-cases';
+import { MIN_PASSWORD_LENGTH } from '../domain/user';
 
 class LoginDto {
   @ApiProperty({ example: 'coordinador@edusudamericano.edu.ec' })
@@ -24,7 +26,7 @@ class LoginDto {
 
 class ChangePasswordDto {
   @ApiProperty() @IsString() @MaxLength(200) currentPassword: string;
-  @ApiProperty() @IsString() @MinLength(8) @MaxLength(200) newPassword: string;
+  @ApiProperty() @IsString() @MinLength(MIN_PASSWORD_LENGTH) @MaxLength(200) newPassword: string;
 }
 
 class ForgotPasswordDto {
@@ -33,7 +35,7 @@ class ForgotPasswordDto {
 
 class ResetPasswordDto {
   @ApiProperty() @IsString() @MinLength(20) @MaxLength(200) token: string;
-  @ApiProperty() @IsString() @MinLength(8) @MaxLength(200) newPassword: string;
+  @ApiProperty() @IsString() @MinLength(MIN_PASSWORD_LENGTH) @MaxLength(200) newPassword: string;
 }
 
 class PageQueryDto {
@@ -45,14 +47,14 @@ class CreateUserDto {
   @ApiProperty() @IsEmail() @MaxLength(200) email: string;
   @ApiProperty() @IsString() @MinLength(2) @MaxLength(120) name: string;
   @ApiProperty({ enum: ROLES }) @IsIn(ROLES) role: Role;
-  @ApiProperty() @IsString() @MinLength(8) @MaxLength(200) password: string;
+  @ApiProperty() @IsString() @MinLength(MIN_PASSWORD_LENGTH) @MaxLength(200) password: string;
 }
 
 class UpdateUserDto {
   @ApiPropertyOptional() @IsOptional() @IsString() @MinLength(2) @MaxLength(120) name?: string;
   @ApiPropertyOptional({ enum: ROLES }) @IsOptional() @IsIn(ROLES) role?: Role;
   @ApiPropertyOptional() @IsOptional() @IsBoolean() active?: boolean;
-  @ApiPropertyOptional() @IsOptional() @IsString() @MinLength(8) @MaxLength(200) password?: string;
+  @ApiPropertyOptional() @IsOptional() @IsString() @MinLength(MIN_PASSWORD_LENGTH) @MaxLength(200) password?: string;
 }
 
 @ApiTags('auth')
@@ -63,7 +65,16 @@ export class AuthController {
     private readonly changePassword: ChangeOwnPasswordUseCase,
     private readonly requestReset: RequestPasswordResetUseCase,
     private readonly resetPassword: ResetPasswordUseCase,
+    @Inject(APP_CONFIG) private readonly config: AppConfig,
   ) {}
+
+  // Opciones publicas del inicio de sesion: el frontend decide si ofrece recuperar la clave por correo
+  // o indica que la restablece el administrador (cuando no hay proveedor de correo configurado).
+  @Public()
+  @Get('options')
+  options() {
+    return { passwordRecovery: this.config.mailDriver === 'none' ? 'admin' : 'email', minPasswordLength: MIN_PASSWORD_LENGTH };
+  }
 
   @Public()
   @Throttle({ default: { limit: 10, ttl: 60_000 } })

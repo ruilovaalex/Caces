@@ -1,4 +1,6 @@
-# Despliegue (guía; nada se ha desplegado)
+# Despliegue
+
+Desplegado el 2026-11-06: web en Vercel, backend en Render (Free), base y archivos en Supabase. Detalle y estado en `docs/ESTADO.md`; paso a paso para un entorno nuevo en `docs/GUIA_MOVIL.md` (sección 12).
 
 ## Componentes
 1. **PostgreSQL 16+** gestionado, con respaldos automáticos.
@@ -15,7 +17,8 @@
 | `CORS_ORIGINS` | Solo `https://` explícitos (sin `*` ni localhost) |
 | `FRONTEND_URL` | Base del enlace de recuperación de clave |
 | `STORAGE_DRIVER=s3`, `S3_BUCKET`, `S3_REGION`, opc. `S3_ENDPOINT`, `S3_FORCE_PATH_STYLE=true`, `S3_PREFIX` | Credenciales por `AWS_ACCESS_KEY_ID`/`AWS_SECRET_ACCESS_KEY` o rol IAM. El bucket debe ser privado |
-| `MAIL_DRIVER=none` | Aún no hay adaptador SMTP: el administrador restablece claves desde Usuarios |
+| `MAIL_DRIVER=none` | Aún no hay adaptador SMTP: el administrador restablece claves desde Usuarios (el login lo indica vía `GET /api/auth/options`) |
+| `CLIENT_IP_HEADER` | Cabecera con la IP real del cliente detrás de un proxy de borde. En Render (Cloudflare): `cf-connecting-ip`. Sin ella, todos los usuarios comparten el límite de intentos |
 | `SEED_ADMIN_EMAIL`, `SEED_DEFAULT_PASSWORD` (≥12) | Solo para el primer seed; cambiar la clave después |
 
 ## Opción rápida: Render (render.yaml)
@@ -31,4 +34,4 @@
 
 ## Pendiente antes de producción real
 SMTP (recuperación por correo), política de respaldos y restauración probada, monitoreo/logs, límites de tamaño en el proxy,
-revisión de CORS/HTTPS, prueba de carga de archivos con el bucket real. La imagen Docker no se construyó en este entorno (Docker no está instalado).
+revisión de CORS/HTTPS, prueba de carga de archivos con el bucket real. La imagen Docker se construye en Render (comprobado). La carga de archivos al bucket real aún no se ha probado.

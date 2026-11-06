@@ -21,6 +21,9 @@ services:
         value: https://caces.vercel.app
       - key: MAIL_DRIVER
         value: none
+      # IP real del cliente puesta por Cloudflare (delante de Render): el limite de intentos es por persona, no por proxy.
+      - key: CLIENT_IP_HEADER
+        value: cf-connecting-ip
       - key: STORAGE_DRIVER
         value: s3
       - key: S3_FORCE_PATH_STYLE
