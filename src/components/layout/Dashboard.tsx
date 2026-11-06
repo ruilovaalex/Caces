@@ -144,7 +144,7 @@ export const Dashboard = ({
             : <ArrowRight className="mt-0.5 h-5 w-5 shrink-0 text-[#2563eb]" aria-hidden />}
           <div className="min-w-0">
             <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">
-              {nextAction.tone === 'done' ? 'Todo al dia' : 'Tu siguiente paso'}
+              {nextAction.tone === 'done' ? 'Todo al día' : 'Tu siguiente paso'}
             </p>
             <h3 id="next-action-title" className="text-base font-black text-slate-800">{nextAction.title}</h3>
             <p className="mt-0.5 text-sm text-slate-600">{nextAction.detail}</p>

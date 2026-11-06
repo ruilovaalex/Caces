@@ -204,7 +204,7 @@ export const EvidenceTable = ({
               ? <ClipboardCheck className="h-5 w-5 text-amber-600" />
               : <FolderOpen className="h-5 w-5 text-blue-600" />}
             <h3 className="text-base font-black text-slate-900">
-              {isEvaluator ? 'Bandeja de revision' : 'Repositorio de evidencias'}
+              {isEvaluator ? 'Bandeja de revisión' : 'Repositorio de evidencias'}
             </h3>
           </div>
           <p className="mt-1 text-sm text-slate-500">
@@ -292,30 +292,33 @@ export const EvidenceTable = ({
                   {!isEvaluator && (
                     <button
                       onClick={() => setGuideRequirement(requirement)}
-                      className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-emerald-50 hover:text-emerald-700"
+                      className="inline-flex h-9 min-w-9 items-center justify-center gap-1.5 rounded-lg px-2.5 text-slate-500 transition-colors hover:bg-emerald-50 hover:text-emerald-700"
                       title="Ver guía de carga"
                       aria-label="Ver guía de carga"
                     >
                       <BookOpen className="h-4 w-4" />
+                      <span className="hidden text-[10px] font-black uppercase tracking-widest xl:inline">Guía</span>
                     </button>
                   )}
                   {isAdmin && (
                     <button
                       onClick={() => setTemplateRequirement(requirement)}
-                      className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-blue-600 transition-colors hover:bg-blue-50 hover:text-blue-700"
+                      className="inline-flex h-9 min-w-9 items-center justify-center gap-1.5 rounded-lg px-2.5 text-blue-600 transition-colors hover:bg-blue-50 hover:text-blue-700"
                       title="Gestionar plantillas de esta evidencia"
                       aria-label="Gestionar plantillas de esta evidencia"
                     >
                       <LayoutTemplate className="h-4 w-4" />
+                      <span className="hidden text-[10px] font-black uppercase tracking-widest xl:inline">Plantillas</span>
                     </button>
                   )}
                   <button
                     onClick={() => onOpenHistory(requirement)}
-                    className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-slate-200 hover:text-slate-800"
+                    className="inline-flex h-9 min-w-9 items-center justify-center gap-1.5 rounded-lg px-2.5 text-slate-500 transition-colors hover:bg-slate-200 hover:text-slate-800"
                     title="Ver historial"
                     aria-label="Ver historial"
                   >
                     <History className="h-4 w-4" />
+                    <span className="hidden text-[10px] font-black uppercase tracking-widest xl:inline">Historial</span>
                   </button>
                   {canVerify && isPresential && (
                     <button
@@ -357,22 +360,24 @@ export const EvidenceTable = ({
                       </button>
                       <button
                         onClick={() => onOpenEditor(requirement)}
-                        className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-amber-600 transition-colors hover:bg-amber-50"
+                        className="inline-flex h-9 min-w-9 items-center justify-center gap-1.5 rounded-lg px-2.5 text-amber-600 transition-colors hover:bg-amber-50"
                         title="Revisión detallada y observaciones"
                         aria-label="Revisión detallada y observaciones"
                       >
                         <ClipboardCheck className="h-4 w-4" />
+                        <span className="hidden text-[10px] font-black uppercase tracking-widest xl:inline">Revisar</span>
                       </button>
                     </>
                   )}
                   {canUpload && (
                     <button
                       onClick={() => onOpenUpload(requirement)}
-                      className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-blue-600 text-white transition-colors hover:bg-blue-700"
+                      className="inline-flex h-9 min-w-9 items-center justify-center gap-1.5 rounded-lg px-2.5 bg-blue-600 text-white transition-colors hover:bg-blue-700"
                       title="Subir archivo"
                       aria-label="Subir archivo"
                     >
                       <Upload className="h-4 w-4" />
+                      <span className="hidden text-[10px] font-black uppercase tracking-widest xl:inline">Subir</span>
                     </button>
                   )}
                 </div>

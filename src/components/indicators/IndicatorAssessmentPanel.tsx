@@ -79,7 +79,7 @@ export const IndicatorAssessmentPanel = ({
             onClick={() => setIsEditing(true)}
             className="inline-flex h-10 shrink-0 items-center justify-center gap-2 rounded-lg bg-slate-900 px-4 text-xs font-black uppercase tracking-widest text-white hover:bg-slate-800"
           >
-            {current ? 'Registrar nueva valoracion' : 'Valorar indicador'}
+            {current ? 'Registrar nueva valoración' : 'Valorar indicador'}
           </button>
         )}
       </div>

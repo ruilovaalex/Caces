@@ -186,7 +186,7 @@ const CredentialsForm = ({ onSubmit }: { onSubmit: (email: string, password: str
     try {
       await onSubmit(email.trim(), password);
     } catch (submitError) {
-      setError(submitError instanceof Error ? submitError.message : 'No se pudo iniciar sesion');
+      setError(submitError instanceof Error ? submitError.message : 'No se pudo iniciar sesión');
     } finally {
       setIsSubmitting(false);
     }
@@ -247,7 +247,7 @@ const CredentialsForm = ({ onSubmit }: { onSubmit: (email: string, password: str
         disabled={isSubmitting}
         className="w-full py-4 bg-[#2563eb] hover:bg-blue-700 text-white rounded-2xl font-black text-xs uppercase tracking-widest transition-all shadow-lg shadow-blue-600/25 active:scale-95 disabled:opacity-60"
       >
-        {isSubmitting ? 'Verificando...' : 'Iniciar sesion'}
+        {isSubmitting ? 'Verificando...' : 'Iniciar sesión'}
       </motion.button>
     </form>
   );
@@ -265,7 +265,7 @@ const PasswordRecovery = ({ mode, onDone }: { mode: 'forgot' | 'reset'; onDone: 
     event.preventDefault();
     setError(null);
     if (mode === 'reset' && password !== confirm) {
-      setError('Las contrasenas no coinciden');
+      setError('Las contraseñas no coinciden');
       return;
     }
     setIsSubmitting(true);
@@ -275,7 +275,7 @@ const PasswordRecovery = ({ mode, onDone }: { mode: 'forgot' | 'reset'; onDone: 
         setMessage('Si el correo esta registrado, recibiras un enlace para restablecer la clave. Si no llega, solicita al administrador que la restablezca.');
       } else {
         await AuthApi.resetPassword(new URLSearchParams(window.location.search).get('reset') ?? '', password);
-        setMessage('Contrasena actualizada. Ya puedes iniciar sesion.');
+        setMessage('Contraseña actualizada. Ya puedes iniciar sesión.');
       }
     } catch (submitError) {
       setError(describeError(submitError));
@@ -287,7 +287,7 @@ const PasswordRecovery = ({ mode, onDone }: { mode: 'forgot' | 'reset'; onDone: 
   return (
     <form onSubmit={handleSubmit} className="space-y-4 text-left">
       <h2 className="text-center text-sm font-black uppercase tracking-widest text-[#0f172a]">
-        {mode === 'forgot' ? 'Recuperar contrasena' : 'Nueva contrasena'}
+        {mode === 'forgot' ? 'Recuperar contraseña' : 'Nueva contraseña'}
       </h2>
       {message ? (
         <p role="status" className="rounded-2xl border border-emerald-100 bg-emerald-50 px-4 py-3 text-xs font-bold text-emerald-700">{message}</p>
@@ -311,7 +311,7 @@ const PasswordRecovery = ({ mode, onDone }: { mode: 'forgot' | 'reset'; onDone: 
       {error && <p role="alert" className="rounded-2xl border border-rose-100 bg-rose-50 px-4 py-3 text-xs font-bold text-rose-600">{error}</p>}
       {!message && (
         <button type="submit" disabled={isSubmitting} className="w-full rounded-2xl bg-[#2563eb] py-4 text-xs font-black uppercase tracking-widest text-white hover:bg-blue-700 disabled:opacity-60">
-          {isSubmitting ? 'Enviando...' : mode === 'forgot' ? 'Enviar enlace' : 'Guardar contrasena'}
+          {isSubmitting ? 'Enviando...' : mode === 'forgot' ? 'Enviar enlace' : 'Guardar contraseña'}
         </button>
       )}
       <button type="button" onClick={onDone} className="w-full text-center text-[10px] font-black uppercase tracking-widest text-[#64748b] hover:text-[#2563eb]">

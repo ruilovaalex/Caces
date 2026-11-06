@@ -4,6 +4,7 @@ import { motion } from 'motion/react';
 import { TopBar } from './TopBar';
 import { UserPanel } from './UserPanel';
 import { NotificationBell } from './NotificationBell';
+import { ROLE_LABEL } from '../../utils/permissions';
 import { Notification, UserRole } from '../../types';
 
 interface HeaderProps {
@@ -36,14 +37,7 @@ export const Header = ({
   trail,
   onToggleMenu
 }: HeaderProps) => {
-  const roleLabel =
-    userRole === 'ADMIN'
-      ? 'Administrador'
-      : userRole === 'COORDINADOR'
-        ? 'Coordinacion Academica'
-        : userRole === 'DOCENTE'
-          ? 'Docente Adjunto'
-          : 'Evaluacion Externa';
+  const roleLabel = ROLE_LABEL[userRole];
 
   return (
     <TopBar>
@@ -68,10 +62,10 @@ export const Header = ({
             <div className="w-1.5 h-1.5 bg-[#22c55e] rounded-full animate-pulse" />
             <span className="whitespace-nowrap text-[9px] font-black text-[#aac4e8] uppercase tracking-widest">
               {userRole === 'EVALUADOR'
-                ? 'Modo de revision activa'
+                ? 'Modo de revisión activa'
                 : userRole === 'ADMIN'
-                    ? 'Gestion de roles'
-                    : 'Gestion de acreditacion'}
+                    ? 'Gestión de roles'
+                    : 'Gestión de acreditación'}
             </span>
           </div>
         </div>

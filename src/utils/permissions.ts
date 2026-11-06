@@ -9,3 +9,11 @@ export const canUserManageRoles = (role: UserRole) => role === 'ADMIN';
 export const canUserManageTeachers = (role: UserRole) => role === 'COORDINADOR';
 export const canUserVerifyPresential = (role: UserRole) => role === 'EVALUADOR';
 export const canUserAssessIndicator = (role: UserRole) => role === 'EVALUADOR';
+
+// Nombre del rol que se muestra en la interfaz (uno solo para cabecera, menú y listados).
+export const ROLE_LABEL: Record<UserRole, string> = {
+  ADMIN: 'Administrador',
+  COORDINADOR: 'Coordinador',
+  EVALUADOR: 'Evaluador',
+  DOCENTE: 'Docente',
+};

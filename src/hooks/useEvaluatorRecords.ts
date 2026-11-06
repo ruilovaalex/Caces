@@ -71,7 +71,7 @@ export const useEvaluatorRecords = (periodCode: string, enabled = true) => {
 
     if (result === 'Con observaciones') {
       NotificationService.add({
-        title: 'Verificacion presencial con observaciones',
+        title: 'Verificación presencial con observaciones',
         message: `Indicador ${indicatorCode}, evidencia ${requirement.id}: ${notes}`,
         type: 'warning',
         targetRole: 'COORDINADOR',

@@ -101,7 +101,7 @@ export const RequirementTemplateManagerModal = ({
   const handleSaveEdit = async () => {
     if (!editingTemplate) return;
     if (!editingForm.label.trim() || !editingForm.description.trim()) {
-      window.alert('Completa nombre y descripcion antes de guardar.');
+      window.alert('Completa nombre y descripción antes de guardar.');
       return;
     }
 

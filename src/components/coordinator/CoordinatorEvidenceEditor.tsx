@@ -376,7 +376,7 @@ export const CoordinatorEvidenceEditor = ({
                     { label: 'Plantilla', detail: draft ? 'Seleccionada' : 'Pendiente', icon: Layout, active: !draft },
                     { label: 'Redaccion', detail: draft ? `${completionPercent}% completo` : 'Crear borrador', icon: PenSquare, active: Boolean(draft && workspaceMode === 'compose') },
                     { label: 'Vista previa', detail: draft ? 'Disponible' : 'Sin contenido', icon: Eye, active: workspaceMode === 'preview' },
-                    { label: 'Descarga', detail: draft ? generatedFileName : 'Formato unico', icon: FileDown, active: draft?.status === 'DOCUMENTO_GENERADO' }
+                    { label: 'Descarga', detail: draft ? generatedFileName : 'Formato único', icon: FileDown, active: draft?.status === 'DOCUMENTO_GENERADO' }
                   ].map(step => {
                     const StepIcon = step.icon;
                     return (
@@ -418,10 +418,10 @@ export const CoordinatorEvidenceEditor = ({
               </div>
               <div className="rounded-xl border border-slate-200 bg-white p-4">
                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                  {evaluatorMode ? 'Subida actual' : 'Formato unico'}
+                  {evaluatorMode ? 'Subida actual' : 'Formato único'}
                 </p>
                 <p className="mt-2 truncate text-sm font-bold text-slate-700">
-                  {evaluatorMode ? (currentFile?.fileName || 'Aun no se ha subido archivo') : (draft ? generatedFileName : 'SIG-EV-...')}
+                  {evaluatorMode ? (currentFile?.fileName || 'Aún no se ha subido archivo') : (draft ? generatedFileName : 'SIG-EV-...')}
                 </p>
                 <p className="mt-1 text-xs text-slate-400">
                   {evaluatorMode ? (currentFile ? `Última carga: ${currentFile.uploadDate}` : 'Cuando se cargue una versión, aparecerá aquí.') : 'Nombre institucional generado por la app.'}
@@ -578,7 +578,7 @@ export const CoordinatorEvidenceEditor = ({
 
           <div className="p-6 border-t border-slate-100 bg-slate-50 flex items-center justify-between">
             <p className="text-xs text-slate-500 leading-relaxed">
-              {evaluatorMode ? 'Flujo de revision y observaciones.' : 'Flujo manual de documento institucional.'}
+              {evaluatorMode ? 'Flujo de revisión y observaciones.' : 'Flujo manual de documento institucional.'}
             </p>
 
             {canDraft && (

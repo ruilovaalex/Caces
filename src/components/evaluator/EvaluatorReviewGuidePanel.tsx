@@ -81,7 +81,7 @@ export const EvaluatorReviewGuidePanel = ({ currentFile, indicator, requirement 
           <p className="mt-1 text-xs text-slate-500">
             {currentFile
               ? `Subido por ${currentFile.uploadedBy} el ${currentFile.uploadDate}`
-              : 'No existe una evidencia cargada para revisar todavia.'}
+              : 'No existe una evidencia cargada para revisar todavía.'}
           </p>
         </div>
       </div>

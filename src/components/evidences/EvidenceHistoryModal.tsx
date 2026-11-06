@@ -124,7 +124,7 @@ export const EvidenceHistoryModal = ({
           <div className="rounded-3xl border-2 border-dashed border-slate-200 p-10 text-center">
             <FileText className="mx-auto mb-3 h-10 w-10 text-slate-300" />
             <p className="text-sm font-black text-slate-600">
-              {files.length > 0 ? 'No hay documentos con esos filtros.' : 'Aun no hay documentos subidos.'}
+              {files.length > 0 ? 'No hay documentos con esos filtros.' : 'Aún no hay documentos subidos.'}
             </p>
             <p className="mt-1 text-xs text-slate-400">
               {files.length > 0 ? 'Cambia los filtros para revisar otras versiones.' : 'Cuando se suban PDFs, DOCX, XLSX u otros archivos para esta evidencia, aparecerán aquí.'}

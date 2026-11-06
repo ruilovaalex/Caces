@@ -10,6 +10,7 @@ import {
 import { AnimatePresence, motion } from 'motion/react';
 import { Indicator, UserRole, YearPeriod } from '../../types';
 import { getAcademicPeriodsForYear } from '../../utils/academicPeriodUtils';
+import { ROLE_LABEL } from '../../utils/permissions';
 import { fadeInRight, slideDown, staggerContainerFast } from '../../utils/animations';
 
 interface SidebarProps {
@@ -57,7 +58,7 @@ export const Sidebar = ({
 
   const roleNames: Record<UserRole, string> = {
     ADMIN: 'Admin Sudamericano',
-    COORDINADOR: 'Coord. Academico',
+    COORDINADOR: 'Coord. Académico',
     EVALUADOR: 'Evaluador Externo',
     DOCENTE: 'Prof. Pablo Mora',
   };
@@ -400,7 +401,7 @@ export const Sidebar = ({
           </div>
           <div className="text-[10px]">
             <p className="font-bold text-[#1e293b] leading-tight">{userName || roleNames[userRole]}</p>
-            <p className="text-[#64748b] font-black uppercase tracking-widest text-[8px] mt-0.5">{userRole}{onSwitchRole ? ' (clic para cambiar)' : ''}</p>
+            <p className="text-[#64748b] font-black uppercase tracking-widest text-[8px] mt-0.5">{ROLE_LABEL[userRole]}{onSwitchRole ? ' (clic para cambiar)' : ''}</p>
           </div>
         </div>
       </motion.div>

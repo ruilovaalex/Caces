@@ -51,7 +51,7 @@ export const getNextAction = (
     if (presentialPending > 0) {
       return {
         tone: 'action',
-        title: `${plural(presentialPending, 'verificacion presencial pendiente', 'verificaciones presenciales pendientes')}`,
+        title: `${plural(presentialPending, 'verificación presencial pendiente', 'verificaciones presenciales pendientes')}`,
         detail: 'No hay evidencias por revisar. Las verificaciones se registran durante la visita in situ, dentro de cada indicador.',
         target: 'none',
       };
@@ -78,7 +78,7 @@ export const getNextAction = (
         indicator: first.indicator,
       };
     }
-    return { tone: 'done', title: 'Evidencias documentales completas', detail: 'Todas tienen un archivo vigente sin observaciones. Espera la revision del evaluador.', target: 'none' };
+    return { tone: 'done', title: 'Evidencias documentales completas', detail: 'Todas tienen un archivo vigente sin observaciones. Espera la revisión del evaluador.', target: 'none' };
   }
 
   return { tone: 'done', title: 'Revisa tus actividades', detail: 'Tus tareas estan en la pestana Actividades.', target: 'none' };

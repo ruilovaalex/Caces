@@ -40,7 +40,7 @@ const initialTeachers: Teacher[] = [
     id: 'doc-1',
     name: 'Carlos Mendoza',
     email: 'docente1@edusudamericano.edu.ec',
-    area: 'Planificacion institucional',
+    area: 'Planificación institucional',
     mobileStatus: 'Conectado'
   },
   {
@@ -113,7 +113,7 @@ export const AssignmentsView = ({ userRole, mockData }: AssignmentsViewProps) =>
       id: crypto.randomUUID(),
       name: teacherName.trim(),
       email: teacherEmail.trim(),
-      area: teacherArea.trim() || 'Sin area asignada',
+      area: teacherArea.trim() || 'Sin área asignada',
       mobileStatus: 'Pendiente'
     };
 

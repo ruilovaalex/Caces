@@ -112,8 +112,8 @@ export const EvidenceFilePreviewModal = ({
               </h3>
               <p className="mt-2 text-sm leading-relaxed text-slate-500">
                 {fileUrl
-                  ? 'Descarga el documento para abrirlo con su aplicacion correspondiente.'
-                  : 'Este documento fue cargado antes de habilitar el almacenamiento del archivo real. Vuelve a subir una nueva version para visualizarla aqui.'}
+                  ? 'Descarga el documento para abrirlo con su aplicación correspondiente.'
+                  : 'Este documento fue cargado antes de habilitar el almacenamiento del archivo real. Vuelve a subir una nueva versión para visualizarla aquí.'}
               </p>
             </div>
           )}

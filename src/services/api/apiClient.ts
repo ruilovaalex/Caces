@@ -102,4 +102,4 @@ export const api = {
 };
 
 export const describeError = (error: unknown) =>
-  error instanceof Error ? error.message : 'Ocurrio un error inesperado';
+  error instanceof Error ? error.message : 'Ocurrió un error inesperado';

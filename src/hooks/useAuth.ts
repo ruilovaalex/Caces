@@ -25,7 +25,7 @@ const buildUserByRole = (role: UserRole): User => ({
     role === 'ADMIN'
       ? 'Admin Sudamericano'
       : role === 'COORDINADOR'
-        ? 'Coord. Academico'
+        ? 'Coord. Académico'
         : role === 'DOCENTE'
           ? 'Prof. Pablo Mora'
           : 'Evaluador Externo',
@@ -73,7 +73,7 @@ export const useAuth = () => {
     setUser(buildUserByRole(role));
 
     NotificationService.add({
-      title: 'Sesion Iniciada',
+      title: 'Sesión Iniciada',
       message: `Bienvenido al sistema de acreditación EduSudamericano. Perfil activo: ${role}`,
       type: 'info'
     });

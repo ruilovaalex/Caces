@@ -68,7 +68,7 @@ export const UsersAdminView = ({ currentUserId }: UsersAdminViewProps) => {
     try {
       await UsersApi.create({ ...form, name: form.name.trim(), email: form.email.trim() });
       setForm({ name: '', email: '', role: 'DOCENTE', password: '' });
-      setNotice('Usuario creado. Comunica la contrasena inicial por un canal seguro.');
+      setNotice('Usuario creado. Comunica la contraseña inicial por un canal seguro.');
       await load();
     } catch (createError) {
       setError(describeError(createError));
@@ -79,7 +79,7 @@ export const UsersAdminView = ({ currentUserId }: UsersAdminViewProps) => {
 
   const handleReset = async (event: React.FormEvent, id: string) => {
     event.preventDefault();
-    await run(id, () => UsersApi.update(id, { password: resetPassword }), 'Contrasena restablecida.');
+    await run(id, () => UsersApi.update(id, { password: resetPassword }), 'Contraseña restablecida.');
     setResetTarget(null);
     setResetPassword('');
   };

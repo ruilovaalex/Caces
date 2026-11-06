@@ -13,7 +13,7 @@ const steps = {
     label: 'Paso 1',
     title: 'Repositorio',
     detail: 'Busca el indicador dentro del modelo CACES.',
-    next: 'Abre un indicador o crea una asignacion.',
+    next: 'Abre un indicador o crea una asignación.',
     icon: FolderTree
   },
   assignments: {

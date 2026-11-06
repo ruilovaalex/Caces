@@ -76,7 +76,7 @@ export const useEvidences = (periodCode: string, enabled = true) => {
     EvidenceService.updateStatus(evidenceId, status, observation);
     await loadData();
     NotificationService.add({
-      title: 'Revision Actualizada',
+      title: 'Revisión Actualizada',
       message: `La evidencia fue marcada como ${status}.`,
       type: status === 'Validado' ? 'success' : status === 'Observado' ? 'warning' : 'error'
     });
@@ -96,7 +96,7 @@ export const useEvidences = (periodCode: string, enabled = true) => {
     await loadData();
     NotificationService.add({
       title: 'Documento eliminado',
-      message: 'La version seleccionada fue retirada del historial de evidencia.',
+      message: 'La versión seleccionada fue retirada del historial de evidencia.',
       type: 'warning'
     });
   }, [loadData]);

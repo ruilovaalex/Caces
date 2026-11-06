@@ -13,14 +13,14 @@ const inferDocumentFocus = (requirement: Requirement) => {
     return {
       focus: 'Documento normativo aprobado y vigente.',
       checks: [
-        'Nombre oficial del documento y codigo interno si existe.',
+        'Nombre oficial del documento y código interno si existe.',
         'Fecha de aprobación, resolución, acta o autoridad que lo emite.',
         'Alcance, responsables y procedimiento que regula.'
       ],
       supports: [
-        'Resolucion o acta de aprobacion.',
+        'Resolución o acta de aprobación.',
         'Documento completo con firmas o sellos.',
-        'Version vigente o evidencia de actualizacion.'
+        'Versión vigente o evidencia de actualización.'
       ]
     };
   }
@@ -29,14 +29,14 @@ const inferDocumentFocus = (requirement: Requirement) => {
     return {
       focus: 'Planificación con objetivos, actividades, responsables e indicadores.',
       checks: [
-        'Periodo de aplicacion y relacion con el modelo CACES.',
+        'Periodo de aplicación y relación con el modelo CACES.',
         'Objetivos, metas, actividades y responsables definidos.',
         'Cronograma, recursos e indicadores de seguimiento.'
       ],
       supports: [
         'Matriz o plan aprobado.',
         'Acta, resolución o firma de aprobación.',
-        'Informe de seguimiento si ya hubo ejecucion.'
+        'Informe de seguimiento si ya hubo ejecución.'
       ]
     };
   }
@@ -52,7 +52,7 @@ const inferDocumentFocus = (requirement: Requirement) => {
       supports: [
         'Matrices de seguimiento.',
         'Reportes, graficos o respaldos estadisticos.',
-        'Actas o comunicaciones de socializacion.'
+        'Actas o comunicaciones de socialización.'
       ]
     };
   }
@@ -79,11 +79,11 @@ const inferDocumentFocus = (requirement: Requirement) => {
       checks: [
         'Imagenes legibles y asociadas al espacio, actividad o sistema evaluado.',
         'Fecha, lugar, responsable y breve descripción.',
-        'Relacion directa con el requerimiento del indicador.'
+        'Relación directa con el requerimiento del indicador.'
       ],
       supports: [
         'Fotografias, capturas o planos.',
-        'Acta de constatacion si aplica.',
+        'Acta de constatación si aplica.',
         'Archivo ZIP organizado por carpetas si son varios soportes.'
       ]
     };
@@ -91,7 +91,7 @@ const inferDocumentFocus = (requirement: Requirement) => {
 
   if (text.includes('acta') || text.includes('convocatoria') || text.includes('asistencia') || text.includes('socializacion')) {
     return {
-      focus: 'Respaldo de participacion o socializacion institucional.',
+      focus: 'Respaldo de participación o socialización institucional.',
       checks: [
         'Convocatoria, fecha, participantes y tema tratado.',
         'Acta o registro con acuerdos principales.',

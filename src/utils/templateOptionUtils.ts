@@ -58,7 +58,7 @@ const detectEvidenceKind = (requirement: Requirement) => {
 const baseSections = (indicator: Indicator, requirement: Requirement, context: TemplateContext) => [
   section(
     'identificacion',
-    'Identificacion de la evidencia',
+    'Identificación de la evidencia',
     'Registra criterio, subcriterio, indicador, evidencia, periodo y responsable.',
     `${context.criterionName || 'Criterio'} / ${context.subCriterionName || 'Subcriterio'} / ${indicator.code} - ${indicator.name}`
   ),
@@ -87,7 +87,7 @@ const kindSections = (kind: ReturnType<typeof detectEvidenceKind>) => {
     case 'normativa':
       return [
         section('objeto', 'Objeto y alcance normativo', 'Define que regula el documento y a quienes aplica.', 'La normativa regula...'),
-        section('aprobacion', 'Aprobacion y vigencia', 'Registra resolución, acta, fecha y autoridad que aprueba.', 'Resolución No..., vigente desde...')
+        section('aprobacion', 'Aprobación y vigencia', 'Registra resolución, acta, fecha y autoridad que aprueba.', 'Resolución No..., vigente desde...')
       ];
     case 'plan':
       return [
@@ -96,23 +96,23 @@ const kindSections = (kind: ReturnType<typeof detectEvidenceKind>) => {
       ];
     case 'informe':
       return [
-        section('metodologia', 'Metodologia y periodo revisado', 'Explica como se levanto la informacion y que periodo cubre.', 'Periodo..., fuente..., metodologia...'),
+        section('metodologia', 'Metodologia y periodo revisado', 'Explica cómo se levantó la información y qué periodo cubre.', 'Periodo..., fuente..., metodologia...'),
         section('hallazgos', 'Resultados y acciones de mejora', 'Presenta resultados, conclusiones y acciones correctivas.', 'Resultado..., acción de mejora...')
       ];
     case 'matriz':
       return [
         section('campos', 'Campos de la matriz', 'Describe columnas, fuentes, responsables y periodo de actualización.', 'Código, carrera, responsable, estado...'),
-        section('certificacion', 'Certificacion de datos', 'Indica quien certifica la matriz y de donde salen los datos.', 'Fuente institucional..., certificado por...')
+        section('certificacion', 'Certificación de datos', 'Indica quien certifica la matriz y de donde salen los datos.', 'Fuente institucional..., certificado por...')
       ];
     case 'visual':
       return [
         section('registro', 'Registro visual', 'Describe lugar, fecha, responsable y que demuestra cada imagen o captura.', 'Imagen 1: fecha, lugar, descripción...'),
-        section('constatacion', 'Constatacion y respaldo', 'Agrega acta, recorrido, fuente o validación institucional si aplica.', 'Acta de constatación..., responsable...')
+        section('constatacion', 'Constatación y respaldo', 'Agrega acta, recorrido, fuente o validación institucional si aplica.', 'Acta de constatación..., responsable...')
       ];
     case 'acta':
       return [
         section('participantes', 'Participantes y convocatoria', 'Registra fecha, medio de convocatoria, asistentes y roles.', 'Convocatoria enviada..., participantes...'),
-        section('acuerdos', 'Acuerdos y evidencias de participacion', 'Resume acuerdos, resultados, firmas y soportes.', 'Acuerdo 1..., lista de asistencia...')
+        section('acuerdos', 'Acuerdos y evidencias de participación', 'Resume acuerdos, resultados, firmas y soportes.', 'Acuerdo 1..., lista de asistencia...')
       ];
     default:
       return [
@@ -175,13 +175,13 @@ export const buildEvidenceTemplateOptions = (
     ),
     createTemplate(
       3,
-      'Informe tecnico de respaldo',
+      'Informe técnico de respaldo',
       'Para explicar resultados, análisis y conclusiones de la evidencia.',
       indicator,
       requirement,
       context,
       [
-        section('analisis', 'Analisis tecnico', 'Relaciona la evidencia con el criterio, subcriterio e indicador.', 'Analisis del cumplimiento...'),
+        section('analisis', 'Análisis técnico', 'Relaciona la evidencia con el criterio, subcriterio e indicador.', 'Análisis del cumplimiento...'),
         section('conclusiones', 'Conclusiones y recomendaciones', 'Cierra con estado de cumplimiento y acciones sugeridas.', 'Conclusión..., recomendación...')
       ]
     ),
@@ -193,20 +193,20 @@ export const buildEvidenceTemplateOptions = (
       requirement,
       context,
       [
-        section('indice', 'Indice de anexos', 'Lista anexos con código, nombre, fecha y descripción.', 'Anexo 1..., Anexo 2...'),
+        section('indice', 'Índice de anexos', 'Lista anexos con código, nombre, fecha y descripción.', 'Anexo 1..., Anexo 2...'),
         section('trazabilidad', 'Trazabilidad documental', 'Explica de donde viene cada soporte y quien lo valida.', 'Fuente..., responsable..., fecha...')
       ]
     ),
     createTemplate(
       5,
-      'Acta de constatacion o validacion',
+      'Acta de constatación o validación',
       'Para dejar evidencia de revisión, constatación o validación interna antes de subir.',
       indicator,
       requirement,
       context,
       [
-        section('constatacion', 'Constatacion interna', 'Registra quien reviso la evidencia y que se verifico.', 'Fecha..., responsable..., verificación...'),
-        section('validacion', 'Resultado de validacion', 'Indica si queda lista, observada o pendiente antes de revisión externa.', 'Resultado..., observaciones...')
+        section('constatacion', 'Constatación interna', 'Registra quien revisó la evidencia y qué se verificó.', 'Fecha..., responsable..., verificación...'),
+        section('validacion', 'Resultado de validación', 'Indica si queda lista, observada o pendiente antes de revisión externa.', 'Resultado..., observaciones...')
       ]
     )
   ];
