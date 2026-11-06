@@ -2,7 +2,9 @@ import { Controller, Get, Module } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { ApiTags } from '@nestjs/swagger';
+import { APP_CONFIG, AppConfig } from './config/env';
 import { AuthGuard, Public } from './shared/http/auth';
+import { throttleTracker } from './shared/http/throttle-tracker';
 import { PrismaService } from './shared/infrastructure/prisma.service';
 import { SharedModule } from './shared/infrastructure/shared.module';
 import { CatalogModule } from './modules/catalog/catalog.module';
@@ -30,7 +32,13 @@ class HealthController {
 @Module({
   imports: [
     SharedModule,
-    ThrottlerModule.forRoot([{ ttl: 60_000, limit: 300 }]),
+    ThrottlerModule.forRootAsync({
+      inject: [APP_CONFIG],
+      useFactory: (config: AppConfig) => ({
+        throttlers: [{ ttl: 60_000, limit: 300 }],
+        getTracker: (req: Record<string, any>) => throttleTracker(req, config.clientIpHeader),
+      }),
+    }),
     IdentityModule,
     NotificationsModule,
     CatalogModule,

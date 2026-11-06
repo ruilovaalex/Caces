@@ -11,6 +11,8 @@ export interface AppConfig {
   mailDriver: 'console' | 'none';
   frontendUrl: string;
   maxUploadBytes: number;
+  // Cabecera con la IP real del cliente puesta por el proxy de borde (p. ej. cf-connecting-ip en Cloudflare/Render).
+  clientIpHeader?: string;
 }
 
 // Valida la configuracion al arrancar: si falta algo critico, el proceso no inicia.
@@ -56,6 +58,9 @@ export const loadConfig = (env: NodeJS.ProcessEnv = process.env): AppConfig => {
   const maxUploadMb = Number(env.MAX_UPLOAD_MB || 20);
   if (!Number.isFinite(maxUploadMb) || maxUploadMb <= 0) errors.push('MAX_UPLOAD_MB debe ser un numero positivo');
 
+  const clientIpHeader = env.CLIENT_IP_HEADER?.trim().toLowerCase() || undefined;
+  if (clientIpHeader && !/^[a-z0-9-]+$/.test(clientIpHeader)) errors.push('CLIENT_IP_HEADER debe ser un nombre de cabecera HTTP valido');
+
   const config: AppConfig = {
     nodeEnv: env.NODE_ENV || 'development',
     port: Number(env.PORT || 4000),
@@ -71,6 +76,7 @@ export const loadConfig = (env: NodeJS.ProcessEnv = process.env): AppConfig => {
     mailDriver: mailDriver as 'console' | 'none',
     frontendUrl: (env.FRONTEND_URL || 'http://localhost:3000').replace(/\/+$/, ''),
     maxUploadBytes: Math.round(maxUploadMb * 1024 * 1024),
+    clientIpHeader,
   };
 
   if (errors.length) throw new Error(`Configuracion invalida:\n- ${errors.join('\n- ')}`);
