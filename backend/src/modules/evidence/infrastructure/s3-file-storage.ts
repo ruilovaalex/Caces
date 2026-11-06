@@ -17,7 +17,15 @@ export class S3FileStorage implements FileStorage {
     const s3 = config.s3!;
     this.bucket = s3.bucket;
     this.prefix = s3.prefix;
-    this.client = new S3Client({ region: s3.region, endpoint: s3.endpoint, forcePathStyle: s3.forcePathStyle });
+    // Las sumas de verificacion solo cuando la operacion las exige: varios servicios compatibles con S3
+    // (Supabase, R2, MinIO antiguos) rechazan las que el SDK agrega por defecto desde la version 3.729.
+    this.client = new S3Client({
+      region: s3.region,
+      endpoint: s3.endpoint,
+      forcePathStyle: s3.forcePathStyle,
+      requestChecksumCalculation: 'WHEN_REQUIRED',
+      responseChecksumValidation: 'WHEN_REQUIRED',
+    });
   }
 
   async put(key: string, content: Buffer): Promise<void> {
