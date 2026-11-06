@@ -9,8 +9,7 @@ services:
     dockerContext: ./backend
     plan: free
     healthCheckPath: /api/health
-    # El plan gratuito no admite preDeployCommand: las migraciones corren al iniciar (son idempotentes).
-    dockerCommand: sh -c "npx prisma migrate deploy && node dist/main.js"
+    # El plan gratuito no admite preDeployCommand: el CMD del Dockerfile corre las migraciones al iniciar (son idempotentes).
     envVars:
       - key: NODE_ENV
         value: production

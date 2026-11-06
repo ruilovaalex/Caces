@@ -17,4 +17,5 @@ COPY --from=build /app/dist ./dist
 COPY --from=build /app/prisma ./prisma
 COPY --from=build /app/package.json ./package.json
 EXPOSE 4000
-CMD ["node", "dist/main.js"]
+# Aplica las migraciones pendientes (idempotente) y arranca. Para solo iniciar: docker run ... node dist/main.js
+CMD ["sh", "-c", "npx prisma migrate deploy && node dist/main.js"]
