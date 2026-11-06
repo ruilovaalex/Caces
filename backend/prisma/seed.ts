@@ -13,8 +13,8 @@ const periodsForYear = (year: number) => [
 
 const DEMO_USERS: { email: string; name: string; role: UserRole }[] = [
   { email: 'admin@edusudamericano.edu.ec', name: 'Admin Sudamericano', role: 'ADMIN' },
-  { email: 'coordinador@edusudamericano.edu.ec', name: 'Coord. Academico', role: 'COORDINADOR' },
-  { email: 'evaluador@edusudamericano.edu.ec', name: 'Evaluador Externo', role: 'EVALUADOR' },
+  { email: 'coordinador@edusudamericano.edu.ec', name: 'Coord. Académico', role: 'COORDINADOR' },
+  { email: 'evaluador@edusudamericano.edu.ec', name: 'Evaluador externo', role: 'EVALUADOR' },
   { email: 'docente@edu.ec', name: 'Prof. Pablo Mora', role: 'DOCENTE' },
 ];
 
