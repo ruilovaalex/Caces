@@ -19,7 +19,7 @@
 | `SEED_ADMIN_EMAIL`, `SEED_DEFAULT_PASSWORD` (≥12) | Solo para el primer seed; cambiar la clave después |
 
 ## Opción rápida: Render (render.yaml)
-El archivo `render.yaml` crea el servicio web (Docker), PostgreSQL 16 y un disco de 5 GB. Render pide `SEED_ADMIN_EMAIL` y `SEED_DEFAULT_PASSWORD` al crear el blueprint. Tras el primer despliegue: abre la Shell del servicio y ejecuta `npx tsx prisma/seed.ts` una vez. La URL pública (`https://caces-api.onrender.com` o similar) va en `VITE_API_URL` de Vercel.
+`render.yaml` (plan gratuito) crea solo el servicio web. PostgreSQL y los archivos van en **Supabase** (gratis): `DATABASE_URL` = cadena *Session pooler*; almacenamiento S3 con `S3_ENDPOINT`, `S3_REGION`, `S3_BUCKET` y llaves S3 de Supabase (`S3_FORCE_PATH_STYLE=true`). Las migraciones corren al iniciar. El primer seed se ejecuta desde un equipo con `NODE_ENV=production`, `DATABASE_URL`, `SEED_ADMIN_EMAIL` y `SEED_DEFAULT_PASSWORD`: `cd backend && npx tsx prisma/seed.ts`. Limites gratuitos: el servicio se duerme tras ~15 min; Supabase pausa proyectos inactivos ~7 dias. La URL publica va en `VITE_API_URL` de Vercel.
 
 ## Pasos manuales
 1. `docker build -t caces-backend backend/`

@@ -1,44 +1,41 @@
-# Blueprint de Render para el backend. Crear en: Render > New > Blueprint > repositorio ruilovaalex/Caces.
-# Genera costos mensuales (servicio web, PostgreSQL y disco): revisa los planes antes de aprobar.
+# Blueprint de Render (plan gratuito) para el backend. Render > New > Blueprint > repositorio ruilovaalex/Caces.
+# La base de datos y los archivos NO viven en Render: se usan Supabase (PostgreSQL + almacenamiento compatible con S3).
+# Limites del plan gratuito: el servicio se "duerme" tras ~15 min sin uso (el primer acceso tarda ~1 min).
 services:
   - type: web
     name: caces-api
     runtime: docker
     dockerfilePath: ./backend/Dockerfile
     dockerContext: ./backend
-    plan: starter            # el disco persistente requiere un plan de pago
+    plan: free
     healthCheckPath: /api/health
-    preDeployCommand: npx prisma migrate deploy
-    disk:
-      name: caces-storage
-      mountPath: /data
-      sizeGB: 5
+    # El plan gratuito no admite preDeployCommand: las migraciones corren al iniciar (son idempotentes).
+    dockerCommand: sh -c "npx prisma migrate deploy && node dist/main.js"
     envVars:
       - key: NODE_ENV
         value: production
-      - key: DATABASE_URL
-        fromDatabase:
-          name: caces-db
-          property: connectionString
       - key: JWT_SECRET
-        generateValue: true   # Render genera un valor aleatorio largo
+        generateValue: true
       - key: CORS_ORIGINS
         value: https://caces.vercel.app
       - key: FRONTEND_URL
         value: https://caces.vercel.app
-      - key: STORAGE_DRIVER
-        value: local
-      - key: STORAGE_LOCAL_DIR
-        value: /data/storage
       - key: MAIL_DRIVER
         value: none
-      # Solo para el primer seed (ver docs/DESPLIEGUE.md); se pueden eliminar despues.
-      - key: SEED_ADMIN_EMAIL
-        sync: false           # lo escribes tu en el panel de Render
-      - key: SEED_DEFAULT_PASSWORD
+      - key: STORAGE_DRIVER
+        value: s3
+      - key: S3_FORCE_PATH_STYLE
+        value: "true"
+      # Los siguientes se escriben en el panel de Render (secretos o datos de tu proyecto de Supabase):
+      - key: DATABASE_URL
+        sync: false     # cadena "Session pooler" de Supabase (IPv4)
+      - key: S3_BUCKET
+        sync: false     # por ejemplo: evidencias
+      - key: S3_REGION
+        sync: false     # la region del proyecto de Supabase
+      - key: S3_ENDPOINT
+        sync: false     # https://<ref>.storage.supabase.co/storage/v1/s3
+      - key: AWS_ACCESS_KEY_ID
         sync: false
-
-databases:
-  - name: caces-db
-    plan: basic-256mb
-    postgresMajorVersion: "16"
+      - key: AWS_SECRET_ACCESS_KEY
+        sync: false
